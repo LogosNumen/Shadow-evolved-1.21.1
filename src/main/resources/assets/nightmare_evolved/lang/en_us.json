@@ -50,6 +50,7 @@
   "creature.nightmare_evolved.class.tyrant": "Tyrant",
   "creature.nightmare_evolved.class.terror": "Terror",
   "creature.nightmare_evolved.class.titan": "Titan",
+  "creature.nightmare_evolved.title": "%s %s",
   "soul.nightmare_evolved.rank.aspirant": "Aspirant",
   "soul.nightmare_evolved.rank.sleeper": "Sleeper",
   "soul.nightmare_evolved.rank.awakened": "Awakened",
