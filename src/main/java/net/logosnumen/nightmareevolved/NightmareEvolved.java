@@ -4,6 +4,7 @@ import net.logosnumen.nightmareevolved.aspect.AspectEvents;
 import net.logosnumen.nightmareevolved.client.ClientSetup;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.command.NeCommands;
+import net.logosnumen.nightmareevolved.command.SpellCommand;
 import net.logosnumen.nightmareevolved.core.ModAttachments;
 import net.logosnumen.nightmareevolved.core.ModTab;
 import net.logosnumen.nightmareevolved.core.Scheduler;
@@ -40,6 +41,7 @@ public final class NightmareEvolved {
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerTick);
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerStopped);
         NeoForge.EVENT_BUS.addListener(NeCommands::register);
+        NeoForge.EVENT_BUS.addListener(SpellCommand::register);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onLogin);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onRespawn);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onChangeDimension);
