@@ -70,5 +70,14 @@
   "soul.nightmare_evolved.aspect_tier.dormant": "Dormant",
   "soul.nightmare_evolved.aspect_tier.awakened": "Awakened",
   "soul.nightmare_evolved.aspect_tier.ascended": "Ascended",
-  "soul.nightmare_evolved.aspect_tier.transcendent": "Transcendent"
+  "soul.nightmare_evolved.aspect_tier.transcendent": "Transcendent",
+  "trial.nightmare_evolved.first_nightmare": "The First Nightmare",
+  "trial.nightmare_evolved.awakening": "The Awakening",
+  "trial.nightmare_evolved.second_nightmare": "The Second Nightmare",
+  "trial.nightmare_evolved.third_nightmare": "The Third Nightmare",
+  "trial.nightmare_evolved.fourth_nightmare": "The Fourth Nightmare",
+  "trial.nightmare_evolved.fifth_nightmare": "The Fifth Nightmare",
+  "trial.nightmare_evolved.sixth_nightmare": "The Sixth Nightmare",
+  "trial.nightmare_evolved.wave": "%s - wave %s of %s",
+  "trial.nightmare_evolved.gateway": "The Gateway - %s blocks"
 }
