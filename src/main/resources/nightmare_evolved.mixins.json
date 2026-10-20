@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.logosnumen.nightmareevolved.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "FirstPersonPoseMixin",
+    "HumanoidPoseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
