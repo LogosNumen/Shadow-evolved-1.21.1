@@ -7,6 +7,7 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.colossus.ColossusAttack;
 import net.logosnumen.nightmareevolved.colossus.ColossusKind;
 import net.logosnumen.nightmareevolved.colossus.ColossusVariant;
+import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -573,7 +574,9 @@ public abstract class ColossusEntity extends Monster {
 
     /** "Cursed Titan - Mossback Cairn Colossus", in view of everyone who can see it. */
     private Component barTitle() {
-        return Component.translatable("colossus.nightmare_evolved.bar", this.kind.rank.title(), this.kind.creatureClass().title(), this.getDisplayName());
+        return Component.translatable(
+            "colossus.nightmare_evolved.bar", Creatures.rankOf(this).title(), Creatures.classOf(this).title(), this.getDisplayName()
+        );
     }
 
     @Override

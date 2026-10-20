@@ -1,6 +1,12 @@
 package net.logosnumen.nightmareevolved.client;
 
+import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
+import net.logosnumen.nightmareevolved.client.soul.AbilityKeys;
+import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
+import net.logosnumen.nightmareevolved.client.soul.SoulHud;
+import net.logosnumen.nightmareevolved.item.ModItems;
+import net.logosnumen.nightmareevolved.item.SoulShardItem;
 import net.logosnumen.nightmareevolved.client.colossus.ColossusRenderer;
 import net.logosnumen.nightmareevolved.client.particle.VfxParticle;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
@@ -8,11 +14,18 @@ import net.logosnumen.nightmareevolved.vfx.ModParticles;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 
-/** Client-only wiring: entity renderers, the effect particles, and the hooks body animation needs each frame. */
+/**
+ * Client-only wiring: entity renderers, the effect particles, the hooks body animation needs each frame, the soul HUD,
+ * the ability keys and the tint of soul shards.
+ */
 public final class ClientSetup {
     private ClientSetup() {
     }
@@ -20,6 +33,11 @@ public final class ClientSetup {
     public static void register(IEventBus modBus) {
         modBus.addListener(ClientSetup::onRegisterRenderers);
         modBus.addListener(ClientSetup::onRegisterParticles);
+        modBus.addListener(ClientSetup::onRegisterLayers);
+        modBus.addListener(ClientSetup::onRegisterItemColours);
+        modBus.addListener(AbilityKeys::onRegister);
+        NeoForge.EVENT_BUS.addListener(AbilityKeys::onClientTick);
+        NeoForge.EVENT_BUS.addListener(ClientSetup::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(VfxParticle::onRenderLevel);
         // Pushes and pops must pair: the push listens last, so nothing can cancel the render after it.
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, PoseEvents::onRenderPlayerPre);
@@ -35,6 +53,18 @@ public final class ClientSetup {
         event.registerEntityRenderer(Colossi.GRAVEWYRM.get(), ColossusRenderer::new);
         event.registerEntityRenderer(Colossi.CHAINBOUND.get(), ColossusRenderer::new);
         event.registerEntityRenderer(Colossi.BOULDER.get(), context -> new ThrownItemRenderer<>(context, 7.0F, false));
+    }
+
+    private static void onRegisterLayers(RegisterGuiLayersEvent event) {
+        event.registerAbove(VanillaGuiLayers.HOTBAR, NightmareEvolved.id("soul"), SoulHud::render);
+    }
+
+    private static void onRegisterItemColours(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, layer) -> layer == 0 ? SoulShardItem.colour(stack) : -1, ModItems.SOUL_SHARD.get());
+    }
+
+    private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientSoul.clear();
     }
 
     private static void onRegisterParticles(RegisterParticleProvidersEvent event) {

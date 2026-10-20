@@ -1,16 +1,29 @@
 package net.logosnumen.nightmareevolved.gametest;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import com.mojang.serialization.Lifecycle;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseClips;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** The foundations: work scheduled for later ticks runs on time, and every body animation the mod names exists. */
+/**
+ * The foundations: work scheduled for later ticks runs on time, every body animation the mod names exists, and the
+ * Nightmare dimension doesn't make a world "experimental".
+ */
 @GameTestHolder(NightmareEvolved.MOD_ID)
 @PrefixGameTestTemplate(false)
 public class CoreGameTests {
@@ -40,5 +53,24 @@ public class CoreGameTests {
 
         helper.assertTrue(missing.isEmpty(), "Missing body animations: " + missing);
         helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void nightmareDimensionKeepsWorldsStable(GameTestHelper helper) {
+        helper.assertTrue(lifecycleWith(helper, NightmareEvolved.id("nightmare")) == Lifecycle.stable(),
+            "The Nightmare dimension shouldn't mark a world experimental");
+        helper.assertTrue(lifecycleWith(helper, ResourceLocation.fromNamespaceAndPath("elsewhere", "extra")) != Lifecycle.stable(),
+            "Other mods' dimensions should be judged as before");
+        helper.succeed();
+    }
+
+    /** How the game judges a world with the vanilla dimensions and one more, as it does before loading it. */
+    private static Lifecycle lifecycleWith(GameTestHelper helper, ResourceLocation extra) {
+        Registry<LevelStem> vanilla = helper.getLevel().getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+        Map<ResourceKey<LevelStem>, LevelStem> stems = new LinkedHashMap<>();
+        vanilla.entrySet().forEach(entry -> stems.put(entry.getKey(), entry.getValue()));
+        LevelStem overworld = vanilla.getOrThrow(LevelStem.OVERWORLD);
+        stems.put(ResourceKey.create(Registries.LEVEL_STEM, extra), new LevelStem(overworld.type(), overworld.generator()));
+        return new WorldDimensions(stems).bake(new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.stable()).freeze()).lifecycle();
     }
 }
