@@ -2,6 +2,8 @@ package net.logosnumen.nightmareevolved.core;
 
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
+import net.logosnumen.nightmareevolved.creature.CreatureRank;
+import net.logosnumen.nightmareevolved.item.ModItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -23,6 +25,9 @@ public final class ModTab {
                 output.accept(Colossi.OSSUARY_EGG.get());
                 output.accept(Colossi.GRAVEWYRM_EGG.get());
                 output.accept(Colossi.CHAINBOUND_EGG.get());
+                for (CreatureRank rank : CreatureRank.values()) {
+                    output.accept(ModItems.shard(rank, 1));
+                }
             })
             .build()
     );
