@@ -18,25 +18,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public abstract class FirstPersonPoseMixin {
     @Unique
-    private boolean dots$moved;
+    private boolean nightmare_evolved$moved;
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"))
-    private void dots$moveHand(
+    private void nightmare_evolved$moveHand(
         AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand, float swingProgress, ItemStack stack,
         float equippedProgress, PoseStack poseStack, MultiBufferSource buffer, int light, CallbackInfo ci
     ) {
         HumanoidArm arm = hand == InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
-        this.dots$moved = ClientPoses.pushHand(poseStack, player, arm, partialTicks);
+        this.nightmare_evolved$moved = ClientPoses.pushHand(poseStack, player, arm, partialTicks);
     }
 
     @Inject(method = "renderArmWithItem", at = @At("RETURN"))
-    private void dots$restoreHand(
+    private void nightmare_evolved$restoreHand(
         AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand, float swingProgress, ItemStack stack,
         float equippedProgress, PoseStack poseStack, MultiBufferSource buffer, int light, CallbackInfo ci
     ) {
-        if (this.dots$moved) {
+        if (this.nightmare_evolved$moved) {
             poseStack.popPose();
-            this.dots$moved = false;
+            this.nightmare_evolved$moved = false;
         }
     }
 }
