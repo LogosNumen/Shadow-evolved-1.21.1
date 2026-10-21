@@ -20,7 +20,21 @@ public final class Roster {
             SongOfTheFallen.ASPECT,
             SoulReaper.ASPECT,
             KingOfSwords.ASPECT,
-            QueenOfWorms.ASPECT
+            QueenOfWorms.ASPECT,
+            RaisedByWolves.ASPECT,
+            PrincessOfWar.ASPECT,
+            Nightingale.ASPECT,
+            SongDaughters.CRIMSON_HUNGER,
+            SongDaughters.LIGHTSLAYER,
+            SongDaughters.BEASTMASTER,
+            SongDaughters.SILENT_STALKER,
+            Jester.ASPECT,
+            Valor.HUNTRESS_BOW,
+            Valor.SUMMER_KNIGHT,
+            Valor.SKY_TIDE,
+            Valor.GOLDEN_THUNDER,
+            Valor.STEPPING_AIR,
+            Valor.ROSE_AEGIS
         );
     }
 }
