@@ -15,7 +15,12 @@ public final class Roster {
     public static List<Aspect> all() {
         return List.of(
             ShadowSlave.ASPECT,
-            LightBringer.ASPECT
+            LightBringer.ASPECT,
+            PrinceOfNothing.ASPECT,
+            SongOfTheFallen.ASPECT,
+            SoulReaper.ASPECT,
+            KingOfSwords.ASPECT,
+            QueenOfWorms.ASPECT
         );
     }
 }
