@@ -143,9 +143,11 @@ public final class GodgravePlaces {
         private static final int HALF = 32;
         private static final int STEP = 6;
         private static final int STEPS = 6;
+        /** How far the great stair runs out past the ziggurat's foot, so that it climbs one block at a time. */
+        private static final int STAIR = 6;
 
         public Ziggurat() {
-            super(Places.MICTLAN_ZIGGURAT.x(), Places.MICTLAN_ZIGGURAT.z(), HALF + 2, 0x2166L);
+            super(Places.MICTLAN_ZIGGURAT.x(), Places.MICTLAN_ZIGGURAT.z(), HALF + STAIR, 0x2166L);
         }
 
         @Override
@@ -153,20 +155,24 @@ public final class GodgravePlaces {
             int x = this.dx(column);
             int z = this.dz(column);
             int m = Math.max(Math.abs(x), Math.abs(z));
-            if (m > HALF) {
+            boolean stairway = Math.abs(x) <= 2 && z > 0 && z <= HALF + STAIR;
+            if (m > HALF && !stairway) {
                 return;
             }
 
-            int step = Math.min(STEPS - 1, (HALF - m) / 5);
-            int top = FLOOR + (step + 1) * STEP;
-            column.clear(FLOOR + 1, top + 12);
-            column.fill(FLOOR + 1, top, Blocks.STONE_BRICKS.defaultBlockState());
-            column.set(top, this.hash(column, 1) < 0.55 ? DreamBlocks.RED_MOSS.get().defaultBlockState() : Blocks.MOSSY_STONE_BRICKS.defaultBlockState());
-            // The great stair up the southern face.
-            if (Math.abs(x) <= 2 && z > 0) {
-                int stair = FLOOR + Math.max(0, (HALF - z)) * STEPS * STEP / (HALF - 2);
-                column.fill(FLOOR + 1, Math.min(stair, FLOOR + STEPS * STEP), Blocks.STONE_BRICKS.defaultBlockState());
-                column.clear(Math.min(stair, FLOOR + STEPS * STEP) + 1, FLOOR + STEPS * STEP + 6);
+            if (m <= HALF) {
+                int step = Math.min(STEPS - 1, (HALF - m) / 5);
+                int top = FLOOR + (step + 1) * STEP;
+                column.clear(FLOOR + 1, top + 12);
+                column.fill(FLOOR + 1, top, Blocks.STONE_BRICKS.defaultBlockState());
+                column.set(top, this.hash(column, 1) < 0.55 ? DreamBlocks.RED_MOSS.get().defaultBlockState() : Blocks.MOSSY_STONE_BRICKS.defaultBlockState());
+            }
+
+            // The great stair up the southern face, one block to a step from the jungle floor to the top.
+            if (stairway) {
+                int stair = FLOOR + Math.min(STEPS * STEP, HALF + STAIR - z);
+                column.fill(FLOOR + 1, stair, Blocks.STONE_BRICKS.defaultBlockState());
+                column.clear(stair + 1, FLOOR + STEPS * STEP + 6);
             }
 
             if (x == 0 && z == 0) {
