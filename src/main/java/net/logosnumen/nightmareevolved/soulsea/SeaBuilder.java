@@ -1,5 +1,6 @@
 package net.logosnumen.nightmareevolved.soulsea;
 
+import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
@@ -67,7 +68,7 @@ public final class SeaBuilder {
         }
     }
 
-    /** What a Citadel's likeness is built of, by the Citadel: white stone for Bright Castle, black jade for Ravenheart. */
+    /** What a Citadel's likeness is built of, by the Citadel: white stone for Bright Castle, ivory for the Ivory Tower, and so on. */
     private record Stone(BlockState wall, BlockState trim, BlockState roof, BlockState light) {
     }
 
@@ -79,6 +80,28 @@ public final class SeaBuilder {
                 Blocks.WARPED_WART_BLOCK.defaultBlockState(), Blocks.SOUL_LANTERN.defaultBlockState());
             case "crimson_spire" -> new Stone(Blocks.RED_NETHER_BRICKS.defaultBlockState(), Blocks.CHISELED_RED_SANDSTONE.defaultBlockState(),
                 Blocks.NETHER_WART_BLOCK.defaultBlockState(), Blocks.SHROOMLIGHT.defaultBlockState());
+            case "ivory_tower" -> new Stone(DreamBlocks.IVORY.get().defaultBlockState(), Blocks.CHISELED_QUARTZ_BLOCK.defaultBlockState(),
+                DreamBlocks.IVORY.get().defaultBlockState(), Blocks.END_ROD.defaultBlockState());
+            case "sanctuary_of_noctis" -> new Stone(DreamBlocks.WHITE_JADE.get().defaultBlockState(), Blocks.CALCITE.defaultBlockState(),
+                Blocks.BIRCH_PLANKS.defaultBlockState(), Blocks.SEA_LANTERN.defaultBlockState());
+            case "night_temple" -> new Stone(DreamBlocks.EBONY.get().defaultBlockState(), Blocks.POLISHED_BLACKSTONE.defaultBlockState(),
+                DreamBlocks.BLACK_JADE.get().defaultBlockState(), Blocks.SOUL_LANTERN.defaultBlockState());
+            case "black_skull" -> new Stone(Blocks.BLACKSTONE.defaultBlockState(), Blocks.BONE_BLOCK.defaultBlockState(),
+                Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(), Blocks.LANTERN.defaultBlockState());
+            case "vanishing_lake" -> new Stone(Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), DreamBlocks.RED_MOSS.get().defaultBlockState(),
+                Blocks.DARK_OAK_PLANKS.defaultBlockState(), Blocks.LANTERN.defaultBlockState());
+            case "red_hill" -> new Stone(Blocks.RED_SANDSTONE.defaultBlockState(), Blocks.CUT_RED_SANDSTONE.defaultBlockState(),
+                Blocks.RED_STAINED_GLASS.defaultBlockState(), Blocks.GLOWSTONE.defaultBlockState());
+            case "bastion" -> new Stone(Blocks.STONE_BRICKS.defaultBlockState(), Blocks.CHISELED_STONE_BRICKS.defaultBlockState(),
+                Blocks.BLUE_TERRACOTTA.defaultBlockState(), Blocks.LANTERN.defaultBlockState());
+            case "sorrow" -> new Stone(Blocks.SMOOTH_STONE.defaultBlockState(), Blocks.CALCITE.defaultBlockState(),
+                Blocks.LIGHT_GRAY_TERRACOTTA.defaultBlockState(), Blocks.SOUL_LANTERN.defaultBlockState());
+            case "rivergate" -> new Stone(Blocks.STONE_BRICKS.defaultBlockState(), Blocks.PRISMARINE_BRICKS.defaultBlockState(),
+                Blocks.DARK_PRISMARINE.defaultBlockState(), Blocks.SEA_LANTERN.defaultBlockState());
+            case "night_garden" -> new Stone(Blocks.DARK_OAK_PLANKS.defaultBlockState(), Blocks.DARK_OAK_LOG.defaultBlockState(),
+                Blocks.AZALEA_LEAVES.defaultBlockState(), Blocks.OCHRE_FROGLIGHT.defaultBlockState());
+            case "black_obelisk" -> new Stone(Blocks.OBSIDIAN.defaultBlockState(), Blocks.CRYING_OBSIDIAN.defaultBlockState(),
+                Blocks.OBSIDIAN.defaultBlockState(), Blocks.SOUL_LANTERN.defaultBlockState());
             default -> new Stone(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), Blocks.POLISHED_DEEPSLATE.defaultBlockState(),
                 Blocks.DEEPSLATE_TILES.defaultBlockState(), Blocks.LANTERN.defaultBlockState());
         };

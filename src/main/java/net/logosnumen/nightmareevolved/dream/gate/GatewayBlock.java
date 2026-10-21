@@ -123,7 +123,12 @@ public final class GatewayBlock extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player instanceof ServerPlayer server) {
-            DreamTravel.touch(server, pos);
+            Gateways.Gateway gateway = player.isShiftKeyDown() ? Gateways.at(server.serverLevel(), pos) : null;
+            if (gateway != null && gateway.citadel() != null) {
+                Citadels.bind(server, gateway);
+            } else {
+                DreamTravel.touch(server, pos);
+            }
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);

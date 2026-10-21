@@ -14,7 +14,9 @@ import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
 import net.logosnumen.nightmareevolved.dream.Region;
 import net.logosnumen.nightmareevolved.dream.gate.Altars;
+import net.logosnumen.nightmareevolved.dream.gate.Citadels;
 import net.logosnumen.nightmareevolved.dream.gate.GatewayBlock;
+import net.logosnumen.nightmareevolved.dream.gate.GatewayRecords;
 import net.logosnumen.nightmareevolved.dream.gate.Gateways;
 import net.logosnumen.nightmareevolved.dream.gate.SeedBlock;
 import net.logosnumen.nightmareevolved.dream.gen.Column;
@@ -53,7 +55,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
  * The Dream Realm as the novel lays it out: its regions where they belong, every Gateway and canon Seed standing in its
  * landmark, a Sleeper's random arrival always on safe ground, the Dark Sea rising by night, the Isles rising and
  * crushing, the one path to the Tomb of Ariel, and the two sets of belongings a dreamer keeps; the Seeds of Nightmare
- * scattered by region, turning away the unready, the altars' knives, and an open Gate sending its creatures through.
+ * scattered by region, turning away the unready, the altars' knives, and an open Gate sending its creatures through; and
+ * Saints binding Citadels.
  */
 @GameTestHolder(NightmareEvolved.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -328,5 +331,36 @@ public class DreamRealmGameTests {
 
             gate.discard();
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void saintsBindCitadels(GameTestHelper helper) {
+        Gateways.Gateway sanctuary = canon("sanctuary_of_noctis");
+        Gateways.Gateway temple = canon("night_temple");
+        Gateways.Gateway ravenheart = canon("ravenheart");
+        GatewayRecords records = GatewayRecords.get(helper.getLevel().getServer());
+        ServerPlayer saint = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "ne_saint_a"));
+        ServerPlayer other = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "ne_saint_b"));
+        Soul.setRank(saint, Rank.AWAKENED);
+        helper.assertTrue(!Citadels.bind(saint, sanctuary), "Only a Saint can bind a Citadel");
+        Soul.setRank(saint, Rank.SAINT);
+        Soul.setRank(other, Rank.SAINT);
+        helper.assertTrue(Citadels.bind(saint, sanctuary), "A Saint binds the Sanctuary of Noctis to their soul");
+        helper.assertTrue(Soul.of(saint).citadel().equals("sanctuary_of_noctis"), "Its likeness belongs in their Soul Sea");
+        helper.assertTrue(DreamState.of(saint).anchor().equals(sanctuary.id()), "and its Gateway becomes their anchor");
+        helper.assertTrue(!Citadels.bind(other, sanctuary), "A Citadel has one lord");
+        helper.assertTrue(!Citadels.bind(other, ravenheart), "A Great Citadel will not answer a Saint");
+        Soul.setRank(other, Rank.SOVEREIGN);
+        helper.assertTrue(Citadels.bind(other, ravenheart), "but it answers a Sovereign");
+        helper.assertTrue(Citadels.bind(saint, temple) && records.lord("sanctuary_of_noctis") == null,
+            "A soul holds one Citadel at a time: binding another frees the first");
+        Citadels.release(saint);
+        Citadels.release(other);
+        helper.assertTrue(records.lord("night_temple") == null && records.lord("ravenheart") == null, "Released, the Citadels are free again");
+        helper.succeed();
+    }
+
+    private static Gateways.Gateway canon(String id) {
+        return Gateways.CANON.stream().filter(g -> g.id().equals(id)).findFirst().orElseThrow();
     }
 }
