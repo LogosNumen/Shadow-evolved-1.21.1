@@ -13,10 +13,11 @@ descriptions and dialogue are original writing.
 - **The rank ladder**: Aspirant, Sleeper, Awakened, Master, Saint, Sovereign, Sacred and Divine. Each rank raises
   health, strength, armour and speed, and holds more essence. A rank above your foe softens its blows on you; a rank
   below makes them land harder.
-- **Nightmares**: seven trials in a dimension of their own, each on a freshly built floating island. Survive waves of
+- **Nightmares**: trials in a dimension of their own, each on a freshly built floating island. Survive waves of
   Nightmare Creatures and destroy the Nightmare's master (from the Fourth Nightmare on, a colossus) to climb a rank.
-  The Awakening is a road to a Gateway instead. Dying in a trial loses nothing you carry but shakes the soul for a
-  while, and costs half of what your cores held.
+  The Spell takes an Aspirant into the First Nightmare in their sleep; after that, a Sleeper Awakens by reaching a
+  Gateway in the Dream Realm, and every later Nightmare waits inside a Seed of Nightmare there. Dying in a trial loses
+  nothing you carry but shakes the soul for a while, and costs half of what your cores held.
 - **The soul, as the novel has it**: every Awakened has one soul core holding a thousand soul fragments; slain
   creatures leave one shard for each core they had (one for a Beast, seven for a Titan), worth more the higher their
   Rank and far less from creatures below you. A fuller core makes the body stronger and holds more essence. Only the
@@ -51,6 +52,18 @@ descriptions and dialogue are original writing.
   Citadel stands at its heart, and a Sovereign's sea keeps things for them.
 
   Every Memory, enchantment and Echo Attribute is in [docs/MEMORIES.md](docs/MEMORIES.md).
+- **The Dream Realm**: a dimension laid out as the novel maps it, the same in every world. It runs from the Forgotten
+  Shore's crimson labyrinth, flooded each night by the Dark Sea, through the Hollow Mountains, the Nightmare Desert,
+  Godgrave's bones and the Chained Isles, down to Bastion, Ravenheart and the Stormsea. Each region has its own sky,
+  landmarks and laws.
+  - **Sleep** to dream your way there. Your first time, you land anywhere; reach a Gateway to Awaken and anchor
+    yourself to it. Each world keeps its own belongings, and your body lies asleep where you left it.
+  - **Cross in body** as a Master (**L**).
+  - **Seeds of Nightmare** call to the Awakened and hold their next Nightmares. A Seed left alone blooms into a Gate in
+    the waking world, which sends waves of creatures and then its Guardian.
+  - **Citadels:** a Saint can bind one by crouching at its Gateway.
+
+  The regions, Gateways, Seeds and Citadels are in [docs/DREAM_REALM.md](docs/DREAM_REALM.md).
 - **Colossi**: four Titan-class Nightmare Creatures many times a player's height, and no two alike. The **Cairn
   Colossus** of piled stone, the skeletal **Ossuary Behemoth**, the burrowing **Gravewyrm** and the armoured
   **Chainbound Colossus**. Each is built from a seed (colouring, size, elders, horns, heads, weapons, segments) and has
@@ -80,12 +93,18 @@ For operators:
 | `/ne memory summon <memory>\|all` / `dismiss` / `list` / `clear` / `shards` | Summons, dismisses, lists or clears your Memories; gives the seven Shards. |
 | `/ne echo give <creature> [rank class]` / `summon` / `list` / `clear` | Freezes a creature of that kind into an Echo; calls out, lists or clears your Echoes. |
 | `/ne sea enter\|leave` | Goes down into your Soul Sea at once, or comes back. |
-| `/ne sea citadel <citadel>\|none` / `shadow <creature>` | Binds a Citadel to your soul; stands the shadow of a slain creature in your sea. |
+| `/ne sea citadel <citadel>\|none` / `shadow <creature>` | Raises a Citadel's likeness in your sea without binding it; stands the shadow of a slain creature in your sea. |
+| `/ne realm go <place>` / `tp <x> <z>` / `here` | Goes to a named place in the Dream Realm or to any spot; names the region underfoot. |
+| `/ne realm dream` / `wake` / `cross` / `state` | Dreams, wakes or crosses in body at once; shows what your journeys have left in your soul. |
+| `/ne realm bind` / `release` | Binds the Citadel of the Gateway beside you, as kneeling would; lets your Citadel go. |
+| `/ne realm tear` / `seal` / `unseal` | Tears Godgrave's veil open ahead of you; seals the Dark Sea away or lets it loose. |
+| `/ne seed near [range]` / `go <id>` / `bloom <id>` / `conquer <id>` | Lists the Seeds of Nightmare around you; goes to one; opens its Gate near you; counts it as conquered. |
 | `/ne colossus <kind> [seed]` | Raises a colossus ten blocks ahead: `cairn_colossus`, `ossuary_behemoth`, `gravewyrm` or `chainbound_colossus`. The seed it reports raises the same one again. |
 | `/ne vfx <shape> <palette>` | Plays an effect in front of you. |
 | `/ne pose <clip>` | Plays a body animation on you. |
 
-Spawn eggs, soul shards and the novel's Memories are in the Nightmare Evolved creative tab.
+Spawn eggs, soul shards, the novel's Memories, the Dream Realm's blocks, the two knives and the Isles' strange coins
+are in the Nightmare Evolved creative tab.
 
 ## Building
 
