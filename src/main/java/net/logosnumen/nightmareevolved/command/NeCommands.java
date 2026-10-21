@@ -19,8 +19,9 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * {@code /ne}, for operators: {@code colossus <kind> [seed]} raises a colossus, {@code soul ...} and {@code trial ...}
- * shape your soul and its trials, {@code vfx <shape> <palette>} plays an effect in front of you, and {@code pose <clip>}
- * plays a body animation on you.
+ * shape your soul and its trials, {@code memory ...}, {@code echo ...} and {@code sea ...} tend its Memories, Echoes and
+ * Soul Sea, {@code vfx <shape> <palette>} plays an effect in front of you, and {@code pose <clip>} plays a body animation
+ * on you.
  */
 public final class NeCommands {
     private static final List<String> SHAPES = List.of(
@@ -42,6 +43,9 @@ public final class NeCommands {
                 .then(ColossusCommand.node())
                 .then(SoulCommand.soul())
                 .then(SoulCommand.trial())
+                .then(MemoryCommand.memory())
+                .then(MemoryCommand.echo())
+                .then(MemoryCommand.sea())
                 .then(
                     Commands.literal("vfx")
                         .then(

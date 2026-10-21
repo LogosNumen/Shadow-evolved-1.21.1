@@ -7,6 +7,8 @@ import net.logosnumen.nightmareevolved.entity.soul.SoulConstructEntity;
 import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
 import net.logosnumen.nightmareevolved.soul.SoulRules;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
@@ -18,12 +20,18 @@ public final class Summons {
 
     /** A construct in the master's shape, fighting for them for {@code ticks} (or until dismissed, if negative). */
     public static SoulConstructEntity construct(Ctx ctx, SoulConstructEntity.Look look, Vec3 at, double health, double damage, int ticks, String kind) {
-        SoulConstructEntity body = SoulEntities.CONSTRUCT.get().create(ctx.level());
-        body.moveTo(at.x, at.y, at.z, ctx.player().getYRot(), 0.0F);
-        body.setup(ctx.player().getUUID(), look, health, damage);
-        ctx.level().addFreshEntity(body);
-        Bound.bind(body, ctx.player(), ticks, kind, true);
-        Vfx.burst(ctx.level(), body.getBoundingBox().getCenter(), look.palette, 14, 0.18);
+        return construct(ctx.player(), look, at, health, damage, ticks, kind);
+    }
+
+    /** A construct in the master's shape, called up by something other than an ability (a Memory, say). */
+    public static SoulConstructEntity construct(ServerPlayer master, SoulConstructEntity.Look look, Vec3 at, double health, double damage, int ticks, String kind) {
+        ServerLevel level = master.serverLevel();
+        SoulConstructEntity body = SoulEntities.CONSTRUCT.get().create(level);
+        body.moveTo(at.x, at.y, at.z, master.getYRot(), 0.0F);
+        body.setup(master.getUUID(), look, health, damage);
+        level.addFreshEntity(body);
+        Bound.bind(body, master, ticks, kind, true);
+        Vfx.burst(level, body.getBoundingBox().getCenter(), look.palette, 14, 0.18);
         return body;
     }
 

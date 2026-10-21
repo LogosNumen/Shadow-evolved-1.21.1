@@ -1,0 +1,42 @@
+{
+  "soul_sea.ambient": {
+    "subtitle": "subtitles.nightmare_evolved.soul_sea.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block/conduit/ambient",
+        "pitch": 0.45,
+        "volume": 0.35
+      }
+    ]
+  },
+  "soul_sea.enter": {
+    "subtitle": "subtitles.nightmare_evolved.soul_sea.enter",
+    "sounds": [
+      {
+        "name": "minecraft:block/conduit/activate",
+        "pitch": 0.6,
+        "volume": 0.9
+      }
+    ]
+  },
+  "soul_sea.exit": {
+    "subtitle": "subtitles.nightmare_evolved.soul_sea.exit",
+    "sounds": [
+      {
+        "name": "minecraft:block/conduit/deactivate",
+        "pitch": 0.7,
+        "volume": 0.9
+      }
+    ]
+  },
+  "soul_sea.meditate": {
+    "subtitle": "subtitles.nightmare_evolved.soul_sea.meditate",
+    "sounds": [
+      {
+        "name": "minecraft:block/respawn_anchor/ambient1",
+        "pitch": 0.6,
+        "volume": 0.6
+      }
+    ]
+  }
+}

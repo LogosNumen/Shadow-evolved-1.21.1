@@ -1,0 +1,26 @@
+{
+  "type": "nightmare_evolved:soul_sea",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "nightmare_evolved:soul_sea",
+      "lakes": false,
+      "features": false,
+      "structure_overrides": [],
+      "layers": [
+        {
+          "block": "nightmare_evolved:soul_sea_bed",
+          "height": 1
+        },
+        {
+          "block": "minecraft:air",
+          "height": 63
+        },
+        {
+          "block": "nightmare_evolved:soul_sea_surface",
+          "height": 1
+        }
+      ]
+    }
+  }
+}

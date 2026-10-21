@@ -1,0 +1,6 @@
+{
+  "parent": "nightmare_evolved:item/morgans_warbow",
+  "textures": {
+    "layer0": "nightmare_evolved:item/memory/morgans_warbow_pulling_2"
+  }
+}

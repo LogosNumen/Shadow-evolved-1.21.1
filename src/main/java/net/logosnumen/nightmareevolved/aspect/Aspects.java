@@ -80,7 +80,7 @@ public final class Aspects {
 
     private static double costShare(ServerPlayer player, SoulData soul, Ability ability) {
         double share = 1.0;
-        for (SoulHooks trait : Soul.traits(soul)) {
+        for (SoulHooks trait : Soul.hooks(player)) {
             share *= trait.cost(player, soul, ability);
         }
 
@@ -89,7 +89,7 @@ public final class Aspects {
 
     private static double cooldownShare(ServerPlayer player, SoulData soul, Ability ability) {
         double share = 1.0;
-        for (SoulHooks trait : Soul.traits(soul)) {
+        for (SoulHooks trait : Soul.hooks(player)) {
             share *= trait.cooldown(player, soul, ability);
         }
 
@@ -139,7 +139,7 @@ public final class Aspects {
             return true;
         }
 
-        for (SoulHooks trait : Soul.traits(soul)) {
+        for (SoulHooks trait : Soul.hooks(player)) {
             Component reason = trait.forbids(player, soul, ability);
             if (reason != null) {
                 player.displayClientMessage(reason, true);
@@ -173,7 +173,7 @@ public final class Aspects {
             Kit.pose(player, ability.clip);
         }
 
-        Soul.traits(soul).forEach(trait -> trait.used(player, soul, ability));
+        Soul.hooks(player).forEach(trait -> trait.used(player, soul, ability));
         Soul.sync(player);
         return true;
     }
@@ -246,7 +246,7 @@ public final class Aspects {
                 stop(player, soul, aspect, ability);
                 tell(player, "faded", ability.title());
             } else {
-                Soul.traits(soul).forEach(trait -> trait.used(player, soul, ability));
+                Soul.hooks(player).forEach(trait -> trait.used(player, soul, ability));
             }
         }
     }

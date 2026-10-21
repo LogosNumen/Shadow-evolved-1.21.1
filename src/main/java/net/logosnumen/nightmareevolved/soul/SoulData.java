@@ -6,6 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import javax.annotation.Nullable;
+import net.logosnumen.nightmareevolved.echo.EchoRecord;
+import net.logosnumen.nightmareevolved.memory.MemoryRecord;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -18,7 +22,8 @@ import org.jetbrains.annotations.UnknownNullability;
  * Everything the Spell knows about one player's soul: its Rank, its soul cores and the fragments saturating them, its
  * Aspect (with the Aspect's Rank), its Flaw and Attributes, essence, which abilities are held active and which
  * Transformation is worn, cooldowns, trials passed, and what a trial holds safe for its return. Saved with the player
- * and kept through death.
+ * and kept through death. It also holds the soul's Memories and Echoes, and (for a Sovereign) what it keeps in its
+ * Soul Sea.
  */
 public final class SoulData implements INBTSerializable<CompoundTag> {
     private Rank rank = Rank.ASPIRANT;
@@ -40,7 +45,14 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
     private ListTag stash = new ListTag();
     private int stashedExperience;
     private CompoundTag returnPoint = new CompoundTag();
+    private final List<MemoryRecord> memories = new ArrayList<>();
+    private final List<EchoRecord> echoes = new ArrayList<>();
+    private ListTag vault = new ListTag();
+    private String citadel = "";
+    private CompoundTag seaReturn = new CompoundTag();
+    private int seaVisits;
     private boolean dirty = true;
+    private boolean seaDirty = true;
 
     public Rank rank() {
         return this.rank;
@@ -57,6 +69,7 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         }
 
         this.changed();
+        this.seaChanged();
     }
 
     public String aspect() {
@@ -296,8 +309,88 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return this.returnPoint.contains("Dimension");
     }
 
+    /** The soul's Memories, in the order they came to it. */
+    public List<MemoryRecord> memories() {
+        return this.memories;
+    }
+
+    @Nullable
+    public MemoryRecord memory(UUID id) {
+        for (MemoryRecord record : this.memories) {
+            if (record.id.equals(id)) {
+                return record;
+            }
+        }
+
+        return null;
+    }
+
+    /** The soul's Echoes (and, for Shadow Slave, its Shadows), in the order they came to it. */
+    public List<EchoRecord> echoes() {
+        return this.echoes;
+    }
+
+    @Nullable
+    public EchoRecord echo(UUID id) {
+        for (EchoRecord record : this.echoes) {
+            if (record.id.equals(id)) {
+                return record;
+            }
+        }
+
+        return null;
+    }
+
+    /** What a Sovereign's Soul Sea holds: plain things, kept in the soul. */
+    public ListTag vault() {
+        return this.vault;
+    }
+
+    public void setVault(ListTag vault) {
+        this.vault = vault;
+        this.seaChanged();
+    }
+
+    /** The Citadel bound to the soul, whose likeness stands in its Soul Sea, or empty. */
+    public String citadel() {
+        return this.citadel;
+    }
+
+    public void setCitadel(String citadel) {
+        this.citadel = citadel;
+        this.seaChanged();
+    }
+
+    /** Where the body was left when the mind went down into the Soul Sea. */
+    public CompoundTag seaReturn() {
+        return this.seaReturn;
+    }
+
+    public void setSeaReturn(CompoundTag point) {
+        this.seaReturn = point;
+    }
+
+    public int seaVisits() {
+        return this.seaVisits;
+    }
+
+    public void visitSea() {
+        this.seaVisits++;
+    }
+
     public void changed() {
         this.dirty = true;
+    }
+
+    /** The Memories, Echoes or Soul Sea changed, for the client's view of them. */
+    public void seaChanged() {
+        this.seaDirty = true;
+    }
+
+    public boolean takeSeaDirty() {
+        boolean was = this.seaDirty;
+        this.seaDirty = false;
+        return was;
     }
 
     /** True once after any change, for syncing to the client. */
@@ -337,6 +430,16 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         tag.put("Stash", this.stash);
         tag.putInt("StashedExperience", this.stashedExperience);
         tag.put("Return", this.returnPoint);
+        ListTag memories = new ListTag();
+        this.memories.forEach(record -> memories.add(record.save(provider)));
+        tag.put("Memories", memories);
+        ListTag echoes = new ListTag();
+        this.echoes.forEach(record -> echoes.add(record.save()));
+        tag.put("Echoes", echoes);
+        tag.put("Vault", this.vault);
+        tag.putString("Citadel", this.citadel);
+        tag.put("SeaReturn", this.seaReturn);
+        tag.putInt("SeaVisits", this.seaVisits);
         return tag;
     }
 
@@ -372,6 +475,27 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         this.stash = tag.getList("Stash", Tag.TAG_COMPOUND);
         this.stashedExperience = tag.getInt("StashedExperience");
         this.returnPoint = tag.getCompound("Return");
+        this.memories.clear();
+        for (Tag t : tag.getList("Memories", Tag.TAG_COMPOUND)) {
+            MemoryRecord record = MemoryRecord.load(provider, (CompoundTag)t);
+            if (record != null) {
+                this.memories.add(record);
+            }
+        }
+
+        this.echoes.clear();
+        for (Tag t : tag.getList("Echoes", Tag.TAG_COMPOUND)) {
+            EchoRecord record = EchoRecord.load((CompoundTag)t);
+            if (record != null) {
+                this.echoes.add(record);
+            }
+        }
+
+        this.vault = tag.getList("Vault", Tag.TAG_COMPOUND);
+        this.citadel = tag.getString("Citadel");
+        this.seaReturn = tag.getCompound("SeaReturn");
+        this.seaVisits = tag.getInt("SeaVisits");
         this.dirty = true;
+        this.seaDirty = true;
     }
 }

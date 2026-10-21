@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "nightmare_evolved:block/soul_sea_bed"
+  }
+}

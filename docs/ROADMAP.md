@@ -7,7 +7,7 @@ other mods. Ideas from other Shadow Slave mods are welcome where the novel leave
 
 Each step below lands as its own pull request.
 
-## 3a. Soul, Aspects, Flaws and Attributes
+## 3a. Soul, Aspects, Flaws and Attributes (done)
 
 - **The soul as the novel has it.** Every human has one soul core. Its rank rises with each Nightmare, and soul
   shards saturate it. Divine Aspects (Shadow Slave, Light Bringer, Mordret's mirrors) can grow up to seven cores,
@@ -25,7 +25,7 @@ Each step below lands as its own pull request.
 - **Runes:** a screen showing what the Spell knows of you: Name, Rank, Class, cores and fragments, Aspect and its
   abilities, Flaw, and Attributes.
 
-## 3b. Soul Sea, Memories and Echoes
+## 3b. Soul Sea, Memories and Echoes (done; see [MEMORIES.md](MEMORIES.md))
 
 - **The Soul Sea:** an inner sea under the star of each soul core, entered while the body stays aware.
   - Memories orbit there as lights, and Echoes stand there.

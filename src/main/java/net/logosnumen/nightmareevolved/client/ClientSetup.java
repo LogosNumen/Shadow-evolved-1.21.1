@@ -2,7 +2,24 @@ package net.logosnumen.nightmareevolved.client;
 
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
+import java.util.function.Supplier;
+import net.logosnumen.nightmareevolved.client.memory.ClientWorn;
+import net.logosnumen.nightmareevolved.client.memory.WalkingCofferRenderer;
+import net.logosnumen.nightmareevolved.client.memory.WornMemoryLayer;
 import net.logosnumen.nightmareevolved.client.soul.AbilityKeys;
+import net.logosnumen.nightmareevolved.client.soul.ClientSea;
+import net.logosnumen.nightmareevolved.client.soulsea.MeditationOverlay;
+import net.logosnumen.nightmareevolved.client.soulsea.SeaEchoRenderer;
+import net.logosnumen.nightmareevolved.client.soulsea.SeaHoardRenderer;
+import net.logosnumen.nightmareevolved.client.soulsea.SeaMemoryRenderer;
+import net.logosnumen.nightmareevolved.client.soulsea.SeaShadowRenderer;
+import net.logosnumen.nightmareevolved.client.soulsea.SeaSunRenderer;
+import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaClient;
+import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaSky;
+import net.logosnumen.nightmareevolved.client.soulsea.VesselRenderer;
+import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
+import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
+import net.logosnumen.nightmareevolved.memory.MemoryItems;
 import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
 import net.logosnumen.nightmareevolved.client.soul.FlyingSwordRenderer;
 import net.logosnumen.nightmareevolved.client.soul.SoulConstructRenderer;
@@ -15,6 +32,15 @@ import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
 import net.logosnumen.nightmareevolved.vfx.ModParticles;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ShieldItem;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
@@ -39,6 +65,11 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::onRegisterLayers);
         modBus.addListener(ClientSetup::onRegisterItemColours);
         modBus.addListener(AbilityKeys::onRegister);
+        modBus.addListener(ClientSetup::onAddLayers);
+        modBus.addListener(ClientSetup::onDimensionEffects);
+        modBus.addListener(ClientSetup::onClientSetup);
+        NeoForge.EVENT_BUS.addListener(SoulSeaClient::onRenderFog);
+        NeoForge.EVENT_BUS.addListener(SoulSeaClient::onFogColour);
         NeoForge.EVENT_BUS.addListener(AbilityKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(VfxParticle::onRenderLevel);
@@ -58,10 +89,50 @@ public final class ClientSetup {
         event.registerEntityRenderer(Colossi.BOULDER.get(), context -> new ThrownItemRenderer<>(context, 7.0F, false));
         event.registerEntityRenderer(SoulEntities.CONSTRUCT.get(), SoulConstructRenderer::new);
         event.registerEntityRenderer(SoulEntities.FLYING_SWORD.get(), FlyingSwordRenderer::new);
+        event.registerEntityRenderer(MemoryEntities.THROWN_MEMORY.get(), context -> new ThrownItemRenderer<>(context, 1.2F, false));
+        event.registerEntityRenderer(MemoryEntities.WALKING_COFFER.get(), WalkingCofferRenderer::new);
+        event.registerEntityRenderer(SeaEntities.VESSEL.get(), VesselRenderer::new);
+        event.registerEntityRenderer(SeaEntities.SUN.get(), SeaSunRenderer::new);
+        event.registerEntityRenderer(SeaEntities.MEMORY.get(), SeaMemoryRenderer::new);
+        event.registerEntityRenderer(SeaEntities.ECHO.get(), SeaEchoRenderer::new);
+        event.registerEntityRenderer(SeaEntities.SHADOW.get(), SeaShadowRenderer::new);
+        event.registerEntityRenderer(SeaEntities.HOARD.get(), SeaHoardRenderer::new);
+    }
+
+    /** What players wear from their Memories, drawn on every player model. */
+    private static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        for (PlayerSkin.Model model : PlayerSkin.Model.values()) {
+            if (event.getSkin(model) instanceof PlayerRenderer renderer) {
+                WornMemoryLayer.add(renderer);
+            }
+        }
+    }
+
+    private static void onDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
+        event.register(NightmareEvolved.id("soul_sea"), new SoulSeaSky());
+    }
+
+    /** Memory bows draw like bows and Memory shields block like shields. */
+    private static void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            for (Supplier<? extends Item> memory : MemoryItems.all()) {
+                Item item = memory.get();
+                if (item instanceof BowItem) {
+                    ItemProperties.register(item, ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, seed) -> entity == null
+                        || entity.getUseItem() != stack ? 0.0F : (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F);
+                    ItemProperties.register(item, ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, seed) -> entity != null
+                        && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+                } else if (item instanceof ShieldItem) {
+                    ItemProperties.register(item, ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, seed) -> entity != null
+                        && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+                }
+            }
+        });
     }
 
     private static void onRegisterLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.HOTBAR, NightmareEvolved.id("soul"), SoulHud::render);
+        event.registerAbove(VanillaGuiLayers.CROSSHAIR, NightmareEvolved.id("meditation"), MeditationOverlay::render);
     }
 
     private static void onRegisterItemColours(RegisterColorHandlersEvent.Item event) {
@@ -70,6 +141,8 @@ public final class ClientSetup {
 
     private static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientSoul.clear();
+        ClientSea.clear();
+        ClientWorn.clear();
     }
 
     private static void onRegisterParticles(RegisterParticleProvidersEvent event) {
