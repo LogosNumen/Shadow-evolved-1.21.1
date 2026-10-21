@@ -109,6 +109,19 @@ public class SoulGameTests {
             }
         }
 
+        helper.assertTrue(Aspects.all().size() >= 34, "Every Aspect of the novel should be here, found " + Aspects.all().size());
+        helper.assertTrue(Aspects.all().stream().filter(Aspect::divine).count() == 3, "Three Aspects are Divine");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void everyFlawBelongsToAnAspect(GameTestHelper helper) {
+        for (Flaw flaw : Flaw.values()) {
+            boolean owned = Aspects.all().stream().anyMatch(a -> a.flaws().contains(flaw.id()) && a.canonFlaw());
+            helper.assertTrue(owned, flaw.id() + " should be the Flaw of the Aspect whose bearer had it");
+        }
+
+        helper.assertTrue(Flaw.values().length == 25, "The novel shows 25 Flaws");
         helper.succeed();
     }
 
@@ -128,6 +141,26 @@ public class SoulGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void divineSoulsGrowCores(GameTestHelper helper) {
+        ServerPlayer player = soul(helper);
+        Soul.setRank(player, Rank.AWAKENED);
+        Awakening.grant(player, Aspects.byId("light_bringer"), "pristine_soul", List.of());
+        SoulData soul = Soul.of(player);
+        helper.assertTrue(soul.cores() == 1, "Every soul starts with one core");
+        soul.setFragments(soul.capacity());
+        Soul.absorb(player, 1, 1);
+        helper.assertTrue(soul.cores() == 2, "A Divine soul with a full core should grow a second, has " + soul.cores());
+        helper.assertTrue(Soul.soulClass(soul).ordinal() == 1, "Two cores make a Monster");
+
+        ServerPlayer plain = soul(helper);
+        Soul.setRank(plain, Rank.AWAKENED);
+        Awakening.grant(plain, Aspects.byId("raised_by_wolves"), "ravenous_body", List.of());
+        Soul.of(plain).setFragments(Soul.of(plain).capacity());
+        helper.assertTrue(Soul.absorb(plain, 1, 1) == 0 && Soul.of(plain).cores() == 1, "Other souls keep a single core");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void shadowCoreRefusesShards(GameTestHelper helper) {
         ServerPlayer player = soul(helper);
         Soul.setRank(player, Rank.SLEEPER);
@@ -135,6 +168,40 @@ public class SoulGameTests {
         helper.assertTrue(Soul.absorb(player, 0, 5) == 0, "A Shadow Core takes nothing from shards");
         Soul.feed(player, 300);
         helper.assertTrue(Soul.of(player).fragments() == 300, "It grows from what its bearer kills");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void abilitiesWakeHoldAndRest(GameTestHelper helper) {
+        ServerPlayer player = soul(helper);
+        Soul.setRank(player, Rank.SLEEPER);
+        Awakening.grant(player, Aspects.byId("raised_by_wolves"), "ravenous_body", List.of());
+        SoulData soul = Soul.of(player);
+        double base = player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        helper.assertFalse(Aspects.use(player, 0), "A passive ability has nothing to call");
+        helper.assertFalse(Aspects.use(player, 1), "Skin of Steel sleeps until Awakened");
+        Soul.setRank(player, Rank.AWAKENED);
+        helper.assertTrue(player.getAttributeValue(Attributes.ATTACK_DAMAGE) >= base, "War Body should still hold");
+        helper.assertTrue(Aspects.use(player, 1) && soul.toggled("skin_of_steel"), "Skin of Steel should switch on");
+        double armour = player.getAttributeValue(Attributes.ARMOR);
+        helper.assertTrue(armour >= 10.0, "Skin of Steel should harden the body, armour is " + armour);
+        double before = soul.essence();
+        Aspects.upkeep(player);
+        helper.assertTrue(soul.essence() < before, "A held ability should draw essence");
+        helper.assertTrue(Aspects.use(player, 1) && !soul.toggled("skin_of_steel"), "Skin of Steel should switch off");
+        helper.assertFalse(Aspects.use(player, 1), "It should rest a moment after");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void crownOfThornsCannotKill(GameTestHelper helper) {
+        ServerPlayer player = soul(helper);
+        Soul.setRank(player, Rank.SLEEPER);
+        Awakening.grant(player, Aspects.byId("distant_sky"), "crown_of_thorns", List.of());
+        Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 1));
+        zombie.hurt(helper.getLevel().damageSources().playerAttack(player), 500.0F);
+        helper.assertTrue(zombie.isAlive() && zombie.getHealth() < zombie.getMaxHealth() * 0.25F,
+            "Rain's blow should leave its target alive but barely, health " + zombie.getHealth());
         helper.succeed();
     }
 
