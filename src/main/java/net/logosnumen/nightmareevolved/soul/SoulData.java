@@ -1,25 +1,38 @@
 package net.logosnumen.nightmareevolved.soul;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
 
 /**
- * Everything the Spell knows about one player's soul: rank, Aspect, essence, how saturated the soul cores are, how many
- * trials it has passed, ability cooldowns, and belongings held safe through a death inside a Nightmare. Saved with the
- * player and carried through death.
+ * Everything the Spell knows about one player's soul: its Rank, its soul cores and the fragments saturating them, its
+ * Aspect (with the Aspect's Rank), its Flaw and Attributes, essence, which abilities are held active and which
+ * Transformation is worn, cooldowns, trials passed, and what a trial holds safe for its return. Saved with the player
+ * and kept through death.
  */
 public final class SoulData implements INBTSerializable<CompoundTag> {
     private Rank rank = Rank.ASPIRANT;
     private String aspect = "";
-    private AspectTier aspectTier = AspectTier.DORMANT;
+    private Tier aspectTier = Tier.DORMANT;
+    private String flaw = "";
+    private final Set<String> attributes = new LinkedHashSet<>();
+    private int cores;
+    private int fragments;
     private double essence;
-    private double saturation;
+    private final Set<String> toggles = new LinkedHashSet<>();
+    private String form = "";
+    private CompoundTag flawState = new CompoundTag();
+    private CompoundTag abilityState = new CompoundTag();
     private int trials;
     private boolean touched;
     private long retryAt;
@@ -33,8 +46,16 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return this.rank;
     }
 
+    /** Sets the Rank; a soul that has passed its First Nightmare always holds at least one core. */
     public void setRank(Rank rank) {
         this.rank = rank;
+        if (rank == Rank.ASPIRANT) {
+            this.cores = 0;
+            this.fragments = 0;
+        } else if (this.cores < 1) {
+            this.cores = 1;
+        }
+
         this.changed();
     }
 
@@ -46,14 +67,101 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return !this.aspect.isEmpty();
     }
 
-    public void setAspect(String aspect, AspectTier tier) {
+    public Tier aspectTier() {
+        return this.aspectTier;
+    }
+
+    public void setAspect(String aspect, Tier tier) {
         this.aspect = aspect;
         this.aspectTier = tier;
+        this.toggles.clear();
+        this.form = "";
+        this.abilityState = new CompoundTag();
         this.changed();
     }
 
-    public AspectTier aspectTier() {
-        return this.aspectTier;
+    public String flaw() {
+        return this.flaw;
+    }
+
+    public void setFlaw(String flaw) {
+        this.flaw = flaw;
+        this.flawState = new CompoundTag();
+        this.changed();
+    }
+
+    public List<String> attributes() {
+        return new ArrayList<>(this.attributes);
+    }
+
+    public boolean hasAttribute(String id) {
+        return this.attributes.contains(id);
+    }
+
+    public void addAttribute(String id) {
+        if (this.attributes.add(id)) {
+            this.changed();
+        }
+    }
+
+    public void removeAttribute(String id) {
+        if (this.attributes.remove(id)) {
+            this.changed();
+        }
+    }
+
+    /** Swaps one Attribute for its evolved form, keeping its place in the list. */
+    public void replaceAttribute(String from, String to) {
+        List<String> list = this.attributes();
+        int at = list.indexOf(from);
+        if (at < 0) {
+            this.addAttribute(to);
+            return;
+        }
+
+        list.set(at, to);
+        this.attributes.clear();
+        this.attributes.addAll(list);
+        this.changed();
+    }
+
+    public void clearAttributes() {
+        this.attributes.clear();
+        this.changed();
+    }
+
+    /** How many soul cores the soul holds: one for any Awakened, up to seven for a Divine Aspect, none for an Aspirant. */
+    public int cores() {
+        return this.cores;
+    }
+
+    public void setCores(int cores) {
+        this.cores = Math.max(0, Math.min(SoulRules.MAX_CORES, cores));
+        this.fragments = Math.min(this.fragments, this.capacity());
+        this.changed();
+    }
+
+    public int fragments() {
+        return this.fragments;
+    }
+
+    public int capacity() {
+        return SoulRules.capacity(this.cores);
+    }
+
+    public void setFragments(int fragments) {
+        this.fragments = Math.max(0, Math.min(this.capacity(), fragments));
+        this.changed();
+    }
+
+    /** How full the cores are, from 0 to 1. */
+    public double saturation() {
+        int capacity = this.capacity();
+        return capacity <= 0 ? 0.0 : (double)this.fragments / capacity;
+    }
+
+    public boolean saturated() {
+        return this.capacity() > 0 && this.fragments >= this.capacity();
     }
 
     public double essence() {
@@ -61,7 +169,7 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
     }
 
     public double maxEssence() {
-        return SoulRules.maxEssence(this.rank, this.aspectTier);
+        return SoulRules.maxEssence(this.rank, this.aspectTier, this.cores, this.saturation());
     }
 
     public void setEssence(double essence) {
@@ -82,22 +190,39 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return true;
     }
 
-    public double saturation() {
-        return this.saturation;
+    /** Abilities held active (toggled on), by id. */
+    public Set<String> toggles() {
+        return this.toggles;
     }
 
-    public double capacity() {
-        return SoulRules.capacity(this.rank);
+    public boolean toggled(String ability) {
+        return this.toggles.contains(ability);
     }
 
-    public void setSaturation(double saturation) {
-        this.saturation = Math.max(0.0, Math.min(this.capacity(), saturation));
+    public void setToggled(String ability, boolean on) {
+        if (on ? this.toggles.add(ability) : this.toggles.remove(ability)) {
+            this.changed();
+        }
+    }
+
+    /** The Transformation being worn, by ability id, or empty. */
+    public String form() {
+        return this.form;
+    }
+
+    public void setForm(String form) {
+        this.form = form;
         this.changed();
     }
 
-    /** Whether every soul core is full, so the soul can face its next trial. */
-    public boolean saturated() {
-        return this.capacity() > 0.0 && this.saturation >= this.capacity() - 1.0E-6;
+    /** Free-form state a Flaw keeps (time lost, growth, oaths, and so on). */
+    public CompoundTag flawState() {
+        return this.flawState;
+    }
+
+    /** Free-form state an Aspect's abilities keep (marks, absorbed enchantments, shadows gathered, and so on). */
+    public CompoundTag abilityState() {
+        return this.abilityState;
     }
 
     public int trials() {
@@ -134,6 +259,11 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
 
     public void setReadyAt(String ability, long gameTime) {
         this.cooldowns.put(ability, gameTime);
+        this.changed();
+    }
+
+    public void clearCooldowns() {
+        this.cooldowns.clear();
         this.changed();
     }
 
@@ -177,14 +307,27 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return was;
     }
 
+    private static ListTag strings(Iterable<String> values) {
+        ListTag list = new ListTag();
+        values.forEach(value -> list.add(StringTag.valueOf(value)));
+        return list;
+    }
+
     @Override
     public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putString("Rank", this.rank.id());
         tag.putString("Aspect", this.aspect);
-        tag.putInt("AspectTier", this.aspectTier.ordinal());
+        tag.putString("AspectTier", this.aspectTier.id());
+        tag.putString("Flaw", this.flaw);
+        tag.put("Attributes", strings(this.attributes));
+        tag.putInt("Cores", this.cores);
+        tag.putInt("Fragments", this.fragments);
         tag.putDouble("Essence", this.essence);
-        tag.putDouble("Saturation", this.saturation);
+        tag.put("Toggles", strings(this.toggles));
+        tag.putString("Form", this.form);
+        tag.put("FlawState", this.flawState);
+        tag.put("AbilityState", this.abilityState);
         tag.putInt("Trials", this.trials);
         tag.putBoolean("Touched", this.touched);
         tag.putLong("RetryAt", this.retryAt);
@@ -199,21 +342,24 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.rank = Rank.SLEEPER;
-        for (Rank r : Rank.values()) {
-            if (r.id().equals(tag.getString("Rank"))) {
-                this.rank = r;
-            }
-        }
-
-        if (!tag.contains("Rank")) {
-            this.rank = Rank.ASPIRANT;
-        }
-
+        this.rank = tag.contains("Rank") ? Rank.byId(tag.getString("Rank")) : Rank.ASPIRANT;
         this.aspect = tag.getString("Aspect");
-        this.aspectTier = AspectTier.byOrdinal(tag.getInt("AspectTier"));
+        this.aspectTier = Tier.byId(tag.getString("AspectTier"));
+        this.flaw = tag.getString("Flaw");
+        this.attributes.clear();
+        tag.getList("Attributes", Tag.TAG_STRING).forEach(t -> this.attributes.add(t.getAsString()));
+        this.cores = tag.getInt("Cores");
+        if (this.rank != Rank.ASPIRANT && this.cores < 1) {
+            this.cores = 1;
+        }
+
+        this.fragments = tag.getInt("Fragments");
         this.essence = tag.getDouble("Essence");
-        this.saturation = tag.getDouble("Saturation");
+        this.toggles.clear();
+        tag.getList("Toggles", Tag.TAG_STRING).forEach(t -> this.toggles.add(t.getAsString()));
+        this.form = tag.getString("Form");
+        this.flawState = tag.getCompound("FlawState");
+        this.abilityState = tag.getCompound("AbilityState");
         this.trials = tag.getInt("Trials");
         this.touched = tag.getBoolean("Touched");
         this.retryAt = tag.getLong("RetryAt");

@@ -4,7 +4,6 @@ import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.soul.Soul;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -58,16 +57,7 @@ public final class CreatureEvents {
         }
 
         CreatureRank rank = Creatures.rankOf(entity);
-        RandomSource random = entity.getRandom();
-        int count;
-        if (entity instanceof ColossusEntity colossus) {
-            count = 7 + (colossus.variant().elder() ? 4 : 0);
-        } else if (Creatures.profile(entity).guardian()) {
-            count = 3 + rank.ordinal();
-        } else {
-            count = 1 + (random.nextFloat() < 0.3F ? 1 : 0);
-        }
-
+        int count = Creatures.cores(entity);
         ItemStack shards = ModItems.shard(rank, count);
         event.getDrops().add(new ItemEntity(entity.level(), entity.getX(), entity.getY() + 0.5, entity.getZ(), shards));
     }

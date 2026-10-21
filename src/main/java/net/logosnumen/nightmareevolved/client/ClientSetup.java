@@ -4,12 +4,15 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
 import net.logosnumen.nightmareevolved.client.soul.AbilityKeys;
 import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
+import net.logosnumen.nightmareevolved.client.soul.FlyingSwordRenderer;
+import net.logosnumen.nightmareevolved.client.soul.SoulConstructRenderer;
 import net.logosnumen.nightmareevolved.client.soul.SoulHud;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.item.SoulShardItem;
 import net.logosnumen.nightmareevolved.client.colossus.ColossusRenderer;
 import net.logosnumen.nightmareevolved.client.particle.VfxParticle;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
+import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
 import net.logosnumen.nightmareevolved.vfx.ModParticles;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.bus.api.EventPriority;
@@ -53,6 +56,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(Colossi.GRAVEWYRM.get(), ColossusRenderer::new);
         event.registerEntityRenderer(Colossi.CHAINBOUND.get(), ColossusRenderer::new);
         event.registerEntityRenderer(Colossi.BOULDER.get(), context -> new ThrownItemRenderer<>(context, 7.0F, false));
+        event.registerEntityRenderer(SoulEntities.CONSTRUCT.get(), SoulConstructRenderer::new);
+        event.registerEntityRenderer(SoulEntities.FLYING_SWORD.get(), FlyingSwordRenderer::new);
     }
 
     private static void onRegisterLayers(RegisterGuiLayersEvent event) {

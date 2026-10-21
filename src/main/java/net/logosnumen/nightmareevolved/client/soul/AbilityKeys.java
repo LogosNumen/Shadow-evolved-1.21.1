@@ -11,13 +11,23 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
-/** The two keys that call on a soul's Aspect: Z for its first ability and X for its second, by default. */
+/**
+ * The keys that call on a soul's Aspect, one for each step of Ascension (Z, X, C, V and B by default: Dormant,
+ * Awakened, Ascended, Transformation and Supreme), and R to read the soul's runes.
+ */
 public final class AbilityKeys {
     private static final String CATEGORY = "key.categories.nightmare_evolved";
-    private static final KeyMapping[] KEYS = {
-        new KeyMapping("key.nightmare_evolved.ability_1", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY),
-        new KeyMapping("key.nightmare_evolved.ability_2", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, CATEGORY)
-    };
+    private static final int[] DEFAULTS = {GLFW.GLFW_KEY_Z, GLFW.GLFW_KEY_X, GLFW.GLFW_KEY_C, GLFW.GLFW_KEY_V, GLFW.GLFW_KEY_B};
+    private static final KeyMapping[] KEYS = new KeyMapping[DEFAULTS.length];
+    private static final KeyMapping RUNES = new KeyMapping(
+        "key.nightmare_evolved.runes", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY
+    );
+
+    static {
+        for (int i = 0; i < DEFAULTS.length; i++) {
+            KEYS[i] = new KeyMapping("key.nightmare_evolved.ability_" + (i + 1), KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, DEFAULTS[i], CATEGORY);
+        }
+    }
 
     private AbilityKeys() {
     }
@@ -26,10 +36,13 @@ public final class AbilityKeys {
         for (KeyMapping key : KEYS) {
             event.register(key);
         }
+
+        event.register(RUNES);
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {
-        if (Minecraft.getInstance().player == null) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
             return;
         }
 
@@ -38,10 +51,14 @@ public final class AbilityKeys {
                 PacketDistributor.sendToServer(new AbilityPayload(slot));
             }
         }
+
+        while (RUNES.consumeClick()) {
+            mc.setScreen(new RunesScreen());
+        }
     }
 
-    /** The key bound to a slot, as the player has it set. */
+    /** The key bound to a step's slot, as the player has it set. */
     public static Component key(int slot) {
-        return KEYS[slot].getTranslatedKeyMessage();
+        return KEYS[Math.max(0, Math.min(KEYS.length - 1, slot))].getTranslatedKeyMessage();
     }
 }
