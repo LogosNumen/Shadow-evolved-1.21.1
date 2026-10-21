@@ -34,7 +34,20 @@ public final class Roster {
             Valor.SKY_TIDE,
             Valor.GOLDEN_THUNDER,
             Valor.STEPPING_AIR,
-            Valor.ROSE_AEGIS
+            Valor.ROSE_AEGIS,
+            Others.MOONLIGHT,
+            Others.BRIGHT_LORD,
+            Cohort.BLINDING_SPEED,
+            Cohort.PUSH_AND_PULL,
+            Cohort.RESTORATION_AND_RUIN,
+            Cohort.PHANTOM_BLADE,
+            Irregulars.FLAW_SIGHT,
+            Irregulars.WELLSPRING,
+            Irregulars.CHARGED_ESSENCE,
+            Irregulars.GOLDEN_HANDS,
+            Others.DISTANT_SKY,
+            Others.DEEP_CURRENT,
+            Others.VERDANT_TOUCH
         );
     }
 }
