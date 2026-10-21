@@ -4,10 +4,14 @@ import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
 import net.logosnumen.nightmareevolved.echo.Echoes;
 import net.logosnumen.nightmareevolved.memory.MemoryData;
 import net.logosnumen.nightmareevolved.memory.MemoryRecord;
+import net.logosnumen.nightmareevolved.memory.MemoryStorage;
 import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.memory.Worn;
+import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
+import net.logosnumen.nightmareevolved.soulsea.SoulSea;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 /** Carries out what a player asked of their soul. Everything is checked again here; the client only asks. */
@@ -30,6 +34,14 @@ public final class SoulActions {
             case ECHO_SUMMON -> Echoes.summon(player, payload.target());
             case ECHO_DISMISS -> Echoes.dismiss(player, payload.target(), false);
             case ECHO_SHADOW -> Echoes.makeShadow(player, payload.target());
+            case VAULT -> {
+                if (Soul.of(player).rank().atLeast(Rank.SOVEREIGN)) {
+                    MemoryStorage.openVault(player);
+                } else {
+                    player.displayClientMessage(Component.translatable("soul_sea.nightmare_evolved.vault_locked"), true);
+                }
+            }
+            case SEA -> SoulSea.toggle(player);
             case DISMISS_HELD -> {
                 MemoryData held = SoulMemories.mine(player, player.getMainHandItem());
                 if (held != null) {

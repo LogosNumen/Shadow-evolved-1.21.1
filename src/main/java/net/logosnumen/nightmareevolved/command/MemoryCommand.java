@@ -21,27 +21,34 @@ import net.logosnumen.nightmareevolved.memory.MemoryRecord;
 import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
+import net.logosnumen.nightmareevolved.soulsea.SoulSea;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 
 /**
- * {@code /ne memory} and {@code /ne echo}, for operators testing Memories and Echoes:
+ * {@code /ne memory}, {@code /ne echo} and {@code /ne sea}, for operators testing Memories, Echoes and the Soul Sea:
  * <ul>
  * <li>{@code memory give <memory> [rank] [tier]} puts a Memory in your soul; {@code memory weave <shape> <family> <rank>
  * <tier>} has the Spell weave one; {@code memory shards} gives all seven Shard Memories; {@code memory summon
  * <memory>|all} summons them; {@code memory list}, {@code memory dismiss} and {@code memory clear} do what they say.</li>
  * <li>{@code echo give <creature> [rank] [class]} freezes a creature of that kind into an Echo; {@code echo summon}
  * calls out every one that will come; {@code echo list} and {@code echo clear}.</li>
+ * <li>{@code sea enter|leave} goes down into your Soul Sea or comes back at once; {@code sea citadel <citadel>|none}
+ * binds a Citadel to your soul; {@code sea shadow <creature>} stands the shadow of a slain creature in it.</li>
  * </ul>
  */
 final class MemoryCommand {
+    private static final List<String> CITADELS = List.of("bright_castle", "ravenheart", "crimson_spire", "bastion", "none");
 
     private MemoryCommand() {
     }
@@ -95,6 +102,29 @@ final class MemoryCommand {
                 Soul.of(player).seaChanged();
                 return 1;
             }));
+    }
+
+    static LiteralArgumentBuilder<CommandSourceStack> sea() {
+        return Commands.literal("sea")
+            .then(Commands.literal("enter").executes(c -> {
+                SoulSea.enter(c.getSource().getPlayerOrException());
+                return 1;
+            }))
+            .then(Commands.literal("leave").executes(c -> {
+                SoulSea.leave(c.getSource().getPlayerOrException());
+                return 1;
+            }))
+            .then(Commands.literal("citadel").then(Commands.argument("citadel", StringArgumentType.word())
+                .suggests((c, b) -> SharedSuggestionProvider.suggest(CITADELS, b))
+                .executes(c -> {
+                    String id = StringArgumentType.getString(c, "citadel");
+                    Soul.of(c.getSource().getPlayerOrException()).setCitadel("none".equals(id) ? "" : id);
+                    c.getSource().sendSuccess(() -> Component.translatable("commands.nightmare_evolved.sea.citadel", id), false);
+                    return 1;
+                })))
+            .then(Commands.literal("shadow").then(Commands.argument("creature", StringArgumentType.greedyString())
+                .suggests((c, b) -> SharedSuggestionProvider.suggestResource(BuiltInRegistries.ENTITY_TYPE.keySet(), b))
+                .executes(MemoryCommand::standShadow)));
     }
 
     private static int give(CommandContext<CommandSourceStack> context, int rank, int tier) throws CommandSyntaxException {
@@ -209,5 +239,21 @@ final class MemoryCommand {
         }
 
         return soul.echoes().size();
+    }
+
+    private static int standShadow(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        ResourceLocation id = ResourceLocation.tryParse(StringArgumentType.getString(context, "creature").trim());
+        if (id == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
+            context.getSource().sendFailure(Component.translatable("commands.nightmare_evolved.echo.unknown"));
+            return 0;
+        }
+
+        SoulData soul = Soul.of(player);
+        ListTag shadows = Echoes.standing(soul);
+        shadows.add(StringTag.valueOf(id.toString()));
+        soul.abilityState().put("Shadows", shadows);
+        soul.seaChanged();
+        return 1;
     }
 }

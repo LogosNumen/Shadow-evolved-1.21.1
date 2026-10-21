@@ -4,10 +4,14 @@ import java.util.function.Consumer;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
 import net.logosnumen.nightmareevolved.entity.memory.WalkingCofferEntity;
 import net.logosnumen.nightmareevolved.soul.Soul;
+import net.logosnumen.nightmareevolved.soul.SoulData;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -25,7 +29,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Things kept inside Memories that are larger inside than out (Effie's bag, the Bag of Withholding, the Covetous
- * Coffer). A Memory can't be put into any of them.
+ * Coffer), and inside a Sovereign's Soul Sea. A Memory can't be put into any of them.
  */
 public final class MemoryStorage {
     private MemoryStorage() {
@@ -165,6 +169,36 @@ public final class MemoryStorage {
             updated.set(DataComponents.CONTAINER, saved);
             coffer.setItem(updated);
             remember(player, data.id(), saved);
+        });
+    }
+
+    /** What a Sovereign's Soul Sea can hold: six rows of plain things. */
+    public static final int VAULT = 54;
+
+    /** Opens the store of things kept in the soul itself. */
+    public static void openVault(ServerPlayer player) {
+        SoulData soul = Soul.of(player);
+        NonNullList<ItemStack> items = NonNullList.withSize(VAULT, ItemStack.EMPTY);
+        for (Tag t : soul.vault()) {
+            CompoundTag tag = (CompoundTag)t;
+            int slot = tag.getByte("Slot") & 255;
+            if (slot < VAULT) {
+                items.set(slot, ItemStack.parse(player.registryAccess(), tag.getCompound("Item")).orElse(ItemStack.EMPTY));
+            }
+        }
+
+        show(player, Component.translatable("soul_sea.nightmare_evolved.vault"), items, saved -> {
+            ListTag list = new ListTag();
+            for (int i = 0; i < saved.size(); i++) {
+                if (!saved.get(i).isEmpty()) {
+                    CompoundTag tag = new CompoundTag();
+                    tag.putByte("Slot", (byte)i);
+                    tag.put("Item", saved.get(i).save(player.registryAccess()));
+                    list.add(tag);
+                }
+            }
+
+            soul.setVault(list);
         });
     }
 }

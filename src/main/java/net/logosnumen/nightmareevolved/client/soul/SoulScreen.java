@@ -15,6 +15,7 @@ import net.logosnumen.nightmareevolved.network.SeaPayload;
 import net.logosnumen.nightmareevolved.network.SoulActionPayload;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Tier;
+import net.logosnumen.nightmareevolved.soulsea.SoulSea;
 import net.logosnumen.nightmareevolved.spell.Spell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * The soul as its owner tends it: every Memory (summon it, dismiss it, a layer of armour at a time if they like, see
- * how far it has mended), and every Echo and Shadow (call it, send it back, make it a Shadow).
+ * how far it has mended), every Echo and Shadow (call it, send it back, make it a Shadow), and the Soul Sea itself
+ * (go down into it, open what a Sovereign keeps there, see the Citadel bound to the soul).
  */
 public class SoulScreen extends Screen {
     private static final int RUNE = 0xFF000000 | Spell.COLOUR;
@@ -51,7 +53,8 @@ public class SoulScreen extends Screen {
 
     private enum Tab {
         MEMORIES,
-        ECHOES
+        ECHOES,
+        SEA
     }
 
     private record Hit(int x0, int y0, int x1, int y1, Runnable action) {
@@ -83,10 +86,11 @@ public class SoulScreen extends Screen {
         switch (this.tab) {
             case MEMORIES -> this.memories(g, left, top, bottom, mouseX, mouseY);
             case ECHOES -> this.echoes(g, left, top, bottom, mouseX, mouseY);
+            case SEA -> this.sea(g, left, top, mouseX, mouseY);
         }
 
         g.disableScissor();
-        g.drawCenteredString(this.font, Component.translatable("soul.nightmare_evolved.screen.keys", AbilityKeys.dismissKey())
+        g.drawCenteredString(this.font, Component.translatable("soul.nightmare_evolved.screen.keys", AbilityKeys.soulSeaKey(), AbilityKeys.dismissKey())
             .withStyle(ChatFormatting.DARK_GRAY), this.width / 2, bottom + 6, DIM);
         if (!this.tooltip.isEmpty()) {
             g.renderComponentTooltip(this.font, this.tooltip, mouseX, mouseY);
@@ -97,7 +101,8 @@ public class SoulScreen extends Screen {
         long echoesOut = ClientSea.echoes().stream().filter(SeaPayload.EchoEntry::out).count();
         Component[] labels = {
             Component.translatable("soul.nightmare_evolved.screen.memories", ClientSea.memories().size()),
-            Component.translatable("soul.nightmare_evolved.screen.echoes", echoesOut, ClientSea.echoLimit())
+            Component.translatable("soul.nightmare_evolved.screen.echoes", echoesOut, ClientSea.echoLimit()),
+            Component.translatable("soul.nightmare_evolved.screen.sea")
         };
         int width = WIDTH / labels.length;
         for (int i = 0; i < labels.length; i++) {
@@ -292,6 +297,49 @@ public class SoulScreen extends Screen {
         if (entry.canShadow()) {
             this.button(g, right - 104, y + 6, 38, Component.translatable("soul.nightmare_evolved.screen.make_shadow"), !entry.out(), mouseX, mouseY,
                 () -> send(SoulActionPayload.Action.ECHO_SHADOW, entry.id(), 0));
+        }
+    }
+
+    // The sea.
+
+    private void sea(GuiGraphics g, int left, int top, int mouseX, int mouseY) {
+        Rank rank = ClientSoul.rank();
+        int y = top + 4;
+        if (rank == Rank.ASPIRANT) {
+            g.drawWordWrap(this.font, Component.translatable("soul.nightmare_evolved.screen.no_sea"), left, y, WIDTH, DIM);
+            return;
+        }
+
+        g.drawString(this.font, Component.translatable("soul.nightmare_evolved.screen.suns", ClientSoul.cores(), ClientSoul.fragments(), ClientSoul.capacity()),
+            left, y, RUNE, false);
+        y += 14;
+        boolean inSea = Minecraft.getInstance().level != null && Minecraft.getInstance().level.dimension().equals(SoulSea.DIMENSION);
+        Component go = Component.translatable(inSea ? "soul.nightmare_evolved.screen.rise" : "soul.nightmare_evolved.screen.sink");
+        this.button(g, left, y, 200, go, true, mouseX, mouseY, () -> {
+            send(SoulActionPayload.Action.SEA, net.minecraft.Util.NIL_UUID, 0);
+            this.onClose();
+        });
+        y += 16;
+        g.drawWordWrap(this.font, Component.translatable(inSea ? "soul.nightmare_evolved.screen.rise.desc" : "soul.nightmare_evolved.screen.sink.desc"),
+            left, y, WIDTH, DIM);
+        y += 34;
+        g.drawString(this.font, Component.translatable("soul.nightmare_evolved.screen.echo_limit", ClientSea.echoLimit()), left, y, TEXT, false);
+        y += 16;
+        if (rank.atLeast(Rank.SAINT)) {
+            String citadel = ClientSea.citadel();
+            Component line = citadel.isEmpty() ? Component.translatable("soul.nightmare_evolved.screen.no_citadel")
+                : Component.translatable("soul.nightmare_evolved.screen.citadel", Component.translatable("citadel.nightmare_evolved." + citadel));
+            g.drawWordWrap(this.font, line, left, y, WIDTH, TEXT);
+            y += 24;
+        }
+
+        if (ClientSea.vault()) {
+            this.button(g, left, y, 200, Component.translatable("soul.nightmare_evolved.screen.vault"), true, mouseX, mouseY,
+                () -> send(SoulActionPayload.Action.VAULT, net.minecraft.Util.NIL_UUID, 0));
+            y += 16;
+            g.drawWordWrap(this.font, Component.translatable("soul.nightmare_evolved.screen.vault.desc"), left, y, WIDTH, DIM);
+        } else {
+            g.drawWordWrap(this.font, Component.translatable("soul.nightmare_evolved.screen.vault_locked"), left, y, WIDTH, DIM);
         }
     }
 

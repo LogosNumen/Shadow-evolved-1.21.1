@@ -11,8 +11,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
  * Something a player asks of their soul from the Soul screen or a key: summon or dismiss a Memory (or some of its
- * armour layers), bind a relic, call or dismiss an Echo, make an Echo a Shadow, or dismiss whatever Memory is in
- * hand.
+ * armour layers), bind a relic, call or dismiss an Echo, make an Echo a Shadow, open what the Soul Sea keeps, sink
+ * into the Soul Sea or rise from it, or dismiss whatever Memory is in hand.
  */
 public record SoulActionPayload(Action action, UUID target, int mask) implements CustomPacketPayload {
     public enum Action {
@@ -22,6 +22,8 @@ public record SoulActionPayload(Action action, UUID target, int mask) implements
         ECHO_SUMMON,
         ECHO_DISMISS,
         ECHO_SHADOW,
+        VAULT,
+        SEA,
         DISMISS_HELD
     }
 

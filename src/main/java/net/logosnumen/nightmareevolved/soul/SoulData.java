@@ -22,7 +22,8 @@ import org.jetbrains.annotations.UnknownNullability;
  * Everything the Spell knows about one player's soul: its Rank, its soul cores and the fragments saturating them, its
  * Aspect (with the Aspect's Rank), its Flaw and Attributes, essence, which abilities are held active and which
  * Transformation is worn, cooldowns, trials passed, and what a trial holds safe for its return. Saved with the player
- * and kept through death. It also holds the soul's Memories and Echoes.
+ * and kept through death. It also holds the soul's Memories and Echoes, and (for a Sovereign) what it keeps in its
+ * Soul Sea.
  */
 public final class SoulData implements INBTSerializable<CompoundTag> {
     private Rank rank = Rank.ASPIRANT;
@@ -46,6 +47,10 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
     private CompoundTag returnPoint = new CompoundTag();
     private final List<MemoryRecord> memories = new ArrayList<>();
     private final List<EchoRecord> echoes = new ArrayList<>();
+    private ListTag vault = new ListTag();
+    private String citadel = "";
+    private CompoundTag seaReturn = new CompoundTag();
+    private int seaVisits;
     private boolean dirty = true;
     private boolean seaDirty = true;
 
@@ -336,11 +341,48 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         return null;
     }
 
+    /** What a Sovereign's Soul Sea holds: plain things, kept in the soul. */
+    public ListTag vault() {
+        return this.vault;
+    }
+
+    public void setVault(ListTag vault) {
+        this.vault = vault;
+        this.seaChanged();
+    }
+
+    /** The Citadel bound to the soul, whose likeness stands in its Soul Sea, or empty. */
+    public String citadel() {
+        return this.citadel;
+    }
+
+    public void setCitadel(String citadel) {
+        this.citadel = citadel;
+        this.seaChanged();
+    }
+
+    /** Where the body was left when the mind went down into the Soul Sea. */
+    public CompoundTag seaReturn() {
+        return this.seaReturn;
+    }
+
+    public void setSeaReturn(CompoundTag point) {
+        this.seaReturn = point;
+    }
+
+    public int seaVisits() {
+        return this.seaVisits;
+    }
+
+    public void visitSea() {
+        this.seaVisits++;
+    }
+
     public void changed() {
         this.dirty = true;
     }
 
-    /** The Memories or Echoes changed, for the client's view of them. */
+    /** The Memories, Echoes or Soul Sea changed, for the client's view of them. */
     public void seaChanged() {
         this.seaDirty = true;
     }
@@ -394,6 +436,10 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         ListTag echoes = new ListTag();
         this.echoes.forEach(record -> echoes.add(record.save()));
         tag.put("Echoes", echoes);
+        tag.put("Vault", this.vault);
+        tag.putString("Citadel", this.citadel);
+        tag.put("SeaReturn", this.seaReturn);
+        tag.putInt("SeaVisits", this.seaVisits);
         return tag;
     }
 
@@ -445,6 +491,10 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
             }
         }
 
+        this.vault = tag.getList("Vault", Tag.TAG_COMPOUND);
+        this.citadel = tag.getString("Citadel");
+        this.seaReturn = tag.getCompound("SeaReturn");
+        this.seaVisits = tag.getInt("SeaVisits");
         this.dirty = true;
         this.seaDirty = true;
     }

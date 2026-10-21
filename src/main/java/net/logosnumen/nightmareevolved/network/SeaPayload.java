@@ -135,7 +135,7 @@ public record SeaPayload(List<MemoryEntry> memories, List<EchoEntry> echoes, boo
                 record.shadow, record.sleepsUntil, (float)Echoes.cost(record, soul), Echoes.whyNotShadow(soul, record) == null));
         }
 
-        return new SeaPayload(memories, echoes, false, "", Echoes.limit(soul));
+        return new SeaPayload(memories, echoes, soul.rank().atLeast(Rank.SOVEREIGN), soul.citadel(), Echoes.limit(soul));
     }
 
     @Override

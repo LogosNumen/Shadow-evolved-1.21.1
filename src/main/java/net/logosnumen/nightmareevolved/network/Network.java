@@ -5,6 +5,7 @@ import net.logosnumen.nightmareevolved.client.anim.ClientPoses;
 import net.logosnumen.nightmareevolved.client.memory.ClientWorn;
 import net.logosnumen.nightmareevolved.client.soul.ClientSea;
 import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
+import net.logosnumen.nightmareevolved.client.soulsea.MeditationOverlay;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -24,11 +25,16 @@ public final class Network {
         registrar.playToServer(AbilityPayload.TYPE, AbilityPayload.CODEC, Network::onAbility);
         registrar.playToClient(SeaPayload.TYPE, SeaPayload.CODEC, Network::onSea);
         registrar.playToServer(SoulActionPayload.TYPE, SoulActionPayload.CODEC, Network::onAction);
+        registrar.playToClient(MeditationPayload.TYPE, MeditationPayload.CODEC, Network::onMeditation);
         registrar.playToClient(WornPayload.TYPE, WornPayload.CODEC, Network::onWorn);
     }
 
     private static void onWorn(WornPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> ClientWorn.set(payload));
+    }
+
+    private static void onMeditation(MeditationPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> MeditationOverlay.start(payload.ticks()));
     }
 
     private static void onSea(SeaPayload payload, IPayloadContext context) {
