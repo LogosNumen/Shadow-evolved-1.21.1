@@ -1,6 +1,5 @@
 package net.logosnumen.nightmareevolved.nightmare;
 
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -11,23 +10,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Builds the ground a trial is fought on, out in the Nightmare's void. A Nightmare to slay is a broken island adrift in
- * the dark, tapering away beneath, strewn with fallen pillars, half walls and lights in its own stone. The Awakening is
- * a ruined causeway running far out over nothing, broken in places, under failing arches, to a Gateway at its end.
+ * Builds the ground a trial is fought on, out in the Nightmare's void: a broken island adrift in the dark, tapering
+ * away beneath, strewn with fallen pillars, half walls and lights in its own stone.
  */
 public final class Arenas {
     public static final int GROUND = 64;
-    public static final int CAUSEWAY = 140;
 
-    /** Where a built arena's player arrives, how far its ground reaches, and (for a run) where it ends. */
-    public record Layout(BlockPos centre, Vec3 arrival, int radius, @Nullable Vec3 goal) {
+    /** Where a built arena's player arrives, and how far its ground reaches. */
+    public record Layout(BlockPos centre, Vec3 arrival, int radius) {
     }
 
     private Arenas() {
     }
 
     public static Layout build(ServerLevel level, Trial trial, BlockPos centre, RandomSource random) {
-        return trial.objective == Trial.Objective.REACH ? causeway(level, trial, centre, random) : island(level, trial, centre, random);
+        return island(level, trial, centre, random);
     }
 
     private static float noise(int x, int z, int seed) {
@@ -67,7 +64,7 @@ public final class Arenas {
         }
 
         ruins(level, theme, centre, radius, 6 + trial.depth(), random);
-        return new Layout(centre, Vec3.atBottomCenterOf(centre.above()), radius, null);
+        return new Layout(centre, Vec3.atBottomCenterOf(centre.above()), radius);
     }
 
     /** Fallen pillars and broken walls, some crowned with a light, kept clear of the arena's middle. */
@@ -116,63 +113,5 @@ public final class Arenas {
                 }
             }
         }
-    }
-
-    private static Layout causeway(ServerLevel level, Trial trial, BlockPos centre, RandomSource random) {
-        Trial.Theme theme = trial.theme;
-        int seed = random.nextInt();
-        disc(level, theme, centre, 6, seed);
-        BlockState ruin = theme.ruin().defaultBlockState();
-        int nextGap = 18 + random.nextInt(6);
-        for (int z = 6; z < CAUSEWAY - 8; z++) {
-            if (z == nextGap) {
-                // A break in the causeway, narrow enough to jump.
-                z += 1;
-                nextGap = z + 18 + random.nextInt(8);
-                continue;
-            }
-
-            for (int x = -3; x <= 3; x++) {
-                boolean crumbled = Math.abs(x) == 3 && noise(x, z, seed) < 0.35F;
-                if (!crumbled) {
-                    put(level, centre.offset(x, 0, z), surface(theme, x, z, seed));
-                    put(level, centre.offset(x, -1, z), theme.deep().defaultBlockState());
-                }
-            }
-
-            if (z % 12 == 0) {
-                // A failing arch: two pillars, sometimes still joined overhead, with lights.
-                for (int side : new int[]{-4, 4}) {
-                    for (int y = -3; y <= 5; y++) {
-                        put(level, centre.offset(side, y, z), ruin);
-                    }
-
-                    put(level, centre.offset(side, 6, z), theme.light().defaultBlockState());
-                }
-
-                if (random.nextFloat() < 0.5F) {
-                    for (int x = -4; x <= 4; x++) {
-                        put(level, centre.offset(x, 6, z), ruin);
-                    }
-                }
-            }
-        }
-
-        BlockPos end = centre.offset(0, 0, CAUSEWAY);
-        disc(level, theme, end, 8, seed + 3);
-        BlockState frame = Blocks.CRYING_OBSIDIAN.defaultBlockState();
-        for (int y = 1; y <= 7; y++) {
-            put(level, end.offset(-3, y, 2), frame);
-            put(level, end.offset(3, y, 2), frame);
-        }
-
-        for (int x = -3; x <= 3; x++) {
-            put(level, end.offset(x, 8, 2), frame);
-        }
-
-        put(level, end.offset(-2, 1, 2), Blocks.AMETHYST_CLUSTER.defaultBlockState());
-        put(level, end.offset(2, 1, 2), Blocks.AMETHYST_CLUSTER.defaultBlockState());
-        put(level, end.offset(0, 9, 2), Blocks.SOUL_LANTERN.defaultBlockState());
-        return new Layout(centre, Vec3.atBottomCenterOf(centre.above()), 6, Vec3.atBottomCenterOf(end.offset(0, 1, 2)));
     }
 }

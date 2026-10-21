@@ -32,6 +32,12 @@ public final class SpellReplies {
             return;
         }
 
+        if (trial != Trial.FIRST_NIGHTMARE && trial != Trial.AWAKENING) {
+            // Past the Awakening the Spell no longer comes in sleep: the next Nightmare waits in a Seed.
+            player.sendSystemMessage(Spell.line("spell.nightmare_evolved.seek_seed"));
+            return;
+        }
+
         player.sendSystemMessage(
             Component.empty()
                 .append(Spell.choice("spell.nightmare_evolved.answer", "/spell accept"))

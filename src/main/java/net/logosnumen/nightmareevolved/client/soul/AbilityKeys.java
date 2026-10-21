@@ -35,6 +35,10 @@ public final class AbilityKeys {
         "key.nightmare_evolved.dismiss", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY
     );
 
+    private static final KeyMapping CROSS = new KeyMapping(
+        "key.nightmare_evolved.cross", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_L, CATEGORY
+    );
+
     static {
         for (int i = 0; i < DEFAULTS.length; i++) {
             KEYS[i] = new KeyMapping("key.nightmare_evolved.ability_" + (i + 1), KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, DEFAULTS[i], CATEGORY);
@@ -53,6 +57,7 @@ public final class AbilityKeys {
         event.register(SOUL);
         event.register(SEA);
         event.register(DISMISS);
+        event.register(CROSS);
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {
@@ -81,6 +86,10 @@ public final class AbilityKeys {
 
         while (DISMISS.consumeClick()) {
             PacketDistributor.sendToServer(SoulActionPayload.of(SoulActionPayload.Action.DISMISS_HELD));
+        }
+
+        while (CROSS.consumeClick()) {
+            PacketDistributor.sendToServer(SoulActionPayload.of(SoulActionPayload.Action.CROSS));
         }
     }
 

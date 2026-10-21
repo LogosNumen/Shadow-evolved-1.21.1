@@ -24,7 +24,8 @@ public record SoulActionPayload(Action action, UUID target, int mask) implements
         ECHO_SHADOW,
         VAULT,
         SEA,
-        DISMISS_HELD
+        DISMISS_HELD,
+        CROSS
     }
 
     public static final Type<SoulActionPayload> TYPE = new Type<>(NightmareEvolved.id("soul_action"));

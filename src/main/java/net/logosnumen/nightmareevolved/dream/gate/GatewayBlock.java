@@ -2,6 +2,12 @@ package net.logosnumen.nightmareevolved.dream.gate;
 
 import java.util.Locale;
 import com.mojang.serialization.MapCodec;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
@@ -70,6 +76,27 @@ public final class GatewayBlock extends Block {
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Form form = state.getValue(FORM);
         return form == Form.WHITE_ALTAR || form == Form.BLACK_ALTAR ? ALTAR : Shapes.block();
+    }
+
+    /** Standing in the Crimson Spire's ring, or in the pond over Vanishing Lake's, begins the passage. */
+    @Override
+    public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+        Form form = state.getValue(FORM);
+        if (!level.isClientSide && (form == Form.RING || form == Form.POOL) && entity instanceof ServerPlayer player) {
+            DreamTravel.touch(player, pos);
+        }
+
+        super.stepOn(level, pos, state, entity);
+    }
+
+    /** Touching an altar or a Gateway's heart begins the passage. */
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player instanceof ServerPlayer server) {
+            DreamTravel.touch(server, pos);
+        }
+
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

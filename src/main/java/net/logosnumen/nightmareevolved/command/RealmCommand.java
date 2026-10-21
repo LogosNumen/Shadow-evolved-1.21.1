@@ -5,13 +5,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.logging.LogUtils;
 import net.logosnumen.nightmareevolved.dream.DreamRealm;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
 import net.logosnumen.nightmareevolved.dream.RealmState;
 import net.logosnumen.nightmareevolved.dream.gen.Column;
 import net.logosnumen.nightmareevolved.dream.gen.RealmTerrain;
 import net.logosnumen.nightmareevolved.dream.law.Cloudveil;
+import net.logosnumen.nightmareevolved.soul.Soul;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -19,13 +22,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 
 /**
  * {@code /ne realm}, for operators exploring the Dream Realm: {@code go <place>} goes to a named place, {@code tp <x>
  * <z>} to any spot (on its ground, or high over open sky), and {@code here} names the region underfoot; {@code tear}
- * tears Godgrave's veil open ahead of you, and {@code seal}/{@code unseal} seal the Dark Sea away or let it loose again.
+ * tears Godgrave's veil open ahead of you, and {@code seal}/{@code unseal} seal the Dark Sea away or let it loose again;
+ * {@code dream}, {@code wake} and {@code cross} go in and out as sleeping, waking and crossing in body would, and
+ * {@code state} shows what the soul's journeys have left in it.
  */
 final class RealmCommand {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private RealmCommand() {
     }
 
@@ -39,7 +47,22 @@ final class RealmCommand {
             .then(Commands.literal("here").executes(RealmCommand::here))
             .then(Commands.literal("tear").executes(RealmCommand::tear))
             .then(Commands.literal("seal").executes(c -> seal(c, true)))
-            .then(Commands.literal("unseal").executes(c -> seal(c, false)));
+            .then(Commands.literal("unseal").executes(c -> seal(c, false)))
+            .then(Commands.literal("dream").executes(c -> DreamTravel.dream(c.getSource().getPlayerOrException()) ? 1 : 0))
+            .then(Commands.literal("wake").executes(c -> {
+                DreamTravel.wake(c.getSource().getPlayerOrException());
+                return 1;
+            }))
+            .then(Commands.literal("state").executes(c -> {
+                ServerPlayer player = c.getSource().getPlayerOrException();
+                c.getSource().sendSuccess(() -> Component.literal(Soul.of(player).dream().toString()), false);
+                LOGGER.info("Dream state of {}: {}", player.getName().getString(), Soul.of(player).dream());
+                return 1;
+            }))
+            .then(Commands.literal("cross").executes(c -> {
+                DreamTravel.cross(c.getSource().getPlayerOrException());
+                return 1;
+            }));
     }
 
     private static int go(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

@@ -10,6 +10,7 @@ import net.logosnumen.nightmareevolved.memory.Worn;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.soulsea.SoulSea;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,6 +43,7 @@ public final class SoulActions {
                 }
             }
             case SEA -> SoulSea.toggle(player);
+            case CROSS -> DreamTravel.cross(player);
             case DISMISS_HELD -> {
                 MemoryData held = SoulMemories.mine(player, player.getMainHandItem());
                 if (held != null) {

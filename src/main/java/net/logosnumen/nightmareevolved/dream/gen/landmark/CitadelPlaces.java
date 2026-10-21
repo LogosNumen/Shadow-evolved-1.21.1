@@ -449,8 +449,9 @@ public final class CitadelPlaces {
             super(Places.RIVERGATE.x(), WeepingShaper.LOCKS_START + WeepingShaper.LOCK_LENGTH * WeepingShaper.LOCKS / 2, 130, 0xD4605L);
         }
 
+        /** The Gateway's tower stands at the western end of the top lock's wall. */
         public static int gatewayX() {
-            return Places.RIVERGATE.x() - SPAN + 6;
+            return (int)Math.round(WeepingShaper.riverX(gatewayZ())) - SPAN + 6;
         }
 
         public static int gatewayZ() {
@@ -521,7 +522,7 @@ public final class CitadelPlaces {
      */
     public static final class RedHill extends Built {
         private static final double HILL = 110.0;
-        private static final int TOP = 102;
+        public static final int TOP = 102;
         private final Town.Style rich = Town.Style.of(Blocks.SPRUCE_PLANKS.defaultBlockState(), Blocks.STONE_BRICKS.defaultBlockState(),
             Blocks.SPRUCE_PLANKS.defaultBlockState(), Blocks.SPRUCE_SLAB.defaultBlockState(), Blocks.RED_SANDSTONE.defaultBlockState(), 1, 2, 0.0);
         private final Town.Style poor = Town.Style.of(Blocks.GLASS.defaultBlockState(), Blocks.TINTED_GLASS.defaultBlockState(),
@@ -589,7 +590,7 @@ public final class CitadelPlaces {
         private static final int LENGTH = 150;
         private static final int BEAM = 32;
         private static final int KEEL = 40;
-        private static final int DECK = 76;
+        public static final int DECK = 76;
         private final BlockState hull = Blocks.STRIPPED_DARK_OAK_WOOD.defaultBlockState();
         private final BlockState deck = Blocks.DARK_OAK_PLANKS.defaultBlockState();
 
@@ -685,7 +686,7 @@ public final class CitadelPlaces {
      */
     public static final class BlackObelisk extends Built {
         private static final double ISLAND = 64.0;
-        private static final int BASE = 72;
+        public static final int BASE = 72;
         private static final int TOP = 250;
         private final BlockState black = Blocks.POLISHED_BLACKSTONE.defaultBlockState();
 

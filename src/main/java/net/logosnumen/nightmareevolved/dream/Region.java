@@ -94,6 +94,11 @@ public enum Region {
         return Component.translatable("region.nightmare_evolved." + this.id());
     }
 
+    /** Where in the region one finds oneself: "on the Forgotten Shore", "in the Chained Isles". */
+    public Component where() {
+        return Component.translatable("region.nightmare_evolved." + this.id() + ".where");
+    }
+
     public ResourceKey<Biome> biome() {
         return ResourceKey.create(Registries.BIOME, NightmareEvolved.id(this.id()));
     }

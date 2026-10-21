@@ -7,6 +7,7 @@ import net.logosnumen.nightmareevolved.dream.gen.RealmGenerator;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -19,6 +20,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  */
 public final class DreamRealm {
     public static final ResourceKey<Level> DIMENSION = ResourceKey.create(Registries.DIMENSION, NightmareEvolved.id("dream_realm"));
+    /**
+     * Whether a dreamer's belongings stay on their own side of sleep (as in the novel: only the soul's own things cross),
+     * or come along with them.
+     */
+    public static final GameRules.Key<GameRules.BooleanValue> SEPARATE_BELONGINGS = GameRules.register(
+        "separateDreamBelongings", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true)
+    );
     private static final DeferredRegister<MapCodec<? extends ChunkGenerator>> GENERATORS = DeferredRegister.create(Registries.CHUNK_GENERATOR,
         NightmareEvolved.MOD_ID);
     private static final DeferredRegister<MapCodec<? extends BiomeSource>> BIOME_SOURCES = DeferredRegister.create(Registries.BIOME_SOURCE,

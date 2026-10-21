@@ -67,7 +67,7 @@ public final class DesertPlaces {
      * the gods died. A citadel was raised in it and around it; its Gateway lies in the hall inside the skull.
      */
     public static final class BlackSkull extends Built {
-        private static final int GROUND = 74;
+        public static final int GROUND = 74;
         private static final double RX = 46.0;
         private static final double RY = 36.0;
         private static final double RZ = 52.0;
