@@ -1,9 +1,10 @@
 package net.logosnumen.nightmareevolved.soul;
 
+import java.util.List;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.aspect.Ctx;
-import net.logosnumen.nightmareevolved.flaw.Flaw;
-import net.logosnumen.nightmareevolved.flaw.FlawEvents;
+import net.logosnumen.nightmareevolved.memory.MemoryEvents;
+import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.spell.SpellReplies;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,7 +28,7 @@ public final class SoulEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             SoulData soul = Soul.of(player);
             Soul.applyStats(player);
-            FlawEvents.hideName(player, Flaw.OVERLOOKED.id().equals(soul.flaw()));
+            MemoryEvents.refreshHidden(player);
             player.refreshDisplayName();
             soul.changed();
             if (!soul.touched()) {
@@ -67,14 +68,15 @@ public final class SoulEvents {
             ctx.ability().hooks.tick(ctx, age);
         }
 
-        for (SoulHooks trait : Soul.traits(soul)) {
+        List<SoulHooks> hooks = Soul.hooks(player);
+        for (SoulHooks trait : hooks) {
             trait.tick(player, soul, age);
         }
 
         if (age % 20 == 0) {
             Aspects.upkeep(player);
             double share = 1.0;
-            for (SoulHooks trait : Soul.traits(soul)) {
+            for (SoulHooks trait : hooks) {
                 share *= trait.regen(player, soul);
             }
 
@@ -88,7 +90,10 @@ public final class SoulEvents {
         }
     }
 
-    /** A blow a soul lands passes through its abilities in effect, Flaw and Attributes; so does one it takes. */
+    /**
+     * A blow a soul lands passes through its abilities in effect, Flaw and Attributes, and the Memories it carries (or
+     * that loosed the shot); so does one it takes.
+     */
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
         DamageSource source = event.getSource();
         LivingEntity victim = event.getEntity();
@@ -99,10 +104,11 @@ public final class SoulEvents {
                 amount = ctx.ability().hooks.dealt(ctx, victim, source, amount);
             }
 
-            for (SoulHooks trait : Soul.traits(soul)) {
+            for (SoulHooks trait : Soul.hooks(attacker)) {
                 amount = trait.dealt(attacker, soul, victim, source, amount);
             }
 
+            amount = SoulMemories.strike(attacker, victim, source, amount);
             event.setAmount(Math.max(0.0F, amount));
         }
 
@@ -113,7 +119,7 @@ public final class SoulEvents {
                 amount = ctx.ability().hooks.taken(ctx, source, amount);
             }
 
-            for (SoulHooks trait : Soul.traits(soul)) {
+            for (SoulHooks trait : Soul.hooks(player)) {
                 amount = trait.taken(player, soul, source, amount);
             }
 
@@ -128,7 +134,7 @@ public final class SoulEvents {
                 ctx.ability().hooks.killed(ctx, event.getEntity());
             }
 
-            for (SoulHooks trait : Soul.traits(soul)) {
+            for (SoulHooks trait : Soul.hooks(killer)) {
                 trait.killed(killer, soul, event.getEntity());
             }
         }

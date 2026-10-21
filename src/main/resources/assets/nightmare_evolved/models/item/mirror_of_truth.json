@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "nightmare_evolved:item/memory/mirror_of_truth"
+  }
+}

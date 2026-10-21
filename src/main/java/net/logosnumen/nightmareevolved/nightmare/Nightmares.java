@@ -14,6 +14,8 @@ import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
+import net.logosnumen.nightmareevolved.memory.Family;
+import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
 import net.logosnumen.nightmareevolved.spell.Spell;
@@ -380,9 +382,16 @@ public final class Nightmares {
         Spell.say(player, "spell.nightmare_evolved.trial_conquered", session.trial.title());
     }
 
-    /** The trial is won: the soul is raised, given its Aspect after the First Nightmare, and sent home. */
+    /**
+     * The trial is won: the soul is raised and sent home; after the First Nightmare it is given its Aspect, and the Spell
+     * gives it its first Memories.
+     */
     private static void conclude(ServerPlayer player, Session session) {
         Trial trial = session.trial;
+        ServerLevel level = player.server.getLevel(DIMENSION);
+        Entity guardian = level == null || session.guardian == null ? null : level.getEntity(session.guardian);
+        Family family = guardian instanceof LivingEntity living ? Family.of(living) : Family.STRANGE;
+        int tier = guardian instanceof LivingEntity living ? Creatures.classOf(living).ordinal() + 1 : 1;
         end(player.server, session);
         Soul.setRank(player, trial.to());
         Soul.of(player).passTrial();
@@ -390,6 +399,7 @@ public final class Nightmares {
         Spell.say(player, "spell.nightmare_evolved.rank_reached", trial.to().title(), trial.to().tier());
         if (trial == Trial.FIRST_NIGHTMARE && !Soul.of(player).hasAspect()) {
             Awakening.grant(player);
+            SoulMemories.firstNightmare(player, family, trial.guardianRank.ordinal(), tier);
         }
     }
 

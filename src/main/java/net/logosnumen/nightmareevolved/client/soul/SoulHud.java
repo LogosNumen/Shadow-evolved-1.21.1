@@ -5,6 +5,8 @@ import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.aspect.Stage;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
+import net.logosnumen.nightmareevolved.memory.MemoryDef;
+import net.logosnumen.nightmareevolved.network.SeaPayload;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.SoulRules;
 import net.logosnumen.nightmareevolved.spell.Spell;
@@ -32,7 +34,7 @@ public final class SoulHud {
 
     public static void render(GuiGraphics graphics, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.player == null || mc.player.isSpectator() || mc.screen instanceof RunesScreen) {
+        if (mc.options.hideGui || mc.player == null || mc.player.isSpectator() || mc.screen instanceof RunesScreen || mc.screen instanceof SoulScreen) {
             return;
         }
 
@@ -80,6 +82,7 @@ public final class SoulHud {
         }
 
         graphics.drawString(font, ClientSoul.fragments() + "/" + ClientSoul.capacity(), x + 8 + cores * 11, y + 21, 0xFF8F86A8, false);
+        worn(graphics, x, y - 3 + height + 2);
         if (aspect == null) {
             return;
         }
@@ -119,6 +122,23 @@ public final class SoulHud {
         graphics.drawString(font, key, x + 3, y, 0xFFE8DDFF, false);
         graphics.drawString(font, name, x + keyWidth + 3, y, colour, false);
         graphics.drawString(font, state, x + keyWidth + 6 + font.width(name), y, 0xFF8FA8D8, false);
+    }
+
+    /** What the soul wears from its Memories without a slot (charms, garments, crowns), as a row of small icons. */
+    private static void worn(GuiGraphics graphics, int x, int y) {
+        int count = 0;
+        for (SeaPayload.MemoryEntry entry : ClientSea.memories()) {
+            if (entry.carry() == MemoryDef.Carry.WORN.ordinal() && entry.out() != 0) {
+                if (count == 0) {
+                    graphics.fill(x - 3, y, x + 15 + 6 * 18, y + 19, PANEL);
+                }
+
+                graphics.renderItem(entry.icon(), x + count * 18, y + 1);
+                if (++count >= 6) {
+                    return;
+                }
+            }
+        }
     }
 
     /** A small diamond, filled from the bottom up, and glowing when full. */

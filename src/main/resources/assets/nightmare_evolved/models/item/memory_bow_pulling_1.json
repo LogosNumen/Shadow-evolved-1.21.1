@@ -1,0 +1,6 @@
+{
+  "parent": "nightmare_evolved:item/memory_bow",
+  "textures": {
+    "layer0": "nightmare_evolved:item/memory/memory_bow_pulling_1"
+  }
+}

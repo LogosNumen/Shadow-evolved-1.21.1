@@ -1,0 +1,6 @@
+{
+  "parent": "nightmare_evolved:item/blackhorn_bow",
+  "textures": {
+    "layer0": "nightmare_evolved:item/memory/blackhorn_bow_pulling_0"
+  }
+}

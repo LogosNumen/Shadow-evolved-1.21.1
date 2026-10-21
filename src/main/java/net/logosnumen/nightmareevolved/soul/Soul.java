@@ -15,6 +15,7 @@ import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureProfile;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
 import net.logosnumen.nightmareevolved.flaw.Flaw;
+import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.network.SoulPayload;
 import net.logosnumen.nightmareevolved.spell.Spell;
 import net.logosnumen.nightmareevolved.spell.SpellReplies;
@@ -64,6 +65,14 @@ public final class Soul {
         }
 
         return out;
+    }
+
+    /**
+     * Everything a soul acts through beyond its Aspect: its Flaw and Attributes, and the enchantments of the Memories it
+     * has summoned and carries.
+     */
+    public static List<SoulHooks> hooks(ServerPlayer player) {
+        return SoulMemories.hooks(player);
     }
 
     /** Ids of every ability the soul has woken, for anything that needs to pick among them. */
@@ -146,7 +155,7 @@ public final class Soul {
             flight |= ctx.ability().hooks.flight(ctx);
         }
 
-        for (SoulHooks trait : traits(soul)) {
+        for (SoulHooks trait : hooks(server)) {
             trait.modifiers(server, soul, out);
         }
 
@@ -197,7 +206,7 @@ public final class Soul {
         }
 
         double share = 1.0;
-        for (SoulHooks trait : traits(soul)) {
+        for (SoulHooks trait : hooks(player)) {
             share *= trait.shards(player, soul);
         }
 

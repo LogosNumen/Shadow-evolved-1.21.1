@@ -1,0 +1,22 @@
+{
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "nightmare_evolved:item/memory/held/memory_shield"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "nightmare_evolved:item/memory/memory_shield"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "blocking": 1
+      },
+      "model": "nightmare_evolved:item/memory_shield_blocking"
+    }
+  ]
+}

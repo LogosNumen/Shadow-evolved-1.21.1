@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:item/bow",
+  "textures": {
+    "layer0": "nightmare_evolved:item/memory/morgans_warbow"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "pulling": 1
+      },
+      "model": "nightmare_evolved:item/morgans_warbow_pulling_0"
+    },
+    {
+      "predicate": {
+        "pulling": 1,
+        "pull": 0.65
+      },
+      "model": "nightmare_evolved:item/morgans_warbow_pulling_1"
+    },
+    {
+      "predicate": {
+        "pulling": 1,
+        "pull": 0.9
+      },
+      "model": "nightmare_evolved:item/morgans_warbow_pulling_2"
+    }
+  ]
+}
