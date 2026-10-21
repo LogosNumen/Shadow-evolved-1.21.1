@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "sealed=false": {
+      "model": "nightmare_evolved:block/seven_star_lock"
+    },
+    "sealed=true": {
+      "model": "nightmare_evolved:block/seven_star_lock_sealed"
+    }
+  }
+}

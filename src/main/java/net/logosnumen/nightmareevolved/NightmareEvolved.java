@@ -11,6 +11,8 @@ import net.logosnumen.nightmareevolved.core.ModSounds;
 import net.logosnumen.nightmareevolved.core.ModTab;
 import net.logosnumen.nightmareevolved.core.Scheduler;
 import net.logosnumen.nightmareevolved.creature.CreatureEvents;
+import net.logosnumen.nightmareevolved.dream.DreamBlocks;
+import net.logosnumen.nightmareevolved.dream.DreamRealm;
 import net.logosnumen.nightmareevolved.echo.EchoEvents;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
@@ -54,6 +56,8 @@ public final class NightmareEvolved {
         MemoryEntities.register(modBus);
         SeaBlocks.register(modBus);
         SeaEntities.register(modBus);
+        DreamBlocks.register(modBus);
+        DreamRealm.register(modBus);
         modBus.addListener(Network::register);
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerTickStart);
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerTick);

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "form=ring": {
+      "model": "nightmare_evolved:block/gateway_ring"
+    },
+    "form=white_altar": {
+      "model": "nightmare_evolved:block/gateway_white_altar"
+    },
+    "form=black_altar": {
+      "model": "nightmare_evolved:block/gateway_black_altar"
+    },
+    "form=pool": {
+      "model": "nightmare_evolved:block/gateway_pool"
+    },
+    "form=heart": {
+      "model": "nightmare_evolved:block/gateway_heart"
+    }
+  }
+}

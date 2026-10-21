@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "form=stone,bloomed=false": {
+      "model": "nightmare_evolved:block/seed_stone"
+    },
+    "form=stone,bloomed=true": {
+      "model": "nightmare_evolved:block/seed_stone_bloomed"
+    },
+    "form=shackles,bloomed=false": {
+      "model": "nightmare_evolved:block/seed_shackles"
+    },
+    "form=shackles,bloomed=true": {
+      "model": "nightmare_evolved:block/seed_shackles_bloomed"
+    }
+  }
+}
