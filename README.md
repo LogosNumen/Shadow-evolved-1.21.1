@@ -35,6 +35,22 @@ descriptions and dialogue are original writing.
   dragon.
 
   The full list, with every ability, is in [docs/ASPECTS.md](docs/ASPECTS.md).
+- **Memories**: the novel's own, 55 of them, from the seven Shard Memories of the Forgotten Shore (Midnight Shard,
+  Zenith, Dawn, Dusk, Moonlight, Sunlight and Starlight) to Puppeteer's Shroud, Dark Wing, Cruel Sight, the Covetous
+  Coffer, Sin of Solace, the Undying Chain, the Crown of Twilight, the Weaver's Mask and the Shadow Lantern, each with
+  the Rank, Tier and enchantments it has in the novel. Other prey leaves Memories the Spell weaves for it, named for the
+  creature and rolled for their Tier. Summon one with essence and dismiss it to get the essence back; it mends while it
+  rests in the soul. Memories die with their owner, as in the novel, all but the Shard Memories (the `keepSoulMemories`
+  game rule keeps them), and seven Shards together make the Oath Keys. Press **J** to tend them, **G** to dismiss the
+  one in your hand.
+- **Echoes and Shadows**: frozen copies of slain creatures that fight for you, heal at rest, and die for good. Sunny can
+  make an Echo into a Shadow when its kind stands among the shadows of the slain in his Soul Sea.
+- **The Soul Sea**: press **K** to meditate and sink into your own sea, while your body sits where you left it (strike
+  it, and you are torn back). Your cores burn over the water as suns, your Memories circle as lights, your Echoes stand
+  in a ring. Each sea is its owner's: Sunny's is black and silent, Nephis's gold, Mordret's lost in mist. A Saint's bound
+  Citadel stands at its heart, and a Sovereign's sea keeps things for them.
+
+  Every Memory, enchantment and Echo Attribute is in [docs/MEMORIES.md](docs/MEMORIES.md).
 - **Colossi**: four Titan-class Nightmare Creatures many times a player's height, and no two alike. The **Cairn
   Colossus** of piled stone, the skeletal **Ossuary Behemoth**, the burrowing **Gravewyrm** and the armoured
   **Chainbound Colossus**. Each is built from a seed (colouring, size, elders, horns, heads, weapons, segments) and has
@@ -59,11 +75,17 @@ For operators:
 | `/ne soul cores <n>` / `fragments <n>` | Sets your soul cores (up to seven) or fragments. |
 | `/ne soul saturate` / `essence` / `reset` | Fills your cores; fills your essence and readies every ability; makes you an Aspirant again. |
 | `/ne trial begin <trial>` / `win` | Enters any trial at once; wins the trial you are in. |
+| `/ne memory give <memory> [rank] [tier]` | Puts one of the novel's Memories in your soul. |
+| `/ne memory weave <shape> <family> <rank> <tier>` | Has the Spell weave a Memory, as for a creature of that kind. |
+| `/ne memory summon <memory>\|all` / `dismiss` / `list` / `clear` / `shards` | Summons, dismisses, lists or clears your Memories; gives the seven Shards. |
+| `/ne echo give <creature> [rank class]` / `summon` / `list` / `clear` | Freezes a creature of that kind into an Echo; calls out, lists or clears your Echoes. |
+| `/ne sea enter\|leave` | Goes down into your Soul Sea at once, or comes back. |
+| `/ne sea citadel <citadel>\|none` / `shadow <creature>` | Binds a Citadel to your soul; stands the shadow of a slain creature in your sea. |
 | `/ne colossus <kind> [seed]` | Raises a colossus ten blocks ahead: `cairn_colossus`, `ossuary_behemoth`, `gravewyrm` or `chainbound_colossus`. The seed it reports raises the same one again. |
 | `/ne vfx <shape> <palette>` | Plays an effect in front of you. |
 | `/ne pose <clip>` | Plays a body animation on you. |
 
-Spawn eggs and soul shards are in the Nightmare Evolved creative tab.
+Spawn eggs, soul shards and the novel's Memories are in the Nightmare Evolved creative tab.
 
 ## Building
 
