@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
-import net.logosnumen.nightmareevolved.aspect.Aspects;
+import net.logosnumen.nightmareevolved.aspect.Awakening;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.colossus.ColossusKind;
 import net.logosnumen.nightmareevolved.colossus.Quake;
@@ -93,8 +93,8 @@ public final class Nightmares {
             return Spell.line("spell.nightmare_evolved.not_recovered", (wait + 19) / 20);
         }
 
-        if (trial.needsSaturation() && !soul.saturated()) {
-            return Spell.line("spell.nightmare_evolved.not_saturated", Math.round(soul.saturation()), Math.round(soul.capacity()));
+        if (trial.needsSaturation() && soul.saturation() < Trial.READY_SATURATION) {
+            return Spell.line("spell.nightmare_evolved.not_saturated", soul.fragments(), (int)(soul.capacity() * Trial.READY_SATURATION));
         }
 
         return null;
@@ -389,15 +389,15 @@ public final class Nightmares {
         returnHome(player);
         Spell.say(player, "spell.nightmare_evolved.rank_reached", trial.to().title(), trial.to().tier());
         if (trial == Trial.FIRST_NIGHTMARE && !Soul.of(player).hasAspect()) {
-            Aspects.grant(player);
+            Awakening.grant(player);
         }
     }
 
-    /** The trial is lost: half the soul's saturation goes, and it must wait before trying again. */
+    /** The trial is lost: half the fragments in the soul's cores go, and it must wait before trying again. */
     private static void fail(ServerPlayer player, Session session) {
         end(player.server, session);
         SoulData soul = Soul.of(player);
-        soul.setSaturation(soul.saturation() * 0.5);
+        soul.setFragments(soul.fragments() / 2);
         soul.setRetryAt(player.level().getGameTime() + RETRY_TICKS);
     }
 

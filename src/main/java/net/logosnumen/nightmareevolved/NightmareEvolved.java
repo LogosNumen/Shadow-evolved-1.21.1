@@ -1,6 +1,7 @@
 package net.logosnumen.nightmareevolved;
 
-import net.logosnumen.nightmareevolved.aspect.AspectEvents;
+import net.logosnumen.nightmareevolved.aspect.Afflictions;
+import net.logosnumen.nightmareevolved.aspect.Bound;
 import net.logosnumen.nightmareevolved.client.ClientSetup;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.command.NeCommands;
@@ -9,6 +10,8 @@ import net.logosnumen.nightmareevolved.core.ModAttachments;
 import net.logosnumen.nightmareevolved.core.ModTab;
 import net.logosnumen.nightmareevolved.core.Scheduler;
 import net.logosnumen.nightmareevolved.creature.CreatureEvents;
+import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
+import net.logosnumen.nightmareevolved.flaw.FlawEvents;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.network.Network;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
@@ -36,6 +39,7 @@ public final class NightmareEvolved {
         ModTab.register(modBus);
         ModAttachments.register(modBus);
         ModItems.register(modBus);
+        SoulEntities.register(modBus);
         modBus.addListener(Network::register);
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerTickStart);
         NeoForge.EVENT_BUS.addListener(Scheduler::onServerTick);
@@ -49,7 +53,18 @@ public final class NightmareEvolved {
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onDrops);
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onFinalizeSpawn);
-        NeoForge.EVENT_BUS.addListener(AspectEvents::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(SoulEvents::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(SoulEvents::onDeath);
+        NeoForge.EVENT_BUS.addListener(Afflictions::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(Afflictions::onEntityTick);
+        NeoForge.EVENT_BUS.addListener(Bound::onChangeTarget);
+        NeoForge.EVENT_BUS.addListener(Bound::onEntityTick);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onChat);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onNameFormat);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onTabName);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onInteract);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onBreak);
+        NeoForge.EVENT_BUS.addListener(FlawEvents::onDeath);
         NeoForge.EVENT_BUS.addListener(Nightmares::onServerTick);
         NeoForge.EVENT_BUS.addListener(Nightmares::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(Nightmares::onDeath);

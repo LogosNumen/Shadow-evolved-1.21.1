@@ -14,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Enemy;
 
 /**
  * Raises an ordinary creature into a Nightmare Creature: it takes a rank and a class, grows tougher and harder-hitting
@@ -46,6 +47,19 @@ public final class Creatures {
         }
 
         return entity instanceof ColossusEntity colossus ? colossus.kind().rank : CreatureRank.DORMANT;
+    }
+
+    /** How many soul cores a creature has: one for a Beast, up to seven for a Titan. A slain creature leaves one shard each. */
+    public static int cores(LivingEntity entity) {
+        return classOf(entity).ordinal() + 1;
+    }
+
+    /**
+     * Whether slaying a creature feeds a soul: Nightmare Creatures do, and so do ordinary monsters, which count as
+     * Dormant Beasts. Animals and people don't.
+     */
+    public static boolean feedsSouls(LivingEntity entity) {
+        return ofNightmare(entity) || entity instanceof Enemy;
     }
 
     public static CreatureClass classOf(LivingEntity entity) {

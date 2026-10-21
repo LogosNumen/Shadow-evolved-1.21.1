@@ -4,112 +4,105 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.logosnumen.nightmareevolved.anim.Poses;
-import net.logosnumen.nightmareevolved.soul.AspectTier;
-import net.logosnumen.nightmareevolved.soul.Rank;
+import javax.annotation.Nullable;
+import net.logosnumen.nightmareevolved.aspect.series.Roster;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
-import net.logosnumen.nightmareevolved.spell.Spell;
+import net.logosnumen.nightmareevolved.soul.SoulHooks;
+import net.logosnumen.nightmareevolved.soul.SoulRules;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * Every Aspect the Spell can grant, and the rules for using their abilities. Each Aspect has one ability that wakes
- * when its bearer becomes a Sleeper and another that wakes when they are Awakened.
+ * Every Aspect, and the rules for wielding them. Each Aspect's abilities sit on five keys, one per step of Ascension;
+ * an ability wakes when the soul reaches its step, costs essence (adjusted by the Flaw and Attributes), and rests
+ * after use. Toggles and Transformations are held on until switched off or until the essence to hold them runs out.
  */
 public final class Aspects {
-    private static final Map<String, Aspect> ALL = new LinkedHashMap<>();
-
-    public static final Aspect HOLLOW_SHADE = add(new Aspect("hollow_shade", List.of(
-        new Ability("shade_step", Rank.SLEEPER, 6.0, 60, "dash", Powers::shadeStep),
-        new Ability("umbral_grasp", Rank.AWAKENED, 15.0, 160, "cast", Powers::umbralGrasp)
-    ), Aspect.Flaw.LIGHT_SHY));
-    public static final Aspect EMBER_HERALD = add(new Aspect("ember_herald", List.of(
-        new Ability("cinder_lash", Rank.SLEEPER, 5.0, 40, "slash", Powers::cinderLash),
-        new Ability("dawn_pyre", Rank.AWAKENED, 18.0, 200, "raise_one", Powers::dawnPyre)
-    ), Aspect.Flaw.DOUSED));
-    public static final Aspect IRON_PENITENT = add(new Aspect("iron_penitent", List.of(
-        new Ability("penitents_guard", Rank.SLEEPER, 6.0, 160, "guard", Powers::penitentsGuard),
-        new Ability("shackle_break", Rank.AWAKENED, 15.0, 180, "slam", Powers::shackleBreak)
-    ), Aspect.Flaw.LEADEN));
-    public static final Aspect TIDE_WEAVER = add(new Aspect("tide_weaver", List.of(
-        new Ability("undertow", Rank.SLEEPER, 6.0, 100, "channel", Powers::undertow),
-        new Ability("riptide_lance", Rank.AWAKENED, 16.0, 160, "cast_both", Powers::riptideLance)
-    ), Aspect.Flaw.PARCHED));
-    public static final Aspect RUNE_SCRIBE = add(new Aspect("rune_scribe", List.of(
-        new Ability("warding_sigil", Rank.SLEEPER, 8.0, 120, "write", Powers::wardingSigil),
-        new Ability("glyph_volley", Rank.AWAKENED, 16.0, 140, "point", Powers::glyphVolley)
-    ), Aspect.Flaw.BRITTLE));
+    private static Map<String, Aspect> registry;
 
     private Aspects() {
     }
 
-    private static Aspect add(Aspect aspect) {
-        ALL.put(aspect.id(), aspect);
-        return aspect;
+    private static Map<String, Aspect> registry() {
+        if (registry == null) {
+            Map<String, Aspect> map = new LinkedHashMap<>();
+            for (Aspect aspect : Roster.all()) {
+                map.put(aspect.id(), aspect);
+            }
+
+            registry = map;
+        }
+
+        return registry;
     }
 
     public static List<Aspect> all() {
-        return new ArrayList<>(ALL.values());
+        return new ArrayList<>(registry().values());
     }
 
-    public static @Nullable Aspect byId(String id) {
-        return ALL.get(id);
+    @Nullable
+    public static Aspect byId(String id) {
+        return registry().get(id);
     }
 
-    public static @Nullable Aspect of(ServerPlayer player) {
-        return byId(Soul.of(player).aspect());
+    /** How hard a soul's abilities hit, by its Rank and its Aspect's. */
+    public static double power(SoulData soul, Aspect aspect) {
+        return SoulRules.power(soul.rank(), aspect.tier());
     }
 
-    public static boolean hasFlaw(ServerPlayer player, Aspect.Flaw flaw) {
-        Aspect aspect = of(player);
-        return aspect != null && aspect.flaw() == flaw;
+    public static Ctx ctx(ServerPlayer player, SoulData soul, Aspect aspect, Ability ability) {
+        return new Ctx(player, player.serverLevel(), soul, aspect, ability, power(soul, aspect));
     }
 
-    /** How hard a soul's abilities hit: a stronger Aspect hits harder, and each rank past Sleeper adds a third again. */
-    public static double power(AspectTier tier, Rank rank) {
-        return tier.potency * (1.0 + 0.35 * Math.max(0, rank.ladder));
-    }
-
-    /** What an ability costs here: a Parched soul pays double in the Nether. */
-    public static double cost(ServerPlayer player, Ability ability) {
-        boolean parched = hasFlaw(player, Aspect.Flaw.PARCHED) && player.level().dimension() == Level.NETHER;
-        return parched ? ability.cost() * 2.0 : ability.cost();
-    }
-
-    /** Grants a random Aspect at a rolled tier and tells the soul what it has become. */
-    public static Aspect grant(ServerPlayer player) {
-        List<Aspect> all = all();
-        Aspect aspect = all.get(player.getRandom().nextInt(all.size()));
-        grant(player, aspect, AspectTier.roll(player.getRandom()));
-        return aspect;
-    }
-
-    public static void grant(ServerPlayer player, Aspect aspect, AspectTier tier) {
+    /** Every ability whose hooks are in effect now: woken actives and passives, and held toggles and Transformations. */
+    public static List<Ctx> inEffect(ServerPlayer player) {
         SoulData soul = Soul.of(player);
-        soul.setAspect(aspect.id(), tier);
-        Soul.applyStats(player);
-        soul.setEssence(soul.maxEssence());
-        Spell.say(player, "spell.nightmare_evolved.aspect_granted", aspect.title(), tier.title());
-        player.sendSystemMessage(Spell.line("spell.nightmare_evolved.aspect_described", aspect.description()));
-        player.sendSystemMessage(Spell.line("spell.nightmare_evolved.aspect_flaw", aspect.flawTitle(), aspect.flawDescription()));
-        for (Ability ability : aspect.abilities()) {
-            player.sendSystemMessage(Spell.line("spell.nightmare_evolved.aspect_ability", title(aspect, ability), ability.unlock().title()));
+        Aspect aspect = byId(soul.aspect());
+        List<Ctx> out = new ArrayList<>();
+        if (aspect == null) {
+            return out;
         }
 
-        Soul.sync(player);
+        for (Ability ability : aspect.unlocked(soul.rank())) {
+            boolean on = switch (ability.kind) {
+                case ACTIVE, PASSIVE -> true;
+                case TOGGLE -> soul.toggled(ability.id);
+                case TRANSFORMATION -> ability.id.equals(soul.form());
+            };
+            if (on) {
+                out.add(ctx(player, soul, aspect, ability));
+            }
+        }
+
+        return out;
     }
 
-    public static Component title(Aspect aspect, Ability ability) {
-        return Component.translatable("ability.nightmare_evolved." + aspect.id() + "." + ability.id());
+    private static double costShare(ServerPlayer player, SoulData soul, Ability ability) {
+        double share = 1.0;
+        for (SoulHooks trait : Soul.traits(soul)) {
+            share *= trait.cost(player, soul, ability);
+        }
+
+        return share;
+    }
+
+    private static double cooldownShare(ServerPlayer player, SoulData soul, Ability ability) {
+        double share = 1.0;
+        for (SoulHooks trait : Soul.traits(soul)) {
+            share *= trait.cooldown(player, soul, ability);
+        }
+
+        return share;
+    }
+
+    private static void tell(ServerPlayer player, String key, Object... args) {
+        player.displayClientMessage(Component.translatable("ability.nightmare_evolved." + key, args), true);
     }
 
     /**
-     * Uses the ability in the given slot (0 or 1), if the soul's rank has woken it, it is off cooldown and there is
-     * essence enough. Says why not otherwise, on the action bar. Returns whether it was used.
+     * Uses the ability on a step's key (0 Dormant to 4 Supreme): fires an active one, or switches a toggle or
+     * Transformation on or off. Says why not on the action bar when it can't. Returns whether anything happened.
      */
     public static boolean use(ServerPlayer player, int slot) {
         if (player.isSpectator() || !player.isAlive()) {
@@ -119,42 +112,142 @@ public final class Aspects {
         SoulData soul = Soul.of(player);
         Aspect aspect = byId(soul.aspect());
         if (aspect == null) {
-            player.displayClientMessage(Component.translatable("ability.nightmare_evolved.no_aspect"), true);
+            tell(player, "no_aspect");
             return false;
         }
 
-        if (slot < 0 || slot >= aspect.abilities().size()) {
+        Stage stage = Stage.bySlot(slot);
+        Ability ability = aspect.at(stage);
+        if (ability == null) {
+            tell(player, "empty", stage.title());
             return false;
         }
 
-        Ability ability = aspect.abilities().get(slot);
-        if (!soul.rank().atLeast(ability.unlock())) {
-            player.displayClientMessage(Component.translatable("ability.nightmare_evolved.locked", title(aspect, ability), ability.unlock().title()), true);
+        if (!soul.rank().atLeast(stage.unlock)) {
+            tell(player, "locked", ability.title(), stage.unlock.title());
             return false;
+        }
+
+        if (ability.kind == Ability.Kind.PASSIVE) {
+            tell(player, "passive", ability.title());
+            return false;
+        }
+
+        boolean on = ability.kind == Ability.Kind.TOGGLE ? soul.toggled(ability.id) : ability.id.equals(soul.form());
+        if (ability.held() && on) {
+            stop(player, soul, aspect, ability);
+            return true;
+        }
+
+        for (SoulHooks trait : Soul.traits(soul)) {
+            Component reason = trait.forbids(player, soul, ability);
+            if (reason != null) {
+                player.displayClientMessage(reason, true);
+                return false;
+            }
         }
 
         long now = player.level().getGameTime();
-        long ready = soul.readyAt(ability.id());
+        long ready = soul.readyAt(ability.id);
         if (now < ready) {
-            player.displayClientMessage(Component.translatable("ability.nightmare_evolved.cooldown", title(aspect, ability), (ready - now + 19) / 20), true);
+            tell(player, "cooldown", ability.title(), (ready - now + 19) / 20);
             return false;
         }
 
-        double cost = cost(player, ability);
-        if (soul.essence() < cost) {
-            player.displayClientMessage(Component.translatable("ability.nightmare_evolved.no_essence", title(aspect, ability)), true);
+        double cost = ability.cost * costShare(player, soul, ability);
+        if (soul.essence() < (ability.held() ? cost * 2.0 : cost)) {
+            tell(player, "no_essence", ability.title());
             return false;
         }
 
-        ServerLevel level = player.serverLevel();
-        if (!ability.effect().use(player, level, power(soul.aspectTier(), soul.rank()))) {
-            return false;
+        Ctx ctx = ctx(player, soul, aspect, ability);
+        if (ability.held()) {
+            start(ctx);
+        } else {
+            if (!ability.use.use(ctx)) {
+                return false;
+            }
+
+            soul.spend(cost);
+            soul.setReadyAt(ability.id, now + Math.round(ability.cooldown * cooldownShare(player, soul, ability)));
+            Kit.pose(player, ability.clip);
         }
 
-        soul.spend(cost);
-        soul.setReadyAt(ability.id(), now + ability.cooldown());
-        Poses.play(player, ability.clip());
+        Soul.traits(soul).forEach(trait -> trait.used(player, soul, ability));
         Soul.sync(player);
         return true;
+    }
+
+    private static void start(Ctx ctx) {
+        ServerPlayer player = ctx.player();
+        SoulData soul = ctx.soul();
+        Ability ability = ctx.ability();
+        if (ability.kind == Ability.Kind.TRANSFORMATION) {
+            Ability worn = ctx.aspect().ability(soul.form());
+            if (worn != null) {
+                stop(player, soul, ctx.aspect(), worn);
+            }
+
+            soul.setForm(ability.id);
+        } else {
+            soul.setToggled(ability.id, true);
+        }
+
+        ability.hooks.start(ctx);
+        Kit.pose(player, ability.clip);
+        Soul.applyStats(player);
+    }
+
+    private static void stop(ServerPlayer player, SoulData soul, Aspect aspect, Ability ability) {
+        if (ability.kind == Ability.Kind.TRANSFORMATION) {
+            soul.setForm("");
+        } else {
+            soul.setToggled(ability.id, false);
+        }
+
+        ability.hooks.stop(ctx(player, soul, aspect, ability));
+        soul.setReadyAt(ability.id, player.level().getGameTime() + Math.round(ability.cooldown * cooldownShare(player, soul, ability)));
+        Soul.applyStats(player);
+        Soul.sync(player);
+    }
+
+    /** Switches off every held ability, as when the Aspect changes or the soul rises. */
+    public static void stopAll(ServerPlayer player) {
+        SoulData soul = Soul.of(player);
+        Aspect aspect = byId(soul.aspect());
+        if (aspect == null) {
+            soul.toggles().clear();
+            soul.setForm("");
+            return;
+        }
+
+        for (Ability ability : aspect.abilities()) {
+            if (soul.toggled(ability.id) || ability.id.equals(soul.form())) {
+                stop(player, soul, aspect, ability);
+            }
+        }
+    }
+
+    /** Once a second: held abilities draw their essence, and drop when there is not enough. */
+    public static void upkeep(ServerPlayer player) {
+        SoulData soul = Soul.of(player);
+        Aspect aspect = byId(soul.aspect());
+        if (aspect == null) {
+            return;
+        }
+
+        for (Ability ability : aspect.abilities()) {
+            boolean on = ability.kind == Ability.Kind.TOGGLE ? soul.toggled(ability.id) : ability.kind == Ability.Kind.TRANSFORMATION && ability.id.equals(soul.form());
+            if (!on) {
+                continue;
+            }
+
+            if (!soul.rank().atLeast(ability.stage.unlock) || !soul.spend(ability.cost * costShare(player, soul, ability))) {
+                stop(player, soul, aspect, ability);
+                tell(player, "faded", ability.title());
+            } else {
+                Soul.traits(soul).forEach(trait -> trait.used(player, soul, ability));
+            }
+        }
     }
 }

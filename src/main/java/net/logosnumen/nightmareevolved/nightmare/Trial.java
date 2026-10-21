@@ -85,6 +85,12 @@ public enum Trial {
         return this.ordinal() + 1;
     }
 
+    /**
+     * How full a soul's cores must be before the Spell takes it into a trial past the first. The novel sets no such
+     * bar; it stands in until the Dream Realm's Gateways and Seeds of Nightmare become the way onward.
+     */
+    public static final double READY_SATURATION = 0.5;
+
     public boolean needsSaturation() {
         return this != FIRST_NIGHTMARE;
     }

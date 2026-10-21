@@ -2,14 +2,18 @@ package net.logosnumen.nightmareevolved.command;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.logosnumen.nightmareevolved.aspect.Ability;
 import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
+import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
+import net.logosnumen.nightmareevolved.flaw.Flaw;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.nightmare.Trial;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
 import net.logosnumen.nightmareevolved.spell.Spell;
 import net.logosnumen.nightmareevolved.spell.SpellReplies;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -18,7 +22,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * {@code /spell}, for every player: {@code accept} answers the Spell's call and enters the next trial (the same as
- * sleeping when ready), and {@code status} asks the Spell what it knows of your soul.
+ * sleeping when ready), {@code status} asks where the soul stands, and {@code runes} has the Spell recite them in chat
+ * (the R key shows them on a screen).
  */
 public final class SpellCommand {
     private SpellCommand() {
@@ -29,6 +34,7 @@ public final class SpellCommand {
             Commands.literal("spell")
                 .then(Commands.literal("accept").executes(SpellCommand::accept))
                 .then(Commands.literal("status").executes(SpellCommand::status))
+                .then(Commands.literal("runes").executes(SpellCommand::runes))
         );
     }
 
@@ -40,16 +46,9 @@ public final class SpellCommand {
         ServerPlayer player = context.getSource().getPlayerOrException();
         SoulData soul = Soul.of(player);
         player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.rank", soul.rank().title(), soul.rank().tier()));
-        Aspect aspect = Aspects.byId(soul.aspect());
-        if (aspect != null) {
-            player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.aspect", aspect.title(), soul.aspectTier().title(), aspect.flawTitle()));
-        }
-
-        if (soul.rank().cores > 0) {
+        if (soul.cores() > 0) {
             player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.essence", Math.round(soul.essence()), Math.round(soul.maxEssence())));
-            player.sendSystemMessage(Spell.line(
-                "spell.nightmare_evolved.status.cores", soul.rank().cores, Math.round(soul.saturation()), Math.round(soul.capacity())
-            ));
+            player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.cores", soul.cores(), soul.fragments(), soul.capacity()));
         }
 
         Trial trial = Trial.next(soul.rank());
@@ -60,6 +59,40 @@ public final class SpellCommand {
                 player.sendSystemMessage(refusal);
             } else {
                 SpellReplies.offer(player);
+            }
+        }
+
+        return 1;
+    }
+
+    private static int runes(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        SoulData soul = Soul.of(player);
+        player.sendSystemMessage(Spell.line("runes.nightmare_evolved.name", player.getName()));
+        player.sendSystemMessage(Spell.line("runes.nightmare_evolved.rank", soul.rank().title().copy().append(" (").append(soul.rank().tier()).append(")")));
+        Aspect aspect = Aspects.byId(soul.aspect());
+        if (aspect == null) {
+            player.sendSystemMessage(Spell.line("runes.nightmare_evolved.no_aspect"));
+            return 1;
+        }
+
+        player.sendSystemMessage(Spell.line("runes.nightmare_evolved.aspect", aspect.title().copy().append(" (").append(aspect.tier().title()).append(")")));
+        for (Ability ability : aspect.abilities()) {
+            boolean awake = soul.rank().atLeast(ability.stage.unlock);
+            Component label = ability.innate ? Component.translatable("runes.nightmare_evolved.innate") : ability.stage.title();
+            player.sendSystemMessage(Component.literal("  ").append(label).append(": ")
+                .append(ability.title().copy().withStyle(awake ? ChatFormatting.WHITE : ChatFormatting.DARK_GRAY)));
+        }
+
+        Flaw flaw = Flaw.byId(soul.flaw());
+        if (flaw != null) {
+            player.sendSystemMessage(Spell.line("runes.nightmare_evolved.flaw", flaw.title()));
+        }
+
+        for (String id : soul.attributes()) {
+            SoulAttribute attribute = SoulAttribute.byId(id);
+            if (attribute != null) {
+                player.sendSystemMessage(Component.literal("  [").append(attribute.title()).append("]"));
             }
         }
 

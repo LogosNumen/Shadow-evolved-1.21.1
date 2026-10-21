@@ -17,20 +17,24 @@ descriptions and dialogue are original writing.
   Nightmare Creatures and destroy the Nightmare's master (from the Fourth Nightmare on, a colossus) to climb a rank.
   The Awakening is a road to a Gateway instead. Dying in a trial loses nothing you carry but shakes the soul for a
   while, and costs half of what your cores held.
-- **Soul cores and shards**: slain Nightmare Creatures leave soul shards. Absorb them to fill your cores; a Sleeper or
-  higher must fill every core before the next trial will take them. In the waking world, some monsters are touched by
-  the Spell and come back ranked, stronger the farther they are from spawn.
-- **Aspects**: after the First Nightmare the Spell grants one of five Aspects, born Dormant, Awakened, Ascended or
-  (rarely) Transcendent. Each has two abilities (Z and X by default) that wake at Sleeper and Awakened, cost essence
-  and rest between uses, and a Flaw it cannot shake:
+- **The soul, as the novel has it**: every Awakened has one soul core holding a thousand soul fragments; slain
+  creatures leave one shard for each core they had (one for a Beast, seven for a Titan), worth more the higher their
+  Rank and far less from creatures below you. A fuller core makes the body stronger and holds more essence. Only the
+  Divine Aspects grow more cores, up to seven, climbing the classes from Beast to Titan. Press **R** to read your runes.
+- **Every Aspect in the novel**: 34 Aspects of its Awakened, from Sunny's Shadow Slave, Nephis's Light Bringer and
+  Mordret's mirrors (the three Divine Aspects) to Cassie's, Jet's, Effie's, Kai's, Morgan's, Anvil's, Ki Song's and
+  her daughters', the Saints of Valor, and the Irregulars of Antarctica. Each wakes its abilities as you rise: the
+  Dormant Ability (**Z**), Awakened (**X**), Ascended (**C**), the Saint's Transformation (**V**) and the Supreme
+  Ability (**B**). Some are pressed, some held, some always with you.
+- **Every Flaw in the novel**: each of the 25 comes with the Aspect it belongs to, and does what it does in the story:
+  Sunny cannot leave a question unanswered, Nephis burns when she uses her power, Cassie is blind, Rain cannot kill,
+  Jet's dead core feeds only on killing. Aspects whose Flaw the novel never names roll one that suits them.
+- **Every Attribute in the novel**: 50 of them. A soul is born with one to three (or with its Aspect's own, as Sunny
+  was born Fated, with the Mark of Divinity and Child of Shadows); some grow as you rise, the Mark of Divinity into a
+  Flame, Child of Shadows into Lord of Shadows. Others come from lineages, relics, Echoes, or deeds such as slaying a
+  dragon.
 
-  | Aspect | Abilities | Flaw |
-  | --- | --- | --- |
-  | Hollow Shade | Shade Step, Umbral Grasp | Light-Shy |
-  | Ember Herald | Cinder Lash, Dawn Pyre | Doused |
-  | Iron Penitent | Penitent's Guard, Shackle Break | Leaden |
-  | Tide Weaver | Undertow, Riptide Lance | Parched |
-  | Rune Scribe | Warding Sigil, Glyph Volley | Brittle |
+  The full list, with every ability, is in [docs/ASPECTS.md](docs/ASPECTS.md).
 - **Colossi**: four Titan-class Nightmare Creatures many times a player's height, and no two alike. The **Cairn
   Colossus** of piled stone, the skeletal **Ossuary Behemoth**, the burrowing **Gravewyrm** and the armoured
   **Chainbound Colossus**. Each is built from a seed (colouring, size, elders, horns, heads, weapons, segments) and has
@@ -43,14 +47,16 @@ descriptions and dialogue are original writing.
 ## Commands
 
 `/spell accept` answers the Spell and enters your next trial when you are ready; `/spell status` shows your rank,
-Aspect, essence, soul cores and what stands between you and the next trial.
+essence, soul cores and what stands between you and the next trial; `/spell runes` recites your runes in chat.
 
 For operators:
 
 | Command | What it does |
 | --- | --- |
 | `/ne soul rank <rank>` | Sets your rank. |
-| `/ne soul aspect <aspect> [tier]` | Grants you an Aspect. |
+| `/ne soul aspect <aspect> [flaw]` | Grants you an Aspect, with its own Flaw or the one named. |
+| `/ne soul flaw <flaw>` / `attribute add\|remove <attribute>` | Sets your Flaw; gives or takes an Attribute. |
+| `/ne soul cores <n>` / `fragments <n>` | Sets your soul cores (up to seven) or fragments. |
 | `/ne soul saturate` / `essence` / `reset` | Fills your cores; fills your essence and readies every ability; makes you an Aspirant again. |
 | `/ne trial begin <trial>` / `win` | Enters any trial at once; wins the trial you are in. |
 | `/ne colossus <kind> [seed]` | Raises a colossus ten blocks ahead: `cairn_colossus`, `ossuary_behemoth`, `gravewyrm` or `chainbound_colossus`. The seed it reports raises the same one again. |
@@ -78,6 +84,8 @@ Needs JDK 21.
 ## Roadmap
 
 1. **Foundations**: effects, body animation, the code-built creature rig, the colossi.
-2. **The core loop** (this): the Nightmare Spell, the rank ladder, Aspects, soul cores and essence, Nightmares.
-3. **The world**: the Dream Realm, its regions and creatures, factions.
-4. **Release**: art pass, guide, project pages.
+2. **The core loop**: the Nightmare Spell, the rank ladder, soul cores and essence, Nightmares.
+3. **The novel's own** (this, under way; see [docs/ROADMAP.md](docs/ROADMAP.md)): its Aspects, Flaws and Attributes;
+   the Soul Sea, Memories and Echoes; the Dream Realm's regions and creatures; and Ascension.
+4. **Release**: factions and the Great Clans, the Nightmares as the novel tells them, an art pass, a guide, and
+   project pages.
