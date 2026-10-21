@@ -1,17 +1,20 @@
 package net.logosnumen.nightmareevolved.dream.gate;
 
 import java.util.Locale;
+import javax.annotation.Nullable;
 import com.mojang.serialization.MapCodec;
 import net.logosnumen.nightmareevolved.dream.DreamTravel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -50,6 +54,17 @@ public final class GatewayBlock extends Block {
         @Override
         public String getSerializedName() {
             return this.name().toLowerCase(Locale.ROOT);
+        }
+
+        @Nullable
+        public static Form byName(String name) {
+            for (Form form : values()) {
+                if (form.getSerializedName().equals(name)) {
+                    return form;
+                }
+            }
+
+            return null;
         }
     }
 
@@ -87,6 +102,21 @@ public final class GatewayBlock extends Block {
         }
 
         super.stepOn(level, pos, state, entity);
+    }
+
+    /**
+     * The altars of the Chained Isles answer offerings: blood shed on the Night Temple's black altar is repaid with the
+     * ivory knife, and a thousand strange coins laid on the Sanctuary's white altar under the moon with the obsidian one.
+     */
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+        BlockHitResult hit) {
+        Form form = state.getValue(FORM);
+        if ((form == Form.BLACK_ALTAR || form == Form.WHITE_ALTAR) && player instanceof ServerPlayer server && Altars.offer(server, pos, form, stack)) {
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     /** Touching an altar or a Gateway's heart begins the passage. */

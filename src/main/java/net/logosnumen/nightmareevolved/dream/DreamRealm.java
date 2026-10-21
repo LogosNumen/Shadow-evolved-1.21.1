@@ -27,6 +27,10 @@ public final class DreamRealm {
     public static final GameRules.Key<GameRules.BooleanValue> SEPARATE_BELONGINGS = GameRules.register(
         "separateDreamBelongings", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true)
     );
+    /** Whether Seeds of Nightmare left alone bloom, opening Gates in the waking world. */
+    public static final GameRules.Key<GameRules.BooleanValue> GATES = GameRules.register(
+        "nightmareGates", GameRules.Category.SPAWNING, GameRules.BooleanValue.create(true)
+    );
     private static final DeferredRegister<MapCodec<? extends ChunkGenerator>> GENERATORS = DeferredRegister.create(Registries.CHUNK_GENERATOR,
         NightmareEvolved.MOD_ID);
     private static final DeferredRegister<MapCodec<? extends BiomeSource>> BIOME_SOURCES = DeferredRegister.create(Registries.BIOME_SOURCE,

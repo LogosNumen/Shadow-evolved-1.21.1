@@ -4,6 +4,7 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
+import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.memory.Memories;
 import net.logosnumen.nightmareevolved.memory.MemoryDef;
@@ -41,6 +42,10 @@ public final class ModTab {
                 for (Item item : DreamBlocks.items()) {
                     output.accept(item);
                 }
+
+                output.accept(SeedEntities.IVORY_KNIFE.get());
+                output.accept(SeedEntities.OBSIDIAN_KNIFE.get());
+                output.accept(SeedEntities.ANCIENT_COIN.get());
             })
             .build()
     );

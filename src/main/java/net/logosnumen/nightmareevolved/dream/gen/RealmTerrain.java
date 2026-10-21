@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
 import net.logosnumen.nightmareevolved.dream.Region;
+import net.logosnumen.nightmareevolved.dream.seed.SeedSites;
 import net.logosnumen.nightmareevolved.dream.gen.shape.BastionShaper;
 import net.logosnumen.nightmareevolved.dream.gen.shape.BurnedForestShaper;
 import net.logosnumen.nightmareevolved.dream.gen.shape.DesertShaper;
@@ -152,6 +153,8 @@ public final class RealmTerrain {
                 landmark.paint(column, this);
             }
         }
+
+        SeedSites.paint(this, column);
     }
 
     /** The highest solid block at a place, or one below the world over open sky. */

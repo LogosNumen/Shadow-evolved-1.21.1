@@ -14,6 +14,7 @@ import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.dream.DreamTravel;
+import net.logosnumen.nightmareevolved.dream.seed.Seeds;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
 import net.logosnumen.nightmareevolved.memory.Family;
 import net.logosnumen.nightmareevolved.memory.SoulMemories;
@@ -128,6 +129,11 @@ public final class Nightmares {
 
     /** Takes a player into a given trial, whatever their state (used by operators to test trials). */
     public static boolean begin(ServerPlayer player, @Nullable Trial trial) {
+        return begin(player, trial, null);
+    }
+
+    /** Takes a player into a trial, entered through a Seed of Nightmare (or none). */
+    public static boolean begin(ServerPlayer player, @Nullable Trial trial, @Nullable String seed) {
         if (trial == Trial.AWAKENING) {
             return DreamTravel.dream(player);
         }
@@ -150,7 +156,7 @@ public final class Nightmares {
 
         BlockPos centre = NightmareSlots.claim(server);
         Arenas.Layout layout = Arenas.build(level, trial, centre, level.random);
-        Session session = new Session(player.getUUID(), trial, layout, nextId++);
+        Session session = new Session(player.getUUID(), trial, layout, nextId++, seed);
         session.nextAt = level.getGameTime() + 80;
         SESSIONS.put(player.getUUID(), session);
         Vec3 arrival = layout.arrival();
@@ -372,6 +378,10 @@ public final class Nightmares {
         Family family = guardian instanceof LivingEntity living ? Family.of(living) : Family.STRANGE;
         int tier = guardian instanceof LivingEntity living ? Creatures.classOf(living).ordinal() + 1 : 1;
         end(player.server, session);
+        if (session.seed != null) {
+            Seeds.conquered(player.server, session.seed);
+        }
+
         Soul.setRank(player, trial.to());
         Soul.of(player).passTrial();
         returnHome(player);
@@ -435,6 +445,18 @@ public final class Nightmares {
 
         soul.setReturnPoint(new CompoundTag());
         player.teleportTo(home, x, y, z, yaw, 0.0F);
+    }
+
+    /** The Seed a running trial was entered through, by the trial's id, or null. */
+    @Nullable
+    public static String seedOf(long trial) {
+        for (Session session : SESSIONS.values()) {
+            if (session.id == trial) {
+                return session.seed;
+            }
+        }
+
+        return null;
     }
 
     /** Ends a running trial as won, at once (for operators testing the road). */

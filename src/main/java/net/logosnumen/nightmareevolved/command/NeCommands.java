@@ -47,6 +47,7 @@ public final class NeCommands {
                 .then(MemoryCommand.echo())
                 .then(MemoryCommand.sea())
                 .then(RealmCommand.node())
+                .then(SeedCommand.node())
                 .then(
                     Commands.literal("vfx")
                         .then(

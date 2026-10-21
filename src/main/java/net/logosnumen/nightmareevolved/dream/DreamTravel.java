@@ -13,6 +13,7 @@ import net.logosnumen.nightmareevolved.dream.gate.Gateways;
 import net.logosnumen.nightmareevolved.dream.gen.Column;
 import net.logosnumen.nightmareevolved.dream.gen.RealmTerrain;
 import net.logosnumen.nightmareevolved.dream.law.DarkSea;
+import net.logosnumen.nightmareevolved.dream.seed.Seeds;
 import net.logosnumen.nightmareevolved.echo.Echoes;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.VesselEntity;
@@ -134,6 +135,12 @@ public final class DreamTravel {
             if (anchor != null) {
                 return new Arrival(Vec3.atBottomCenterOf(Gateways.arrival(realm, anchor)), "spell.nightmare_evolved.dream_carried", anchor.title());
             }
+        }
+
+        Vec3 drawn = soul.rank().atLeast(Rank.AWAKENED) ? Seeds.drawnTo(player, realm) : null;
+        if (drawn != null) {
+            // An open Gate's Call is stronger than any anchor: the soul is drawn to its Seed.
+            return new Arrival(drawn, "spell.nightmare_evolved.dream_drawn", Component.empty());
         }
 
         Gateways.Gateway anchor = state.anchor().isEmpty() ? null : Gateways.byId(realm, state.anchor());

@@ -4,6 +4,7 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
 import net.logosnumen.nightmareevolved.client.dream.ClientRealm;
 import net.logosnumen.nightmareevolved.client.dream.DreamSky;
+import net.logosnumen.nightmareevolved.client.dream.NightmareGateRenderer;
 import net.logosnumen.nightmareevolved.client.dream.RealmFog;
 import net.logosnumen.nightmareevolved.client.dream.RealmRender;
 import java.util.function.Supplier;
@@ -21,6 +22,7 @@ import net.logosnumen.nightmareevolved.client.soulsea.SeaSunRenderer;
 import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaClient;
 import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaSky;
 import net.logosnumen.nightmareevolved.client.soulsea.VesselRenderer;
+import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
 import net.logosnumen.nightmareevolved.memory.MemoryItems;
@@ -105,6 +107,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(SeaEntities.ECHO.get(), SeaEchoRenderer::new);
         event.registerEntityRenderer(SeaEntities.SHADOW.get(), SeaShadowRenderer::new);
         event.registerEntityRenderer(SeaEntities.HOARD.get(), SeaHoardRenderer::new);
+        event.registerEntityRenderer(SeedEntities.GATE.get(), NightmareGateRenderer::new);
     }
 
     /** What players wear from their Memories, drawn on every player model. */

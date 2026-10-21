@@ -1,14 +1,19 @@
 package net.logosnumen.nightmareevolved.gametest;
 
 import com.mojang.authlib.GameProfile;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
+import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.dream.DreamState;
 import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
 import net.logosnumen.nightmareevolved.dream.Region;
+import net.logosnumen.nightmareevolved.dream.gate.Altars;
 import net.logosnumen.nightmareevolved.dream.gate.GatewayBlock;
 import net.logosnumen.nightmareevolved.dream.gate.Gateways;
 import net.logosnumen.nightmareevolved.dream.gate.SeedBlock;
@@ -21,12 +26,21 @@ import net.logosnumen.nightmareevolved.dream.gen.shape.IslesShaper;
 import net.logosnumen.nightmareevolved.dream.law.Crushing;
 import net.logosnumen.nightmareevolved.dream.law.DarkSea;
 import net.logosnumen.nightmareevolved.dream.law.RealmLaws;
+import net.logosnumen.nightmareevolved.dream.seed.NightmareGateEntity;
+import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
+import net.logosnumen.nightmareevolved.dream.seed.SeedSites;
+import net.logosnumen.nightmareevolved.dream.seed.Seeds;
+import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,7 +51,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 /**
  * The Dream Realm as the novel lays it out: its regions where they belong, every Gateway and canon Seed standing in its
  * landmark, a Sleeper's random arrival always on safe ground, the Dark Sea rising by night, the Isles rising and
- * crushing, the one path to the Tomb of Ariel, and the two sets of belongings a dreamer keeps.
+ * crushing, the one path to the Tomb of Ariel, and the two sets of belongings a dreamer keeps; the Seeds of Nightmare
+ * scattered by region, turning away the unready, the altars' knives, and an open Gate sending its creatures through.
  */
 @GameTestHolder(NightmareEvolved.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -203,5 +218,92 @@ public class DreamRealmGameTests {
         }
 
         helper.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 1200)
+    public static void seedsGrowWhereTheirRegionsAllow(GameTestHelper helper) {
+        RealmTerrain terrain = RealmTerrain.of(SEED);
+        Map<Region, Integer> counts = new EnumMap<>(Region.class);
+        int painted = 0;
+        for (int i = -10; i <= 10; i++) {
+            for (int j = -16; j <= 6; j++) {
+                SeedSites.Site site = SeedSites.site(terrain, i, j);
+                if (site == null) {
+                    continue;
+                }
+
+                helper.assertTrue(site.equals(SeedSites.site(terrain, i, j)), "A Seed grows in the same place each time it is asked for");
+                helper.assertTrue(site.category() >= site.region().seedMin && site.category() <= site.region().seedMax,
+                    "A Seed's Category suits its region: " + site.id() + " in " + site.region().id());
+                helper.assertTrue(site.region() != Region.LAND_OF_BARROWS && site.region() != Region.UNDERWORLD, "No Seed grows in the barrows or under the mountains");
+                counts.merge(site.region(), 1, Integer::sum);
+                if (painted < 6) {
+                    BlockState state = terrain.column(site.pos().getX(), site.pos().getZ()).get(site.pos().getY());
+                    helper.assertTrue(state != null && state.is(DreamBlocks.SEED.get()) && state.getValue(SeedBlock.CATEGORY) == site.category(),
+                        "The Seed itself stands on its dais: " + site.id());
+                    painted++;
+                }
+            }
+        }
+
+        int desert = counts.getOrDefault(Region.NIGHTMARE_DESERT, 0);
+        helper.assertTrue(desert > 0 && counts.values().stream().allMatch(n -> n <= desert), "Nowhere do as many Seeds bloom as in the Nightmare Desert");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void aSeedTurnsAwayTheUnready(GameTestHelper helper) {
+        BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
+        ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "ne_seed_test"));
+        BlockState second = DreamBlocks.SEED.get().defaultBlockState().setValue(SeedBlock.CATEGORY, 2);
+        BlockState fourth = second.setValue(SeedBlock.CATEGORY, 4);
+        Soul.setRank(player, Rank.SLEEPER);
+        Seeds.challenge(player, at, second);
+        helper.assertTrue(!Nightmares.inTrial(player), "A Sleeper cannot enter a Nightmare through a Seed");
+        Soul.setRank(player, Rank.MASTER);
+        Seeds.challenge(player, at, second);
+        helper.assertTrue(!Nightmares.inTrial(player), "A Master has nothing more to gain from a Second Nightmare");
+        Soul.setRank(player, Rank.AWAKENED);
+        Seeds.challenge(player, at, fourth);
+        helper.assertTrue(!Nightmares.inTrial(player), "An Awakened is turned away from a Fourth Nightmare");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void theAltarsGiveTheKnives(GameTestHelper helper) {
+        BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
+        ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "ne_altar_test"));
+        Soul.of(player).resetDream();
+        helper.assertTrue(!Altars.offer(player, at, GatewayBlock.Form.BLACK_ALTAR, new ItemStack(Items.BONE)), "The black altar wants blood, not bones");
+        helper.assertTrue(Altars.offer(player, at, GatewayBlock.Form.BLACK_ALTAR, new ItemStack(Items.IRON_SWORD)), "A cut palm on the black altar...");
+        helper.assertTrue(player.getInventory().countItem(SeedEntities.IVORY_KNIFE.get()) == 1, "...is repaid with the ivory knife");
+        Altars.offer(player, at, GatewayBlock.Form.BLACK_ALTAR, new ItemStack(Items.IRON_SWORD));
+        helper.assertTrue(player.getInventory().countItem(SeedEntities.IVORY_KNIFE.get()) == 1, "but only once");
+        player.getInventory().add(new ItemStack(SeedEntities.ANCIENT_COIN.get(), 64));
+        Altars.offer(player, at, GatewayBlock.Form.WHITE_ALTAR, new ItemStack(SeedEntities.ANCIENT_COIN.get()));
+        helper.assertTrue(player.getInventory().countItem(SeedEntities.OBSIDIAN_KNIFE.get()) == 0
+            && player.getInventory().countItem(SeedEntities.ANCIENT_COIN.get()) == 64, "A few coins buy nothing from the white altar");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void anOpenGateSendsItsCreatures(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        NightmareGateEntity gate = NightmareGateEntity.open(level, helper.absolutePos(new BlockPos(1, 2, 1)), "test_seed", 2);
+        CompoundTag tag = gate.saveWithoutId(new CompoundTag());
+        tag.putInt("Age", NightmareGateEntity.FORMING - 3);
+        gate.load(tag);
+        helper.assertTrue(!gate.isOpen(), "A Gate takes its time to open");
+        helper.succeedWhen(() -> {
+            helper.assertTrue(gate.isOpen(), "The Gate tears open");
+            List<Mob> sent = level.getEntitiesOfClass(Mob.class, gate.getBoundingBox().inflate(16.0), gate::sent);
+            helper.assertTrue(sent.size() >= 5, "Its first wave comes through");
+            for (Mob mob : sent) {
+                helper.assertTrue(Creatures.ofNightmare(mob), "Everything that comes through is a Nightmare Creature");
+                mob.discard();
+            }
+
+            gate.discard();
+        });
     }
 }

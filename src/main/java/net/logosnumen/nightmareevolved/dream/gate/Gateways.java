@@ -24,7 +24,12 @@ import net.minecraft.server.level.ServerLevel;
 public final class Gateways {
     /** A Gateway: where it is, which region it lies in, how it is used, and the Citadel around it, if any. */
     public record Gateway(String id, Region region, BlockPos pos, GatewayBlock.Form form, @Nullable String citadel, boolean great) {
+        /** The Gateway's name: its own for the novel's Gateways and canon Seeds', otherwise the region a Seed was conquered in. */
         public Component title() {
+            if (this.id.startsWith("seed_")) {
+                return Component.translatable("gateway.nightmare_evolved.born", this.region.title());
+            }
+
             return Component.translatable("gateway.nightmare_evolved." + this.id);
         }
     }

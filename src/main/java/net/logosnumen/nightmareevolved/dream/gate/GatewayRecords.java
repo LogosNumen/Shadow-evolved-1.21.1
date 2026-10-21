@@ -35,7 +35,10 @@ public final class GatewayRecords extends SavedData {
             Region region = Region.byId(g.getString("Region"));
             BlockPos pos = NbtUtils.readBlockPos(g, "Pos").orElse(null);
             if (region != null && pos != null) {
-                records.born.add(new Gateways.Gateway(g.getString("Id"), region, pos, GatewayBlock.Form.POOL, null, false));
+                GatewayBlock.Form form = GatewayBlock.Form.byName(g.getString("Form"));
+                String citadel = g.getString("Citadel");
+                records.born.add(new Gateways.Gateway(g.getString("Id"), region, pos, form == null ? GatewayBlock.Form.HEART : form,
+                    citadel.isEmpty() ? null : citadel, g.getBoolean("Great")));
             }
         }
 
@@ -54,6 +57,12 @@ public final class GatewayRecords extends SavedData {
             g.putString("Id", gateway.id());
             g.putString("Region", gateway.region().id());
             g.put("Pos", NbtUtils.writeBlockPos(gateway.pos()));
+            g.putString("Form", gateway.form().getSerializedName());
+            if (gateway.citadel() != null) {
+                g.putString("Citadel", gateway.citadel());
+            }
+
+            g.putBoolean("Great", gateway.great());
             born.add(g);
         }
 

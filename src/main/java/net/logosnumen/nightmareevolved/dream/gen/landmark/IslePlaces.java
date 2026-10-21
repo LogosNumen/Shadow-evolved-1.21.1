@@ -1,5 +1,6 @@
 package net.logosnumen.nightmareevolved.dream.gen.landmark;
 
+import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.gate.GatewayBlock;
@@ -10,6 +11,13 @@ import net.logosnumen.nightmareevolved.dream.gen.Noise;
 import net.logosnumen.nightmareevolved.dream.gen.RealmTerrain;
 import net.logosnumen.nightmareevolved.dream.gen.Trees;
 import net.logosnumen.nightmareevolved.dream.gen.shape.IslesShaper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.RandomizableContainer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -617,6 +625,35 @@ public final class IslePlaces {
             } else if (Math.abs(d - 18.0) < 1.5 && Math.floorMod((int)Math.round(Math.toDegrees(Math.atan2(z, x))), 30) < 6) {
                 column.fill(top + 1, top + 9, Blocks.STONE.defaultBlockState());
             }
+        }
+
+        /** The ship's hold keeps a chest of what its sailors carried: some of the Isles' strange coins among it. */
+        @Override
+        public void decorate(WorldGenLevel level, ChunkPos chunk, RealmTerrain terrain) {
+            if (this.place != Places.SHIPWRECK) {
+                return;
+            }
+
+            int x = this.cx - 12;
+            int z = this.cz;
+            if (!chunk.equals(new ChunkPos(new BlockPos(x, 0, z)))) {
+                return;
+            }
+
+            IslesShaper.Island island = terrain.isles().islandAt(x, z);
+            if (island == null) {
+                return;
+            }
+
+            // On the floor of the hold, under the deck.
+            BlockPos chest = new BlockPos(x, terrain.isles().topAt(island, x, z) + 5, z);
+            while (chest.getY() > level.getMinBuildHeight() && level.isEmptyBlock(chest.below())) {
+                chest = chest.below();
+            }
+
+            level.setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_CLIENTS);
+            RandomizableContainer.setBlockEntityLootTable(level, level.getRandom(), chest,
+                ResourceKey.create(Registries.LOOT_TABLE, NightmareEvolved.id("chests/shipwreck_island")));
         }
 
         /** A great ship, broken in two, stranded high on the island. */
