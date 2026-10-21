@@ -165,6 +165,11 @@ public final class IslesShaper implements Shaper {
     /** The height of an island's top at a place on it. */
     public int topAt(Island island, double x, double z) {
         double d = this.reach(island, x, z);
+        if (island.kind == Kind.SANCTUARY) {
+            // The Sanctuary's ground was levelled long ago: flat within its ring of menhirs, so its pool and altar sit true.
+            return island.top + (d < 0.9 ? 0 : (int)Math.round(1.2 * this.bulge.at(x / 15.0, z / 15.0)));
+        }
+
         double rise = Math.min(6.0, island.radius * 0.12) * (1.0 - d * d);
         if (island.kind == Kind.LAKE && d < 0.45) {
             rise -= 5.0 * (1.0 - d / 0.45);

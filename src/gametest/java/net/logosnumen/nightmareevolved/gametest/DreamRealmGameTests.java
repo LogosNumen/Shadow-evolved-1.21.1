@@ -34,6 +34,7 @@ import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -98,9 +99,27 @@ public class DreamRealmGameTests {
             helper.assertTrue(state.getValue(GatewayBlock.FORM) == gateway.form(), gateway.id() + " looks as it should");
             helper.assertTrue(RealmMap.regionAt(gateway.pos().getX(), gateway.pos().getZ()).whole() == gateway.region()
                 || gateway.region() == Region.GODGRAVE, gateway.id() + " stands in its region");
+            helper.assertTrue(open(terrain, gateway.pos()), gateway.id() + " stands open to be touched, not buried");
         }
 
         helper.succeed();
+    }
+
+    /** Whether a block has a face open above or beside it with room for a soul to come and lay a hand on it. */
+    private static boolean open(RealmTerrain terrain, BlockPos pos) {
+        Column above = terrain.column(pos.getX(), pos.getZ());
+        if (!above.solid(pos.getY() + 1) && !above.solid(pos.getY() + 2)) {
+            return true;
+        }
+
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            Column beside = terrain.column(pos.getX() + side.getStepX(), pos.getZ() + side.getStepZ());
+            if (!beside.solid(pos.getY()) && !beside.solid(pos.getY() + 1)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @GameTest(template = "empty", timeoutTicks = 400)
@@ -115,6 +134,10 @@ public class DreamRealmGameTests {
         BlockState top = terrain.column(Places.MICTLAN_ZIGGURAT.x(), Places.MICTLAN_ZIGGURAT.z()).get(Godgrave.VAULT_FLOOR + 37);
         helper.assertTrue(top != null && top.is(DreamBlocks.SEED.get()) && top.getValue(SeedBlock.CATEGORY) == 2,
             "A Seed of the Second Nightmare rests on the ziggurat in Godgrave's hollow");
+        for (SeedSites.Site site : SeedSites.CANON) {
+            helper.assertTrue(open(terrain, site.pos()), site.id() + " can be reached and touched");
+        }
+
         helper.succeed();
     }
 
