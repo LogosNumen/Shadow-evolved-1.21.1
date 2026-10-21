@@ -98,6 +98,18 @@ public final class Column {
         return MIN_Y - 1;
     }
 
+    /** The lowest solid block at or above a height, or one above the world. */
+    public int solidAbove(int y) {
+        for (int i = Math.max(0, y - MIN_Y); i < HEIGHT; i++) {
+            BlockState state = this.states[i];
+            if (state != null && !state.isAir() && state.getFluidState().isEmpty()) {
+                return i + MIN_Y;
+            }
+        }
+
+        return MAX_Y + 1;
+    }
+
     /** The highest solid block at or below a height, or one below the world. */
     public int solidBelow(int y) {
         for (int i = Math.min(HEIGHT - 1, y - MIN_Y); i >= 0; i--) {
