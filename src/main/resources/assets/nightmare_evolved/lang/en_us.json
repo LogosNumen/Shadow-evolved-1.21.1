@@ -1554,5 +1554,13 @@
   "commands.nightmare_evolved.realm.here": "%s, at %s, %s",
   "block.nightmare_evolved.gateway": "Gateway",
   "block.nightmare_evolved.seed_of_nightmare": "Seed of Nightmare",
-  "block.nightmare_evolved.seven_star_lock": "Seven-Starred Lock"
+  "block.nightmare_evolved.seven_star_lock": "Seven-Starred Lock",
+  "realm.nightmare_evolved.law.dark_sea": "The Dark Sea closes over you. Something moves in the black water.",
+  "realm.nightmare_evolved.law.chains": "The chains are rattling. The island is about to rise.",
+  "realm.nightmare_evolved.law.mist": "The mist swallows colour, sound and scent. Do not linger in it.",
+  "realm.nightmare_evolved.law.mirage": "The black pyramid is no nearer than it was.",
+  "realm.nightmare_evolved.law.astray": "The storm hid the stars. The sea has carried you somewhere else.",
+  "spell.nightmare_evolved.dark_sea_sealed": "The seven stars shine in the lock of the Crimson Spire. The Dark Sea is drawn down into its well, and sealed there.",
+  "commands.nightmare_evolved.realm.sealed": "The Dark Sea is sealed away.",
+  "commands.nightmare_evolved.realm.unsealed": "The Dark Sea is loose again."
 }

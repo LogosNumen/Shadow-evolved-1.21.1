@@ -2,6 +2,10 @@ package net.logosnumen.nightmareevolved.client;
 
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
+import net.logosnumen.nightmareevolved.client.dream.ClientRealm;
+import net.logosnumen.nightmareevolved.client.dream.DreamSky;
+import net.logosnumen.nightmareevolved.client.dream.RealmFog;
+import net.logosnumen.nightmareevolved.client.dream.RealmRender;
 import java.util.function.Supplier;
 import net.logosnumen.nightmareevolved.client.memory.ClientWorn;
 import net.logosnumen.nightmareevolved.client.memory.WalkingCofferRenderer;
@@ -70,6 +74,10 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::onClientSetup);
         NeoForge.EVENT_BUS.addListener(SoulSeaClient::onRenderFog);
         NeoForge.EVENT_BUS.addListener(SoulSeaClient::onFogColour);
+        NeoForge.EVENT_BUS.addListener(RealmFog::onRenderFog);
+        NeoForge.EVENT_BUS.addListener(RealmFog::onFogColour);
+        NeoForge.EVENT_BUS.addListener(ClientRealm::onClientTick);
+        NeoForge.EVENT_BUS.addListener(RealmRender::onRenderLevel);
         NeoForge.EVENT_BUS.addListener(AbilityKeys::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(VfxParticle::onRenderLevel);
@@ -110,6 +118,7 @@ public final class ClientSetup {
 
     private static void onDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
         event.register(NightmareEvolved.id("soul_sea"), new SoulSeaSky());
+        event.register(NightmareEvolved.id("dream_realm"), new DreamSky());
     }
 
     /** Memory bows draw like bows and Memory shields block like shields. */
@@ -133,6 +142,7 @@ public final class ClientSetup {
     private static void onRegisterLayers(RegisterGuiLayersEvent event) {
         event.registerAbove(VanillaGuiLayers.HOTBAR, NightmareEvolved.id("soul"), SoulHud::render);
         event.registerAbove(VanillaGuiLayers.CROSSHAIR, NightmareEvolved.id("meditation"), MeditationOverlay::render);
+        event.registerBelow(VanillaGuiLayers.HOTBAR, NightmareEvolved.id("crushing"), RealmFog::renderPressure);
     }
 
     private static void onRegisterItemColours(RegisterColorHandlersEvent.Item event) {
@@ -143,6 +153,7 @@ public final class ClientSetup {
         ClientSoul.clear();
         ClientSea.clear();
         ClientWorn.clear();
+        ClientRealm.clear();
     }
 
     private static void onRegisterParticles(RegisterParticleProvidersEvent event) {

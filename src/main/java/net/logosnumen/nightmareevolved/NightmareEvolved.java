@@ -13,6 +13,7 @@ import net.logosnumen.nightmareevolved.core.Scheduler;
 import net.logosnumen.nightmareevolved.creature.CreatureEvents;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.dream.DreamRealm;
+import net.logosnumen.nightmareevolved.dream.law.RealmLaws;
 import net.logosnumen.nightmareevolved.echo.EchoEvents;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
@@ -114,6 +115,10 @@ public final class NightmareEvolved {
         NeoForge.EVENT_BUS.addListener(SoulSeaEvents::onLogin);
         NeoForge.EVENT_BUS.addListener(SoulSeaEvents::onLogout);
         NeoForge.EVENT_BUS.addListener(SoulSeaEvents::onServerStopped);
+        NeoForge.EVENT_BUS.addListener(RealmLaws::onServerTick);
+        NeoForge.EVENT_BUS.addListener(RealmLaws::onLogout);
+        NeoForge.EVENT_BUS.addListener(RealmLaws::onChangeDimension);
+        NeoForge.EVENT_BUS.addListener(RealmLaws::onServerStopped);
         NeoForge.EVENT_BUS.addListener(Nightmares::onServerTick);
         NeoForge.EVENT_BUS.addListener(Nightmares::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(Nightmares::onDeath);
