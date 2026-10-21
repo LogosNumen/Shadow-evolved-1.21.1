@@ -2,6 +2,7 @@ package net.logosnumen.nightmareevolved.network;
 
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.client.anim.ClientPoses;
+import net.logosnumen.nightmareevolved.client.dream.ClientRealm;
 import net.logosnumen.nightmareevolved.client.memory.ClientWorn;
 import net.logosnumen.nightmareevolved.client.soul.ClientSea;
 import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
@@ -27,6 +28,11 @@ public final class Network {
         registrar.playToServer(SoulActionPayload.TYPE, SoulActionPayload.CODEC, Network::onAction);
         registrar.playToClient(MeditationPayload.TYPE, MeditationPayload.CODEC, Network::onMeditation);
         registrar.playToClient(WornPayload.TYPE, WornPayload.CODEC, Network::onWorn);
+        registrar.playToClient(RealmPayload.TYPE, RealmPayload.CODEC, Network::onRealm);
+    }
+
+    private static void onRealm(RealmPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> ClientRealm.set(payload));
     }
 
     private static void onWorn(WornPayload payload, IPayloadContext context) {

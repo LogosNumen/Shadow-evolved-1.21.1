@@ -41,39 +41,34 @@ Each step below lands as its own pull request.
 - **Echoes:** soulless copies of slain creatures, frozen as they died. They are summoned from the soul, fight with
   their Attributes, and heal over time.
 
-## 3c. The Dream Realm
+## 3c. The Dream Realm (done; see [DREAM_REALM.md](DREAM_REALM.md))
 
-A dimension of its own, built region by region as the novel describes them:
-
-- **The Forgotten Shore**
-  - Black earth and an endless labyrinth of crimson coral under a starless sky.
-  - The Dark Sea floods it every night.
-  - Landmarks: the Ashen Barrow and its Soul Devouring Tree, the Sea of Ash, Bone Ridge, the walled Dark City (Bright
-    Castle, Catacombs, Ruined Cathedral, Library Ruins), and the Crimson Spire with its Gateway.
-- **The Chained Isles**
-  - Floating islands bound by colossal chains between a Sky Above and a Sky Below. The islands rise, fall and crush,
-    and the Tear grows at the centre.
-  - The Sanctuary of Noctis and the Night Temple.
-  - Altar, Iron Hand, Reckoning and Shipwreck Islands, and the Ivory and Ebony Towers.
-- **The Hollow Mountains:** dragon-fang peaks wrapped in the mist of nothingness, hollow with true darkness.
-  - The Underground Mine and its black river.
-  - The temple-gate entrance to the Underworld, and the three layers below it, down to Nether's City.
-- **The Nightmare Desert:** white dunes under a blinding sun where the Deathless rise to war each night, and the black
-  pyramid of the Tomb of Ariel.
-- **Godgrave:** the skeleton of a dead god under a sky that erases what it sees.
-  - Vermilion grass on white bone.
-  - The jungle hollows inside the bones, the Sea of Ash, the Spinal Ocean and Vanishing Lake.
-- **The Stormsea:** endless storm-wracked water where space loops and only the stars guide, with its island Citadels.
-- **Citadels and Bastion's lands:**
-  - Bastion on its lake, ringed by the ash of the forest it burned.
-  - Ravenheart's black-jade palace and giant bridge between a snowy peak and a volcano.
-  - The Burned Forest.
-  - The Moonriver Plain.
+- **A dimension of its own,** laid out region by region where the novel puts them: the Forgotten Shore and its Sea of
+  Ash and barrows, the Burned Forest, the Hollow Mountains and the Underworld beneath them, the Nightmare Desert, the
+  Moonriver Plain, Godgrave and the hollows inside its bones, the Glass Hell, the Chained Isles, Ravenheart, the Bone
+  Sea, Bastion, the Weeping Goddess and the Stormsea.
+- **Their landmarks:** the Crimson Spire and the Dark City, the Ashen Barrow, the Sanctuary of Noctis, the Night
+  Temple, the Ivory and Ebony Towers, the Black Skull and the Tomb of Ariel, Nether's City, Vanishing Lake and the
+  ziggurat of the Hollows, and the Citadels: Bastion, Ravenheart, Clan Sorrow's, Rivergate, Red Hill, the Night Garden
+  and the Black Obelisk.
+- **Their skies and laws:**
+  - the Dark Sea that floods the Shore by night;
+  - the Crushing of the Isles and their forbidden sky;
+  - the mist of nothingness and the lightless dark;
+  - the Desert's mirage and its one true path;
+  - Godgrave's Cloudveil and the white sky behind it;
+  - the Stormsea's looping courses, the Bone Sea's water, and the Glass Hell's burning lenses.
 - **Getting there and back:**
   - A Sleeper's first sleep drops them somewhere random in the Dream Realm. Reaching a Gateway makes them Awakened and
     anchors them there.
-  - Seeds of Nightmare grow in the Dream Realm and call to the Awakened. Conquering one is how the Second through
-    Sixth Nightmares are reached. A Seed left alone blooms into a Gate.
+  - Each side keeps its own belongings, and the sleeping body can be struck awake.
+  - Masters cross in body, and Saints carry others across.
+- **Seeds of Nightmare,** three of them the novel's own and the rest scattered by region, call to the Awakened. Each
+  holds the Second through Sixth Nightmares by Category, and conquering one leaves a Gateway. The two knives cut the
+  Dark Seed's chains. A Seed left alone blooms into a Gate in the waking world, with its waves and its Guardian.
+- **Citadels:** a Saint binds one to their soul, and its likeness rises in their Soul Sea. The Great Citadels wait for
+  Sovereigns.
+- The Desert's Deathless and the rest of the realm's creatures come in 3d.
 
 ## 3d. The creatures of the Dream Realm
 

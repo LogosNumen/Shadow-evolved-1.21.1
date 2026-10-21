@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "nightmare_evolved:block/black_bark_log"
+    },
+    "axis=z": {
+      "model": "nightmare_evolved:block/black_bark_log",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "nightmare_evolved:block/black_bark_log",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

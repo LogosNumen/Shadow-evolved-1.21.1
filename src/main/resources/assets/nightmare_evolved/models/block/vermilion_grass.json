@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "nightmare_evolved:block/vermilion_grass"
+  },
+  "render_type": "minecraft:cutout"
+}

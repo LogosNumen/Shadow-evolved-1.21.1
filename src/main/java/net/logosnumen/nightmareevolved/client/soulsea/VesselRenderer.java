@@ -18,8 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 /**
- * A body left sitting while its mind is in its Soul Sea: its owner's own shape, seated with its head bowed, breathing
- * slowly.
+ * A body left behind by its soul, in its owner's own shape: seated with its head bowed while the mind is in its Soul
+ * Sea, breathing slowly, or lying asleep in bed while the soul dreams.
  */
 public class VesselRenderer extends LivingEntityRenderer<VesselEntity, PlayerModel<VesselEntity>> {
     private final PlayerModel<VesselEntity> wide;
@@ -45,13 +45,24 @@ public class VesselRenderer extends LivingEntityRenderer<VesselEntity, PlayerMod
     public void render(VesselEntity vessel, float yaw, float partialTick, PoseStack pose, MultiBufferSource buffers, int light) {
         PlayerSkin skin = skin(vessel);
         this.model = skin.model() == PlayerSkin.Model.SLIM ? this.slim : this.wide;
-        this.model.riding = true;
+        this.model.riding = !vessel.dreaming();
         super.render(vessel, yaw, partialTick, pose, buffers, light);
     }
 
     @Override
     protected void setupRotations(VesselEntity vessel, PoseStack pose, float bob, float yaw, float partialTick, float scale) {
         super.setupRotations(vessel, pose, bob, yaw, partialTick, scale);
+        if (vessel.dreaming()) {
+            if (!vessel.isSleeping()) {
+                // No bed: asleep where it lay, on the ground.
+                pose.translate(0.0F, 0.15F, 0.0F);
+                pose.mulPose(Axis.XP.rotationDegrees(-90.0F));
+                pose.translate(0.0F, -0.95F, 0.0F);
+            }
+
+            return;
+        }
+
         pose.translate(0.0F, -0.6F, 0.0F);
         pose.mulPose(Axis.XP.rotationDegrees(4.0F + 1.5F * Mth.sin((vessel.tickCount + partialTick) * 0.05F)));
     }

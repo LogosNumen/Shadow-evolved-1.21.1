@@ -15,8 +15,6 @@ final class Session {
         GATHERING,
         WAVES,
         GUARDIAN,
-        /** Crossing to the Gateway. */
-        RUNNING,
         /** Won; the Spell is about to send the soul home, raised. */
         ENDING
     }
@@ -33,11 +31,15 @@ final class Session {
     long nextAt;
     @Nullable
     UUID guardian;
+    /** The Seed of Nightmare this Nightmare was entered through, if any: conquering it destroys the Seed. */
+    @Nullable
+    final String seed;
 
-    Session(UUID player, Trial trial, Arenas.Layout layout, long id) {
+    Session(UUID player, Trial trial, Arenas.Layout layout, long id, @Nullable String seed) {
         this.player = player;
         this.trial = trial;
         this.layout = layout;
         this.id = id;
+        this.seed = seed;
     }
 }

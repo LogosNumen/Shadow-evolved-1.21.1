@@ -1,0 +1,9 @@
+{
+  "type": "nightmare_evolved:dream_realm",
+  "generator": {
+    "type": "nightmare_evolved:dream_realm",
+    "biome_source": {
+      "type": "nightmare_evolved:dream_realm"
+    }
+  }
+}

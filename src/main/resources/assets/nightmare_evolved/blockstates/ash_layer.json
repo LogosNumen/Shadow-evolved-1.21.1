@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "layers=1": {
+      "model": "nightmare_evolved:block/ash_layer_1"
+    },
+    "layers=2": {
+      "model": "nightmare_evolved:block/ash_layer_2"
+    },
+    "layers=3": {
+      "model": "nightmare_evolved:block/ash_layer_3"
+    },
+    "layers=4": {
+      "model": "nightmare_evolved:block/ash_layer_4"
+    },
+    "layers=5": {
+      "model": "nightmare_evolved:block/ash_layer_5"
+    },
+    "layers=6": {
+      "model": "nightmare_evolved:block/ash_layer_6"
+    },
+    "layers=7": {
+      "model": "nightmare_evolved:block/ash_layer_7"
+    },
+    "layers=8": {
+      "model": "nightmare_evolved:block/ash"
+    }
+  }
+}

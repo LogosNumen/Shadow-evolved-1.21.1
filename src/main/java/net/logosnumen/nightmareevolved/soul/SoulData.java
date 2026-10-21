@@ -51,6 +51,7 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
     private String citadel = "";
     private CompoundTag seaReturn = new CompoundTag();
     private int seaVisits;
+    private CompoundTag dream = new CompoundTag();
     private boolean dirty = true;
     private boolean seaDirty = true;
 
@@ -378,6 +379,16 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         this.seaVisits++;
     }
 
+    /** The soul's journeys into the Dream Realm: its anchor, its body left behind, its belongings on either side. */
+    public CompoundTag dream() {
+        return this.dream;
+    }
+
+    /** Forgets every journey the soul made (for operators starting a soul over). */
+    public void resetDream() {
+        this.dream = new CompoundTag();
+    }
+
     public void changed() {
         this.dirty = true;
     }
@@ -440,6 +451,7 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         tag.putString("Citadel", this.citadel);
         tag.put("SeaReturn", this.seaReturn);
         tag.putInt("SeaVisits", this.seaVisits);
+        tag.put("Dream", this.dream);
         return tag;
     }
 
@@ -495,6 +507,7 @@ public final class SoulData implements INBTSerializable<CompoundTag> {
         this.citadel = tag.getString("Citadel");
         this.seaReturn = tag.getCompound("SeaReturn");
         this.seaVisits = tag.getInt("SeaVisits");
+        this.dream = tag.getCompound("Dream");
         this.dirty = true;
         this.seaDirty = true;
     }

@@ -11,6 +11,8 @@ import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.aspect.Awakening;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
+import net.logosnumen.nightmareevolved.dream.gate.Citadels;
 import net.logosnumen.nightmareevolved.flaw.Flaw;
 import net.logosnumen.nightmareevolved.flaw.FlawEvents;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
@@ -179,6 +181,9 @@ final class SoulCommand {
     private static int reset(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         SoulData soul = Soul.of(player);
+        DreamTravel.wake(player);
+        soul.resetDream();
+        Citadels.release(player);
         soul.setAspect("", soul.aspectTier());
         soul.setFlaw("");
         soul.clearAttributes();

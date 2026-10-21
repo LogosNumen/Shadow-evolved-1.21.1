@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.soulsea.SoulSea;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,13 +24,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BedBlock;
 
 /**
- * A body sitting still while its mind is down in its Soul Sea. It draws the eyes of whatever hunts nearby, and the
- * moment it is struck, its mind is torn back up into it.
+ * A body left behind by its soul: sitting still while its mind is down in its Soul Sea, or asleep in its bed while
+ * its soul is in the Dream Realm. It draws the eyes of whatever hunts nearby, and the moment it is struck, its soul is
+ * torn back into it.
  */
 public final class VesselEntity extends LivingEntity {
     private static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(VesselEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Boolean> DREAMING = SynchedEntityData.defineId(VesselEntity.class, EntityDataSerializers.BOOLEAN);
     private int away;
 
     public VesselEntity(EntityType<? extends VesselEntity> type, Level level) {
@@ -43,6 +48,7 @@ public final class VesselEntity extends LivingEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(OWNER, Optional.empty());
+        builder.define(DREAMING, false);
     }
 
     @Nullable
@@ -55,6 +61,33 @@ public final class VesselEntity extends LivingEntity {
         this.setCustomName(Component.translatable("soul_sea.nightmare_evolved.vessel", player.getDisplayName()));
     }
 
+    /** Whether this body lies asleep while its soul is in the Dream Realm, rather than sitting while it is in its Soul Sea. */
+    public boolean dreaming() {
+        return this.entityData.get(DREAMING);
+    }
+
+    /** Lays the body down asleep in its bed, its soul away in the Dream Realm. */
+    public void dream(Player owner, BlockPos bed) {
+        this.entityData.set(DREAMING, true);
+        this.setCustomName(Component.translatable("dream.nightmare_evolved.sleeper", owner.getDisplayName()));
+        if (this.level().getBlockState(bed).getBlock() instanceof BedBlock) {
+            this.startSleeping(bed);
+        }
+    }
+
+    /** The soul came back: the body rises from its bed and is gone, its owner standing in its place. */
+    public void wakeAndVanish() {
+        if (this.isSleeping()) {
+            this.stopSleeping();
+        }
+
+        this.discard();
+    }
+
+    private boolean away(ServerPlayer player) {
+        return this.dreaming() ? DreamTravel.dreaming(player) : SoulSea.in(player);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -64,10 +97,10 @@ public final class VesselEntity extends LivingEntity {
 
         UUID owner = this.owner();
         ServerPlayer player = owner == null ? null : level.getServer().getPlayerList().getPlayer(owner);
-        if (player != null && !SoulSea.in(player)) {
+        if (player != null && !this.away(player)) {
             // Its mind came back some other way (a respawn, a command); the body has no reason to sit here.
             if (++this.away > 5) {
-                this.discard();
+                this.wakeAndVanish();
             }
 
             return;
@@ -85,8 +118,8 @@ public final class VesselEntity extends LivingEntity {
             return false;
         }
 
-        if (SoulSea.struck(this, source, amount)) {
-            this.discard();
+        if (this.dreaming() ? DreamTravel.struck(this, source, amount) : SoulSea.struck(this, source, amount)) {
+            this.wakeAndVanish();
         }
 
         return false;
@@ -128,11 +161,14 @@ public final class VesselEntity extends LivingEntity {
         if (owner != null) {
             tag.putUUID("Owner", owner);
         }
+
+        tag.putBoolean("Dreaming", this.dreaming());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.entityData.set(OWNER, tag.hasUUID("Owner") ? Optional.of(tag.getUUID("Owner")) : Optional.empty());
+        this.entityData.set(DREAMING, tag.getBoolean("Dreaming"));
     }
 }

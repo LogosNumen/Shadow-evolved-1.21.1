@@ -13,9 +13,12 @@ import net.logosnumen.nightmareevolved.colossus.Quake;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
+import net.logosnumen.nightmareevolved.dream.seed.Seeds;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
 import net.logosnumen.nightmareevolved.memory.Family;
 import net.logosnumen.nightmareevolved.memory.SoulMemories;
+import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
 import net.logosnumen.nightmareevolved.spell.Spell;
@@ -53,9 +56,10 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Runs the Spell's trials. A trial begins when a soul answers the Spell (or simply sleeps once it is ready): the Spell
- * remembers where it was, raises an arena in the Nightmare's void and takes it there. Waves of Nightmare Creatures
- * come, then the guardian; in the Awakening the soul must instead cross to the Gateway while creatures harry it.
+ * Runs the Spell's trials. The First Nightmare comes to an Aspirant in sleep; later Nightmares are entered by
+ * challenging a Seed of Nightmare. The Spell remembers where the soul was, raises an arena in the Nightmare's void and
+ * takes it there. Waves of Nightmare Creatures come, then the guardian. (The Awakening is no Nightmare: it is the Dream
+ * Realm itself, see {@link DreamTravel}.)
  * Victory raises the soul and sends it home (with an Aspect, after the First Nightmare). Death in a trial keeps its
  * belongings safe, sends it home, and costs half its saturation and a short wait before it can try again; leaving the
  * game mid-trial counts the same.
@@ -95,14 +99,14 @@ public final class Nightmares {
             return Spell.line("spell.nightmare_evolved.not_recovered", (wait + 19) / 20);
         }
 
-        if (trial.needsSaturation() && soul.saturation() < Trial.READY_SATURATION) {
-            return Spell.line("spell.nightmare_evolved.not_saturated", soul.fragments(), (int)(soul.capacity() * Trial.READY_SATURATION));
-        }
-
         return null;
     }
 
-    /** Takes a soul into its next trial if it is ready; tells it why not otherwise. */
+    /**
+     * Answers the Spell's call. An Aspirant is taken into their First Nightmare. A Sleeper is carried into the Dream
+     * Realm, where the Awakening waits. Past that the Spell no longer comes in sleep: the Nightmares after are reached by
+     * challenging Seeds of Nightmare.
+     */
     public static boolean begin(ServerPlayer player) {
         Component refusal = refusal(player);
         if (refusal != null) {
@@ -110,11 +114,30 @@ public final class Nightmares {
             return false;
         }
 
-        return begin(player, Trial.next(Soul.of(player).rank()));
+        Trial trial = Trial.next(Soul.of(player).rank());
+        if (trial == Trial.AWAKENING) {
+            return DreamTravel.dream(player);
+        }
+
+        if (trial != Trial.FIRST_NIGHTMARE) {
+            Spell.say(player, "spell.nightmare_evolved.seek_seed");
+            return false;
+        }
+
+        return begin(player, trial);
     }
 
     /** Takes a player into a given trial, whatever their state (used by operators to test trials). */
     public static boolean begin(ServerPlayer player, @Nullable Trial trial) {
+        return begin(player, trial, null);
+    }
+
+    /** Takes a player into a trial, entered through a Seed of Nightmare (or none). */
+    public static boolean begin(ServerPlayer player, @Nullable Trial trial, @Nullable String seed) {
+        if (trial == Trial.AWAKENING) {
+            return DreamTravel.dream(player);
+        }
+
         MinecraftServer server = player.server;
         ServerLevel level = server.getLevel(DIMENSION);
         if (trial == null || level == null || inTrial(player)) {
@@ -133,18 +156,18 @@ public final class Nightmares {
 
         BlockPos centre = NightmareSlots.claim(server);
         Arenas.Layout layout = Arenas.build(level, trial, centre, level.random);
-        Session session = new Session(player.getUUID(), trial, layout, nextId++);
+        Session session = new Session(player.getUUID(), trial, layout, nextId++, seed);
         session.nextAt = level.getGameTime() + 80;
         SESSIONS.put(player.getUUID(), session);
         Vec3 arrival = layout.arrival();
-        player.teleportTo(level, arrival.x, arrival.y, arrival.z, trial.objective == Trial.Objective.REACH ? 0.0F : player.getYRot(), 0.0F);
+        player.teleportTo(level, arrival.x, arrival.y, arrival.z, player.getYRot(), 0.0F);
         session.bar.setName(trial.title());
         session.bar.setProgress(1.0F);
         session.bar.addPlayer(player);
         Vfx.flash(level, arrival.add(0.0, 1.0, 0.0), Vfx.Palette.SHADOW, 2.5F);
         level.playSound(null, BlockPos.containing(arrival), SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 1.5F, 0.6F);
         Spell.say(player, "spell.nightmare_evolved.trial_begins", trial.title());
-        Spell.say(player, trial.objective == Trial.Objective.REACH ? "spell.nightmare_evolved.objective_reach" : "spell.nightmare_evolved.objective_slay");
+        Spell.say(player, "spell.nightmare_evolved.objective_slay");
         return true;
     }
 
@@ -196,11 +219,7 @@ public final class Nightmares {
 
             return true;
         });
-        if (session.trial.objective == Trial.Objective.REACH) {
-            reach(level, player, session, now);
-        } else {
-            slay(level, player, session, now);
-        }
+        slay(level, player, session, now);
     }
 
     private static void slay(ServerLevel level, ServerPlayer player, Session session, long now) {
@@ -239,40 +258,6 @@ public final class Nightmares {
         if (guardian instanceof LivingEntity living && living.isAlive()) {
             session.bar.setProgress(Mth.clamp(living.getHealth() / living.getMaxHealth(), 0.0F, 1.0F));
         } else {
-            victory(level, player, session, now);
-        }
-    }
-
-    private static void reach(ServerLevel level, ServerPlayer player, Session session, long now) {
-        Vec3 goal = session.layout.goal();
-        if (goal == null) {
-            return;
-        }
-
-        if (session.state == Session.State.GATHERING && now >= session.nextAt) {
-            session.state = Session.State.RUNNING;
-        }
-
-        if (now % 10 == 0) {
-            Vfx.sigilFacing(level, goal.add(0.0, 3.5, 0.0), 2.4, Vfx.Palette.RUNE, new Vec3(0.0, 0.0, -1.0), 14);
-        }
-
-        double total = Arenas.CAUSEWAY;
-        double left = Math.max(0.0, goal.z - player.getZ());
-        session.bar.setName(Component.translatable("trial.nightmare_evolved.gateway", Math.round(left)));
-        session.bar.setProgress(Mth.clamp((float)(1.0 - left / total), 0.0F, 1.0F));
-        if (session.state == Session.State.RUNNING && now % 120 == 0 && session.creatures.size() < 8) {
-            RandomSource random = level.random;
-            for (int i = 0; i < 2 + random.nextInt(2); i++) {
-                double z = Math.min(goal.z - 6.0, player.getZ() + 12.0 + random.nextDouble() * 10.0);
-                double x = session.layout.centre().getX() + 0.5 + (random.nextDouble() - 0.5) * 4.0;
-                double y = Quake.groundAt(level, x, Arenas.GROUND + 2, z);
-                spawn(level, session.trial.pool.get(random.nextInt(session.trial.pool.size())), new Vec3(x, y, z), session.trial.creatures,
-                    session.trial.classFor(i), false, session, player);
-            }
-        }
-
-        if (player.position().distanceTo(goal) < 3.5) {
             victory(level, player, session, now);
         }
     }
@@ -393,6 +378,10 @@ public final class Nightmares {
         Family family = guardian instanceof LivingEntity living ? Family.of(living) : Family.STRANGE;
         int tier = guardian instanceof LivingEntity living ? Creatures.classOf(living).ordinal() + 1 : 1;
         end(player.server, session);
+        if (session.seed != null) {
+            Seeds.conquered(player.server, session.seed);
+        }
+
         Soul.setRank(player, trial.to());
         Soul.of(player).passTrial();
         returnHome(player);
@@ -458,6 +447,18 @@ public final class Nightmares {
         player.teleportTo(home, x, y, z, yaw, 0.0F);
     }
 
+    /** The Seed a running trial was entered through, by the trial's id, or null. */
+    @Nullable
+    public static String seedOf(long trial) {
+        for (Session session : SESSIONS.values()) {
+            if (session.id == trial) {
+                return session.seed;
+            }
+        }
+
+        return null;
+    }
+
     /** Ends a running trial as won, at once (for operators testing the road). */
     public static boolean forceWin(ServerPlayer player) {
         Session session = SESSIONS.get(player.getUUID());
@@ -471,12 +472,37 @@ public final class Nightmares {
 
     // ---- Events -----------------------------------------------------------------------------------------------------
 
-    /** A soul that sleeps while it is ready for its next trial is taken into it. */
+    /**
+     * The Spell comes in sleep: an Aspirant who sleeps is taken into the First Nightmare, and every soul that has passed
+     * it is carried into the Dream Realm when it sleeps in the waking world.
+     */
     public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (event.getEntity() instanceof ServerPlayer player && player.isSleeping() && player.getSleepTimer() == 60 && refusal(player) == null) {
-            player.stopSleepInBed(true, true);
-            begin(player);
+        if (!(event.getEntity() instanceof ServerPlayer player) || !player.isSleeping() || player.getSleepTimer() != 60) {
+            return;
         }
+
+        SoulData soul = Soul.of(player);
+        if (soul.rank() == Rank.ASPIRANT) {
+            if (refusal(player) == null) {
+                player.stopSleepInBed(true, true);
+                begin(player, Trial.FIRST_NIGHTMARE);
+            }
+        } else if (DreamTravel.waking(player.level()) && !DreamTravel.dreaming(player)) {
+            DreamTravel.dream(player);
+        }
+    }
+
+    /**
+     * A Sleeper comes out of the Dream Realm through a Gateway, and is Awakened: their core evolves, and their Aspect
+     * opens further.
+     */
+    public static void awaken(ServerPlayer player) {
+        Soul.setRank(player, Rank.AWAKENED);
+        Soul.of(player).passTrial();
+        Vfx.flash(player.serverLevel(), Vfx.chest(player), Vfx.Palette.LIGHT, 3.0F);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 0.8F);
+        Spell.say(player, "spell.nightmare_evolved.awakened");
+        Spell.say(player, "spell.nightmare_evolved.rank_reached", Rank.AWAKENED.title(), Rank.AWAKENED.tier());
     }
 
     /** Death in a trial: the soul's belongings are held safe (nothing drops into the void) and the trial is lost. */

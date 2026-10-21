@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "nightmare_evolved:block/gateway_ring",
+    "side": "nightmare_evolved:block/gateway_side",
+    "bottom": "nightmare_evolved:block/gateway_side"
+  }
+}

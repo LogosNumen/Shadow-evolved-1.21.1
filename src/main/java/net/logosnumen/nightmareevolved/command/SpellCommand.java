@@ -7,6 +7,9 @@ import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
 import net.logosnumen.nightmareevolved.flaw.Flaw;
+import net.logosnumen.nightmareevolved.dream.DreamRealm;
+import net.logosnumen.nightmareevolved.dream.DreamState;
+import net.logosnumen.nightmareevolved.dream.gate.Gateways;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.nightmare.Trial;
 import net.logosnumen.nightmareevolved.soul.Soul;
@@ -17,6 +20,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -49,6 +53,14 @@ public final class SpellCommand {
         if (soul.cores() > 0) {
             player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.essence", Math.round(soul.essence()), Math.round(soul.maxEssence())));
             player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.cores", soul.cores(), soul.fragments(), soul.capacity()));
+        }
+
+        DreamState dream = DreamState.of(player);
+        if (!dream.anchor().isEmpty() && player.getServer() != null) {
+            ServerLevel realm = player.getServer().getLevel(DreamRealm.DIMENSION);
+            Gateways.Gateway anchor = realm == null ? null : Gateways.byId(realm, dream.anchor());
+            player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.anchor", anchor != null ? anchor.title()
+                : Component.translatable("spell.nightmare_evolved.status.anchor_lost")));
         }
 
         Trial trial = Trial.next(soul.rank());

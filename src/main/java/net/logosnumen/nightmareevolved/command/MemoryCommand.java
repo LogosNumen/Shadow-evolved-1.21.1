@@ -48,7 +48,8 @@ import net.minecraft.world.entity.Mob;
  * </ul>
  */
 final class MemoryCommand {
-    private static final List<String> CITADELS = List.of("bright_castle", "ravenheart", "crimson_spire", "bastion", "none");
+    private static final List<String> CITADELS = List.of("bright_castle", "crimson_spire", "ivory_tower", "sanctuary_of_noctis", "night_temple",
+        "black_skull", "vanishing_lake", "red_hill", "ravenheart", "bastion", "sorrow", "rivergate", "night_garden", "black_obelisk", "none");
 
     private MemoryCommand() {
     }

@@ -14,15 +14,16 @@ import net.minecraft.world.level.block.Blocks;
 
 /**
  * The trials the Spell sets, one for each step up the ladder. The First Nightmare makes an Aspirant a Sleeper; the
- * Awakening (for now a run across a ruined causeway to a Gateway, until the Dream Realm itself is built) makes a
- * Sleeper Awakened; each Nightmare after raises the soul again. Every trial but the first asks for full soul cores.
- * Each has its waves of Nightmare Creatures, a guardian (colossi guard the deepest), and a look of its own.
+ * Awakening, which is no Nightmare but the Dream Realm itself (a Sleeper must find their way to a Gateway), makes a
+ * Sleeper Awakened; each Nightmare after it, reached by challenging a Seed of Nightmare of its Category, raises the soul
+ * again. Each Nightmare has its waves of Nightmare Creatures, a guardian (colossi guard the deepest), and a look of its
+ * own.
  */
 public enum Trial {
     FIRST_NIGHTMARE(Rank.ASPIRANT, Objective.SLAY, CreatureRank.DORMANT, CreatureRank.AWAKENED, 3,
         List.of(EntityType.ZOMBIE, EntityType.HUSK, EntityType.SPIDER, EntityType.SKELETON), EntityType.ZOMBIE, null,
         new Theme(Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE, Blocks.STONE, Blocks.STONE_BRICKS, Blocks.SOUL_LANTERN)),
-    AWAKENING(Rank.SLEEPER, Objective.REACH, CreatureRank.DORMANT, CreatureRank.AWAKENED, 0,
+    AWAKENING(Rank.SLEEPER, Objective.GATEWAY, CreatureRank.DORMANT, CreatureRank.AWAKENED, 0,
         List.of(EntityType.ZOMBIE, EntityType.SPIDER, EntityType.SKELETON, EntityType.CAVE_SPIDER), null, null,
         new Theme(Blocks.STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS, Blocks.CHISELED_STONE_BRICKS, Blocks.SOUL_LANTERN)),
     SECOND_NIGHTMARE(Rank.AWAKENED, Objective.SLAY, CreatureRank.AWAKENED, CreatureRank.FALLEN, 3,
@@ -41,10 +42,13 @@ public enum Trial {
         List.of(EntityType.RAVAGER, EntityType.WITHER_SKELETON, EntityType.EVOKER, EntityType.PIGLIN_BRUTE), null, ColossusKind.CHAINBOUND,
         new Theme(Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN, Blocks.SCULK, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.SOUL_LANTERN));
 
-    /** What a trial asks: slay its waves and guardian, or reach its far end alive. */
+    /**
+     * What a trial asks: slay its waves and guardian, or (for the Awakening) find a way out of the Dream Realm through a
+     * Gateway.
+     */
     public enum Objective {
         SLAY,
-        REACH
+        GATEWAY
     }
 
     /** The blocks a trial's ground and ruins are made of, and its lights. */
@@ -83,16 +87,6 @@ public enum Trial {
     /** The trial's position in the ladder, from 1 (the First Nightmare). */
     public int depth() {
         return this.ordinal() + 1;
-    }
-
-    /**
-     * How full a soul's cores must be before the Spell takes it into a trial past the first. The novel sets no such
-     * bar; it stands in until the Dream Realm's Gateways and Seeds of Nightmare become the way onward.
-     */
-    public static final double READY_SATURATION = 0.5;
-
-    public boolean needsSaturation() {
-        return this != FIRST_NIGHTMARE;
     }
 
     /** The class a creature of this trial takes, by its place in the wave: deeper trials send fiercer kinds. */
