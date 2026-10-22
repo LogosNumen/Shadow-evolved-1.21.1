@@ -5,6 +5,7 @@ import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
+import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.memory.Memories;
 import net.logosnumen.nightmareevolved.memory.MemoryDef;
@@ -31,6 +32,10 @@ public final class ModTab {
                 output.accept(Colossi.OSSUARY_EGG.get());
                 output.accept(Colossi.GRAVEWYRM_EGG.get());
                 output.accept(Colossi.CHAINBOUND_EGG.get());
+                for (Item egg : CreatureTypes.eggs()) {
+                    output.accept(egg);
+                }
+
                 for (CreatureRank rank : CreatureRank.values()) {
                     output.accept(ModItems.shard(rank, 1));
                 }

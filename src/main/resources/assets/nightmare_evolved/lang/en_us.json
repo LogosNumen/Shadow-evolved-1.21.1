@@ -1663,5 +1663,13 @@
   "spell.nightmare_evolved.citadel_held": "%s is already bound to the soul of %s.",
   "spell.nightmare_evolved.citadel_bound": "%s is bound to your soul. It answers to you alone now, its likeness rises in your Soul Sea, and its Gateway is where you will enter the Dream Realm.",
   "spell.nightmare_evolved.citadel_rebound": "%s is bound to your soul now, and %s is free of you.",
-  "commands.nightmare_evolved.realm.no_gateway": "There is no Gateway beside you."
+  "commands.nightmare_evolved.realm.no_gateway": "There is no Gateway beside you.",
+  "entity.nightmare_evolved.carapace_scavenger": "Carapace Scavenger",
+  "item.nightmare_evolved.carapace_scavenger_spawn_egg": "Carapace Scavenger Spawn Egg",
+  "entity.nightmare_evolved.carapace_centurion": "Carapace Centurion",
+  "item.nightmare_evolved.carapace_centurion_spawn_egg": "Carapace Centurion Spawn Egg",
+  "entity.nightmare_evolved.carapace_demon": "Carapace Demon",
+  "item.nightmare_evolved.carapace_demon_spawn_egg": "Carapace Demon Spawn Egg",
+  "entity.nightmare_evolved.creature_bolt": "Creature Bolt",
+  "creature.nightmare_evolved.named": "%s, %s"
 }

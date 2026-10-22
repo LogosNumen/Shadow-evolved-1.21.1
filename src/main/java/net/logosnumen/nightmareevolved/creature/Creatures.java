@@ -2,7 +2,9 @@ package net.logosnumen.nightmareevolved.creature;
 
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.core.ModAttachments;
+import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
+import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -55,10 +57,14 @@ public final class Creatures {
     }
 
     /**
-     * Whether slaying a creature feeds a soul: Nightmare Creatures do, and so do ordinary monsters, which count as
-     * Dormant Beasts. Animals and people don't.
+     * Whether slaying a creature feeds a soul: Nightmare Creatures do (all but the soulless, like the Deathless), and so
+     * do ordinary monsters, which count as Dormant Beasts. Animals and people don't.
      */
     public static boolean feedsSouls(LivingEntity entity) {
+        if (entity instanceof DreamCreature creature && creature.kind().has(Kind.Trait.SOULLESS)) {
+            return false;
+        }
+
         return ofNightmare(entity) || entity instanceof Enemy;
     }
 
@@ -93,6 +99,22 @@ public final class Creatures {
         profile(mob).set(rank, creatureClass, guardian, trial);
         mob.setPersistenceRequired();
         if (mob instanceof ColossusEntity) {
+            return;
+        }
+
+        if (mob instanceof DreamCreature creature) {
+            // A creature of the Dream Realm is already built for its own rank and class: only a rank above that
+            // (or guarding) makes it stronger.
+            int above = Math.max(0, rank.ordinal() - creature.kind().rank.ordinal());
+            set(mob, Attributes.MAX_HEALTH, HEALTH, above * 0.9 + (guardian ? 1.5 : 0.0), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            set(mob, Attributes.ATTACK_DAMAGE, DAMAGE, above * 2.0 + (guardian ? 2.0 : 0.0), AttributeModifier.Operation.ADD_VALUE);
+            set(mob, Attributes.ARMOR, ARMOR, above * 2.0, AttributeModifier.Operation.ADD_VALUE);
+            mob.setHealth(mob.getMaxHealth());
+            if (guardian) {
+                mob.setCustomName(title(rank, creatureClass));
+                mob.setCustomNameVisible(true);
+            }
+
             return;
         }
 
