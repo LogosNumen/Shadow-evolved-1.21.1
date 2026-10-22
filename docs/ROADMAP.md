@@ -68,28 +68,31 @@ Each step below lands as its own pull request.
   Dark Seed's chains. A Seed left alone blooms into a Gate in the waking world, with its waves and its Guardian.
 - **Citadels:** a Saint binds one to their soul, and its likeness rises in their Soul Sea. The Great Citadels wait for
   Sovereigns.
-- The Desert's Deathless and the rest of the realm's creatures come in 3d.
 
-## 3d. The creatures of the Dream Realm
+## 3d. The creatures of the Dream Realm (done; see [CREATURES.md](CREATURES.md))
 
-Every named Nightmare Creature of each region, at its rank and class, with behaviour to match:
+Sixty-six of the novel's Nightmare Creatures, region by region, at their ranks and classes, each with a body of its own
+and moves to match. The greatest keep lairs at the places the novel puts them.
 
-- **Forgotten Shore:**
-  - Carapace Scavengers, Centurions and the Carapace Demon.
-  - The Black Knight, the Cursed Herald, Stone Saints, Iron Spiders and their Matriarch.
-  - The Lord of the Dead, Blood Fiends, Corpse Eaters and Flesh Reavers.
-  - The Vile Thieving Bird, the Soul Devouring Tree, the Dark Sea's horrors, and the Crimson Terror.
-- **Chained Isles:**
-  - Black Ravagers, Chain Worms, Chalice Maidens, Dread Wolves and Griffins.
-  - The Mirror Beast, Mordant Mimics, Sailor Dolls, Wormvine and the Blood-Nourished Root.
-- **Hollow Mountains and the Underworld:** mist beings, corrupted Stone Saints, the Horror of the Lightless Current,
-  and the Jade Titan.
-- **Nightmare Desert:** the Deathless and Skinwalkers.
-- **Godgrave:**
-  - The Asuras of Condemnation and Condemnation itself, and Abjuration.
-  - The Cloudveil, blood mosquito swarms, harpies, the three-headed hound, and the depth dweller of the Spinal Ocean.
-- **Burned Forest:** the Black Millipede Tribe and its time-shifted Millipede Queens.
-- **Elsewhere:** Stone Worms, Chalice Knights, and the Stormsea's serpents.
+- **Forgotten Shore:** the Carapace Scavengers, Centurions and their Demon; the Black Knight; the Cursed Herald and the
+  Crimson Terror on the Spire; Stone Saints, Iron Spiders and their Matriarch; the Lord of the Dead; Blood Fiends,
+  Corpse Eaters and Flesh Reavers; the Soul Devouring Tree; and the Vile Thieving Bird's unhatched spawn.
+- **Chained Isles:** Black Ravagers, Chain Worms, Chalice Maidens, Dread Wolves and Griffins; the Mirror Beast,
+  Mordant Mimics, Sailor Dolls, Wormvine and the Blood-Nourished Root.
+- **Hollow Mountains and the Underworld:** mist beings, the Saints of Tainted Jade, Absence, the Jade Titan and the
+  Horror of the Lightless Current.
+- **Nightmare Desert:** the Deathless, who rise each night and cannot die, and Skinwalkers.
+- **Godgrave:** the Asuras of Condemnation and Condemnation itself; Abjuration; the Guardian of Vanishing Lake; the
+  hollows' beasts, from blood mosquito swarms to the three-headed hound; ash worms; and the depth dweller of the
+  Spinal Ocean, which now fills the spine's canal.
+- **Burned Forest:** the Black Millipede tribe, its painted elders, and a Millipede Queen who slips between moments,
+  in a fortified hive.
+- **Elsewhere:** Chalice Knights and stone worms around Ravenheart, the gaunt maw of the Moonriver Plain, the
+  Undetectable Forest Maw around Bastion, and the Stormsea's serpents and Old Tom.
+- **Gates** send out the creatures of their Seed's own region.
+
+Still to come: the Corrupted Immortals of the Eternal City, the Cloudveil's fireflies, and creatures for the Glass Hell,
+the Bone Sea, the Weeping Goddess and the Land of Barrows.
 
 ## 3e. Ascension
 
