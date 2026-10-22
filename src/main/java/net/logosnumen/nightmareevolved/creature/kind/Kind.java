@@ -44,7 +44,11 @@ public final class Kind {
         /** Takes no harm from falling. */
         LIGHT_FALL,
         /** Feeds on what it bites: heals by half of every wound it deals. */
-        DRAIN
+        DRAIN,
+        /** Lies still until it is struck or something comes within a few steps of it. */
+        LURKER,
+        /** Hangs in the air where it grows (under an island), untouched by falling. */
+        HANGING
     }
 
     /** When a creature walks abroad. */
@@ -73,6 +77,8 @@ public final class Kind {
      */
     public record Lair(Places.Place place, int dx, int dz, int y) {
         public static final int GROUND = Integer.MIN_VALUE;
+        /** Under the land there, hanging from its underside. */
+        public static final int BENEATH = Integer.MIN_VALUE + 1;
     }
 
     /** Makes the entity for a kind. */

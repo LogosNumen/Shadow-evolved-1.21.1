@@ -103,6 +103,10 @@ public class DreamCreature extends Monster {
             }
         }
 
+        if (kind.has(Kind.Trait.HANGING)) {
+            this.setNoGravity(true);
+        }
+
         this.navigation = this.navigationFor(level);
         if (!level.isClientSide) {
             this.addGoals();
@@ -133,6 +137,11 @@ public class DreamCreature extends Monster {
     /** Which of its kind's looks this one wears. */
     public int look() {
         return this.entityData.get(DATA_LOOK);
+    }
+
+    /** Whether the creature is roused out of its resting form (a mimic out of its chest, and the like). */
+    public boolean roused() {
+        return false;
     }
 
     public boolean keepsLair() {
@@ -188,7 +197,13 @@ public class DreamCreature extends Monster {
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 16.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, motion != Kind.Motion.ROOT));
+        if (this.kind.has(Kind.Trait.LURKER)) {
+            // Lurkers notice only what comes right up to them.
+            this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                player -> player.distanceToSqr(this) < 16.0));
+        } else {
+            this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, motion != Kind.Motion.ROOT));
+        }
     }
 
     @Override
@@ -213,7 +228,8 @@ public class DreamCreature extends Monster {
 
     @Override
     public boolean causeFallDamage(float distance, float multiplier, DamageSource source) {
-        if (this.kind.motion == Kind.Motion.FLY || this.kind.motion == Kind.Motion.HOVER || this.kind.has(Kind.Trait.LIGHT_FALL)) {
+        if (this.kind.motion == Kind.Motion.FLY || this.kind.motion == Kind.Motion.HOVER || this.kind.has(Kind.Trait.LIGHT_FALL)
+            || this.kind.has(Kind.Trait.HANGING)) {
             return false;
         }
 

@@ -2,6 +2,7 @@ package net.logosnumen.nightmareevolved.client.creature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -10,14 +11,20 @@ import net.logosnumen.nightmareevolved.client.rig.Rig;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Move;
 import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
+import net.logosnumen.nightmareevolved.entity.creature.MirrorBeast;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
@@ -41,9 +48,15 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         }
     };
 
+    /** The shapes a Mirror Beast takes when it becomes a player. */
+    private final PlayerModel<DreamCreature> wide;
+    private final PlayerModel<DreamCreature> slim;
+
     public CreatureRenderer(EntityRendererProvider.Context context) {
         super(context);
         this.shadowStrength = 0.7F;
+        this.wide = new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false);
+        this.slim = new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER_SLIM), true);
     }
 
     private static Rig.Baked baked(DreamCreature creature) {
@@ -72,12 +85,18 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
             move != null ? move.id() : null,
             creature.actionProgress(partial),
             death,
-            false
+            creature.roused()
         );
     }
 
     @Override
     public void render(DreamCreature creature, float entityYaw, float partial, PoseStack poseStack, MultiBufferSource buffers, int light) {
+        if (creature instanceof MirrorBeast mirror && mirror.mirrored().isPresent() && this.renderMirrored(mirror, mirror.mirrored().get(), partial, poseStack,
+            buffers, light)) {
+            super.render(creature, entityYaw, partial, poseStack, buffers, light);
+            return;
+        }
+
         CreatureModel model = CreatureModels.of(creature.kind());
         Rig.Baked body = baked(creature);
         Pose pose = pose(creature, partial);
@@ -103,5 +122,30 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         body.root().render(poseStack, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
         super.render(creature, entityYaw, partial, poseStack, buffers, light);
+    }
+
+    /** Draws a Mirror Beast as the player whose shape it has taken, cold and silvered; false if that player is unknown here. */
+    private boolean renderMirrored(MirrorBeast mirror, UUID player, float partial, PoseStack poseStack, MultiBufferSource buffers, int light) {
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        PlayerInfo info = connection != null ? connection.getPlayerInfo(player) : null;
+        if (info == null) {
+            return false;
+        }
+
+        PlayerSkin skin = info.getSkin();
+        PlayerModel<DreamCreature> model = skin.model() == PlayerSkin.Model.SLIM ? this.slim : this.wide;
+        float bodyYaw = Mth.rotLerp(partial, mirror.yBodyRotO, mirror.yBodyRot);
+        float headYaw = Mth.wrapDegrees(Mth.rotLerp(partial, mirror.yHeadRotO, mirror.yHeadRot) - bodyYaw);
+        model.attackTime = mirror.getAttackAnim(partial);
+        model.setupAnim(mirror, mirror.walkAnimation.position(partial), mirror.walkAnimation.speed(partial), mirror.tickCount + partial, headYaw,
+            mirror.getViewXRot(partial));
+        int overlay = OverlayTexture.pack(OverlayTexture.u(0.0F), OverlayTexture.v(mirror.hurtTime > 0 || mirror.deathTime > 0));
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+        poseStack.scale(-0.9375F, -0.9375F, 0.9375F);
+        poseStack.translate(0.0F, -1.501F, 0.0F);
+        model.renderToBuffer(poseStack, buffers.getBuffer(RenderType.entityTranslucent(skin.texture())), light, overlay, 0xF0D8E4FF);
+        poseStack.popPose();
+        return true;
     }
 }

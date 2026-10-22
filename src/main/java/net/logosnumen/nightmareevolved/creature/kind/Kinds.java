@@ -13,6 +13,7 @@ public final class Kinds {
 
     static {
         ShoreKinds.ALL.forEach(Kinds::add);
+        IsleKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {

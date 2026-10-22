@@ -47,8 +47,18 @@ public final class Lairs {
 
         int x = lair.place().x() + lair.dx();
         int z = lair.place().z() + lair.dz();
-        int y = lair.y() != Kind.Lair.GROUND ? lair.y() : realm.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-        return new BlockPos(x, y, z);
+        int top = realm.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        if (lair.y() == Kind.Lair.BENEATH) {
+            // Down through the land to its underside.
+            BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, top - 1, z);
+            while (pos.getY() > realm.getMinBuildHeight() && !realm.isEmptyBlock(pos)) {
+                pos.move(0, -1, 0);
+            }
+
+            return new BlockPos(x, pos.getY() - (int)Math.ceil(kind.height) - 1, z);
+        }
+
+        return new BlockPos(x, lair.y() != Kind.Lair.GROUND ? lair.y() : top, z);
     }
 
     static void visit(ServerLevel realm, ServerPlayer player) {
@@ -104,7 +114,7 @@ public final class Lairs {
     @Nullable
     public static DreamCreature summon(ServerLevel realm, Kind kind) {
         BlockPos at = lairOf(realm, kind);
-        boolean aloft = kind.motion == Kind.Motion.FLY || kind.motion == Kind.Motion.HOVER || kind.motion == Kind.Motion.SWIM;
+        boolean aloft = kind.motion == Kind.Motion.FLY || kind.motion == Kind.Motion.HOVER || kind.motion == Kind.Motion.SWIM || kind.has(Kind.Trait.HANGING);
         DreamCreature creature = null;
         // The lair's very spot may be taken (a coral ridge, a fallen stone): look outward from it for room.
         for (int ring = 0; ring <= 8 && creature == null; ring += 2) {

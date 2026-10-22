@@ -3,6 +3,9 @@ package net.logosnumen.nightmareevolved.client.creature;
 import java.util.HashMap;
 import java.util.Map;
 import com.mojang.logging.LogUtils;
+import net.logosnumen.nightmareevolved.client.creature.isles.IsleBeasts;
+import net.logosnumen.nightmareevolved.client.creature.isles.IsleFolk;
+import net.logosnumen.nightmareevolved.client.creature.isles.IsleHorrors;
 import net.logosnumen.nightmareevolved.client.creature.shore.CarapaceModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreBeasts;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreFolk;
@@ -43,6 +46,19 @@ public final class CreatureModels {
         MODELS.put("blood_flower", new ShoreHorrors.Flower());
         MODELS.put("rolling_stone", new ShoreHorrors.Stone());
         MODELS.put("vile_thieving_birds_spawn", new ShoreHorrors.Egg());
+        MODELS.put("black_ravager", new IsleBeasts.Ravager());
+        MODELS.put("dread_wolf", new IsleBeasts.DreadWolf());
+        MODELS.put("griffin", new IsleBeasts.Griffin());
+        MODELS.put("giant_ant", new IsleBeasts.Ant());
+        MODELS.put("chain_worm", new IsleFolk.ChainWorm());
+        MODELS.put("chalice_maiden", new IsleFolk.Maiden());
+        MODELS.put("mirror_beast", new IsleFolk.Mirror());
+        MODELS.put("sailor_doll", new IsleFolk.Doll());
+        MODELS.put("stone_gargoyle", new IsleFolk.Gargoyle());
+        MODELS.put("mordant_mimic", new IsleHorrors.Mimic());
+        MODELS.put("wormvine", new IsleHorrors.Wormvine());
+        MODELS.put("blood_nourished_root", new IsleHorrors.Root());
+        MODELS.put("isle_horror", new IsleHorrors.IsleHorror());
     }
 
     private CreatureModels() {

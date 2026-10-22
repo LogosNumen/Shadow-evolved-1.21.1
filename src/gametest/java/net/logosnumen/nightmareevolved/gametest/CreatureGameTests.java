@@ -4,6 +4,8 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import java.util.List;
+import net.logosnumen.nightmareevolved.creature.kind.IsleKinds;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
@@ -50,16 +52,21 @@ public class CreatureGameTests {
 
     @GameTest(template = "empty")
     public static void lairsLieInTheirRegions(GameTestHelper helper) {
-        for (Kind kind : ShoreKinds.ALL) {
-            if (kind.lair != null) {
-                int x = kind.lair.place().x() + kind.lair.dx();
-                int z = kind.lair.place().z() + kind.lair.dz();
-                helper.assertTrue(RealmMap.regionAt(x, z).whole() == Region.FORGOTTEN_SHORE, kind.id + " keeps its lair on the Forgotten Shore");
-            }
-        }
+        lairsIn(helper, ShoreKinds.ALL, Region.FORGOTTEN_SHORE);
+        lairsIn(helper, IsleKinds.ALL, Region.CHAINED_ISLES);
 
         helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();
+    }
+
+    private static void lairsIn(GameTestHelper helper, List<Kind> kinds, Region region) {
+        for (Kind kind : kinds) {
+            if (kind.lair != null) {
+                int x = kind.lair.place().x() + kind.lair.dx();
+                int z = kind.lair.place().z() + kind.lair.dz();
+                helper.assertTrue(RealmMap.regionAt(x, z).whole() == region, kind.id + " keeps its lair in " + region.id());
+            }
+        }
     }
 
     @GameTest(template = "empty")
