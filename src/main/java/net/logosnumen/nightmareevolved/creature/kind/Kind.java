@@ -15,6 +15,7 @@ import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
@@ -41,7 +42,9 @@ public final class Kind {
         /** Fire does not touch it. */
         FIREPROOF,
         /** Takes no harm from falling. */
-        LIGHT_FALL
+        LIGHT_FALL,
+        /** Feeds on what it bites: heals by half of every wound it deals. */
+        DRAIN
     }
 
     /** When a creature walks abroad. */
@@ -54,12 +57,22 @@ public final class Kind {
         SURFACE, AIR, WATER
     }
 
-    /** A place a creature haunts: its region, how often it turns up, how many come together, when and where. */
-    public record Haunt(Region region, int weight, int min, int max, Time time, Ground ground) {
+    /**
+     * A place a creature haunts: its region, how often it turns up, how many come together, when and where, and (for
+     * those that keep to one spot of a region) the place they keep near and how far from it they go.
+     */
+    public record Haunt(Region region, int weight, int min, int max, Time time, Ground ground, @Nullable Places.Place near, int radius) {
+        public boolean reaches(double x, double z) {
+            return this.near == null || Math.hypot(x - this.near.x(), z - this.near.z()) <= this.radius;
+        }
     }
 
-    /** A named creature's lair: the place it keeps, and how far off it waits from the place's centre. */
-    public record Lair(Places.Place place, int dx, int dz) {
+    /**
+     * A named creature's lair: the place it keeps, how far off it waits from the place's centre, and the height it is
+     * found at (or {@link #GROUND} for the open ground there).
+     */
+    public record Lair(Places.Place place, int dx, int dz, int y) {
+        public static final int GROUND = Integer.MIN_VALUE;
     }
 
     /** Makes the entity for a kind. */
@@ -82,6 +95,8 @@ public final class Kind {
     public final List<Move> moves;
     public final Set<Trait> traits;
     public final List<Haunt> haunts;
+    /** What a landed blow leaves in its victim besides the wound. */
+    public final List<Supplier<MobEffectInstance>> afflictions;
     @Nullable
     public final Lair lair;
     public final boolean lore;
@@ -114,6 +129,7 @@ public final class Kind {
         this.moves = List.copyOf(b.moves);
         this.traits = b.traits.isEmpty() ? Set.of() : Set.copyOf(b.traits);
         this.haunts = List.copyOf(b.haunts);
+        this.afflictions = List.copyOf(b.afflictions);
         this.lair = b.lair;
         this.lore = b.lore;
         this.commands = Set.copyOf(b.commands);
@@ -161,6 +177,7 @@ public final class Kind {
         private final List<Move> moves = new ArrayList<>();
         private final Set<Trait> traits = EnumSet.noneOf(Trait.class);
         private final List<Haunt> haunts = new ArrayList<>();
+        private final List<Supplier<MobEffectInstance>> afflictions = new ArrayList<>();
         @Nullable
         private Lair lair;
         private boolean lore;
@@ -222,12 +239,31 @@ public final class Kind {
         }
 
         public Builder haunt(Region region, int weight, int min, int max, Time time, Ground ground) {
-            this.haunts.add(new Haunt(region, weight, min, max, time, ground));
+            this.haunts.add(new Haunt(region, weight, min, max, time, ground, null, 0));
+            return this;
+        }
+
+        /** A haunt kept to within {@code radius} blocks of a place. */
+        public Builder hauntNear(Region region, Places.Place near, int radius, int weight, int min, int max, Time time) {
+            Ground ground = this.motion == Motion.FLY ? Ground.AIR : this.motion == Motion.SWIM ? Ground.WATER : Ground.SURFACE;
+            this.haunts.add(new Haunt(region, weight, min, max, time, ground, near, radius));
             return this;
         }
 
         public Builder lair(Places.Place place, int dx, int dz) {
-            this.lair = new Lair(place, dx, dz);
+            this.lair = new Lair(place, dx, dz, Lair.GROUND);
+            return this;
+        }
+
+        /** A lair at a height of its own: inside a tower, high in the air. */
+        public Builder lair(Places.Place place, int dx, int dz, int y) {
+            this.lair = new Lair(place, dx, dz, y);
+            return this;
+        }
+
+        /** A landed blow leaves this in its victim. */
+        public Builder afflicts(Supplier<MobEffectInstance> affliction) {
+            this.afflictions.add(affliction);
             return this;
         }
 

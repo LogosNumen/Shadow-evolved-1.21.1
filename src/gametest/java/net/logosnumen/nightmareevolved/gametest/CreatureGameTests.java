@@ -7,6 +7,9 @@ import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
+import net.logosnumen.nightmareevolved.dream.Places;
+import net.logosnumen.nightmareevolved.dream.RealmMap;
+import net.logosnumen.nightmareevolved.dream.Region;
 import net.logosnumen.nightmareevolved.dream.life.Wildlife;
 import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
 import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
@@ -42,6 +45,20 @@ public class CreatureGameTests {
         }
 
         helper.assertTrue(Memories.leftBy(ShoreKinds.CARAPACE_SCAVENGER.id) != null, "The novel's creatures are named for the Memories they leave");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void lairsLieInTheirRegions(GameTestHelper helper) {
+        for (Kind kind : ShoreKinds.ALL) {
+            if (kind.lair != null) {
+                int x = kind.lair.place().x() + kind.lair.dx();
+                int z = kind.lair.place().z() + kind.lair.dz();
+                helper.assertTrue(RealmMap.regionAt(x, z).whole() == Region.FORGOTTEN_SHORE, kind.id + " keeps its lair on the Forgotten Shore");
+            }
+        }
+
+        helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();
     }
 

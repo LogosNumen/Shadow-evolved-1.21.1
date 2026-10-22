@@ -17,6 +17,10 @@ public final class Places {
     public static final Place DARK_CITY = new Place("dark_city", 1420, -6020);
     public static final Place ASHEN_BARROW = new Place("ashen_barrow", -3330, -6150);
     public static final Place BONE_RIDGE = new Place("bone_ridge", -260, -6960);
+    /** Where the iron spiders nest in the labyrinth (the novel gives no place; this one is the mod's). */
+    public static final Place IRON_NEST = new Place("iron_nest", -200, -5600);
+    /** A nest of stone on a coral hill where the Vile Thieving Bird's spawn waits, unhatched (the mod's own place). */
+    public static final Place STONE_NEST = new Place("stone_nest", -1900, -6700);
     // The Hollow Mountains.
     public static final Place UNDERGROUND_MINE = new Place("underground_mine", 1350, -4200);
     public static final Place UNDERWORLD_GATE = new Place("underworld_gate", -520, -3060);
@@ -56,10 +60,10 @@ public final class Places {
     public static final Place BLACK_OBELISK = new Place("black_obelisk", -800, 5700);
 
     public static final List<Place> ALL = List.of(
-        CRIMSON_SPIRE, DARK_CITY, ASHEN_BARROW, BONE_RIDGE, UNDERGROUND_MINE, UNDERWORLD_GATE, NETHERS_CITY, BLACK_MOUNTAIN, TOMB_OF_ARIEL,
-        BLACK_SKULL, GODGRAVE_SKULL, VANISHING_LAKE, MICTLAN_ZIGGURAT, RED_HILL, TEAR, SANCTUARY_OF_NOCTIS, NORTHERN_ISLAND, IVORY_TOWER,
-        EBONY_TOWER, IRON_HAND, RECKONING, SHIPWRECK, TWISTED_TREES, JAGGED_ROCKS, DESECRATED_GROVE, CORRUPTED_ISLAND, BASTION, RAVENHEART,
-        RAVENHEART_VOLCANO, WEEPING_GODDESS, RIVERGATE, NIGHT_GARDEN, BLACK_OBELISK
+        CRIMSON_SPIRE, DARK_CITY, ASHEN_BARROW, BONE_RIDGE, IRON_NEST, STONE_NEST, UNDERGROUND_MINE, UNDERWORLD_GATE, NETHERS_CITY,
+        BLACK_MOUNTAIN, TOMB_OF_ARIEL, BLACK_SKULL, GODGRAVE_SKULL, VANISHING_LAKE, MICTLAN_ZIGGURAT, RED_HILL, TEAR, SANCTUARY_OF_NOCTIS,
+        NORTHERN_ISLAND, IVORY_TOWER, EBONY_TOWER, IRON_HAND, RECKONING, SHIPWRECK, TWISTED_TREES, JAGGED_ROCKS, DESECRATED_GROVE,
+        CORRUPTED_ISLAND, BASTION, RAVENHEART, RAVENHEART_VOLCANO, WEEPING_GODDESS, RIVERGATE, NIGHT_GARDEN, BLACK_OBELISK
     );
 
     private Places() {

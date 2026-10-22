@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
@@ -22,6 +23,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -76,6 +78,8 @@ public class DreamCreature extends Monster {
     private int restTicks;
     private int clientActionStart;
     private final Set<UUID> struck = new HashSet<>();
+    /** How long a swimmer has lain out of the water. */
+    private int beached;
     /** The lair this creature keeps, if it is one of the named; empty for the rest. */
     private String lair = "";
 
@@ -584,6 +588,10 @@ public class DreamCreature extends Monster {
     /** Lands a blow on something, with a shove of the given strength away from this body. */
     protected void strike(LivingEntity hit, float damage, float shove) {
         if (hit.hurt(this.damageSources().mobAttack(this), damage)) {
+            if (this.kind.has(Kind.Trait.DRAIN)) {
+                this.heal(damage * 0.5F);
+            }
+
             if (shove > 0.0F) {
                 Vec3 away = hit.position().subtract(this.position()).multiply(1.0, 0.0, 1.0).normalize().scale(shove * 0.5);
                 hit.push(away.x, 0.1 * shove, away.z);
@@ -596,6 +604,9 @@ public class DreamCreature extends Monster {
 
     /** What a landed blow leaves behind beyond the wound (venom and the like). */
     protected void afflict(LivingEntity hit) {
+        for (Supplier<MobEffectInstance> affliction : this.kind.afflictions) {
+            hit.addEffect(affliction.get(), this);
+        }
     }
 
     /** A bolt of this creature's has struck something. */
@@ -659,6 +670,17 @@ public class DreamCreature extends Monster {
 
         if (this.restTicks > 0) {
             this.restTicks--;
+        }
+
+        // A swimmer left without water (the Dark Sea draining at dawn) sinks away into what is left of it.
+        if (this.kind.motion == Kind.Motion.SWIM && !this.isInWater() && !this.keepsLair()) {
+            if (++this.beached > 60) {
+                Vfx.smoke(level, this.position().add(0.0, this.getBbHeight() * 0.5, 0.0), this.kind.palette.deep, 20, this.getBbWidth() * 0.5);
+                this.discard();
+                return;
+            }
+        } else {
+            this.beached = 0;
         }
 
         if (this.acting != null) {

@@ -17,11 +17,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -79,7 +81,13 @@ public final class Wildlife {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int dy = up; dy >= -down; dy--) {
             pos.set(x, y + dy, z);
-            if (level.getBlockState(pos).isFaceSturdy(level, pos, Direction.UP) && level.isEmptyBlock(pos.above()) && level.isEmptyBlock(pos.above(2))) {
+            BlockState state = level.getBlockState(pos);
+            if (state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES)) {
+                // Branches are no floor: keep looking for the ground beneath them.
+                continue;
+            }
+
+            if (state.isFaceSturdy(level, pos, Direction.UP) && level.isEmptyBlock(pos.above()) && level.isEmptyBlock(pos.above(2))) {
                 return pos.above().immutable();
             }
         }
@@ -110,7 +118,7 @@ public final class Wildlife {
         int total = 0;
         for (int i = 0; i < haunts.size(); i++) {
             Kind.Haunt haunt = haunts.get(i);
-            if (fits(haunt, night, floor, water)) {
+            if (fits(haunt, night, floor, water) && haunt.reaches(x, z)) {
                 total += haunt.weight();
             }
         }
@@ -122,7 +130,7 @@ public final class Wildlife {
         int roll = random.nextInt(total);
         for (int i = 0; i < haunts.size(); i++) {
             Kind.Haunt haunt = haunts.get(i);
-            if (!fits(haunt, night, floor, water)) {
+            if (!fits(haunt, night, floor, water) || !haunt.reaches(x, z)) {
                 continue;
             }
 

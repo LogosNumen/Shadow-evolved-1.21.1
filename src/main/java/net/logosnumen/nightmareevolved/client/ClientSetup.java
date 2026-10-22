@@ -3,6 +3,7 @@ package net.logosnumen.nightmareevolved.client;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
 import net.logosnumen.nightmareevolved.client.creature.CreatureBoltRenderer;
+import net.logosnumen.nightmareevolved.client.creature.CreatureModels;
 import net.logosnumen.nightmareevolved.client.creature.CreatureRenderer;
 import net.logosnumen.nightmareevolved.client.dream.ClientRealm;
 import net.logosnumen.nightmareevolved.client.dream.DreamSky;
@@ -136,6 +137,7 @@ public final class ClientSetup {
 
     /** Memory bows draw like bows and Memory shields block like shields. */
     private static void onClientSetup(FMLClientSetupEvent event) {
+        CreatureModels.verify();
         event.enqueueWork(() -> {
             for (Supplier<? extends Item> memory : MemoryItems.all()) {
                 Item item = memory.get();

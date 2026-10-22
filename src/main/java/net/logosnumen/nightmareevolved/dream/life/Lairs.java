@@ -47,7 +47,8 @@ public final class Lairs {
 
         int x = lair.place().x() + lair.dx();
         int z = lair.place().z() + lair.dz();
-        return new BlockPos(x, realm.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+        int y = lair.y() != Kind.Lair.GROUND ? lair.y() : realm.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        return new BlockPos(x, y, z);
     }
 
     static void visit(ServerLevel realm, ServerPlayer player) {
@@ -103,8 +104,22 @@ public final class Lairs {
     @Nullable
     public static DreamCreature summon(ServerLevel realm, Kind kind) {
         BlockPos at = lairOf(realm, kind);
-        BlockPos floor = Wildlife.floor(realm, at.getX(), at.getY(), at.getZ(), 4, 24);
-        DreamCreature creature = Wildlife.spawn(realm, kind, floor != null ? floor : at, MobSpawnType.STRUCTURE);
+        boolean aloft = kind.motion == Kind.Motion.FLY || kind.motion == Kind.Motion.HOVER || kind.motion == Kind.Motion.SWIM;
+        DreamCreature creature = null;
+        // The lair's very spot may be taken (a coral ridge, a fallen stone): look outward from it for room.
+        for (int ring = 0; ring <= 8 && creature == null; ring += 2) {
+            int samples = ring == 0 ? 1 : 8;
+            for (int i = 0; i < samples && creature == null; i++) {
+                double angle = i * Math.PI * 2.0 / samples;
+                int x = at.getX() + (int)Math.round(Math.cos(angle) * ring);
+                int z = at.getZ() + (int)Math.round(Math.sin(angle) * ring);
+                BlockPos spot = aloft ? new BlockPos(x, at.getY(), z) : Wildlife.floor(realm, x, at.getY(), z, 4, 24);
+                if (spot != null) {
+                    creature = Wildlife.spawn(realm, kind, spot, MobSpawnType.STRUCTURE);
+                }
+            }
+        }
+
         if (creature == null) {
             return null;
         }
