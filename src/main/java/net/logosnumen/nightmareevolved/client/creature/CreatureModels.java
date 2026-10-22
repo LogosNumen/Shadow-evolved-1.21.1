@@ -85,6 +85,8 @@ public final class CreatureModels {
         MODELS.put("three_headed_hound", new GodgraveBeasts.Hound());
         MODELS.put("viper_lion", new GodgraveBeasts.ViperLion());
         MODELS.put("tyrant_lizard", new GodgraveBeasts.TyrantLizard());
+        MODELS.put("ash_worm", new GodgraveBeasts.AshWorm());
+        MODELS.put("depth_dweller", new GodgraveGreats.DepthDweller());
     }
 
     private CreatureModels() {

@@ -9,6 +9,7 @@ import net.logosnumen.nightmareevolved.client.rig.Look;
 import net.logosnumen.nightmareevolved.client.rig.Material;
 import net.logosnumen.nightmareevolved.client.rig.Pose;
 import net.logosnumen.nightmareevolved.client.rig.Rig;
+import net.minecraft.util.Mth;
 
 /** The beasts of Godgrave's hollows. */
 public final class GodgraveBeasts {
@@ -420,6 +421,65 @@ public final class GodgraveBeasts {
             Bones.turn(body.part("leg0_r"), -50.0F * Math.max(0.0F, stomp), 0.0F, 0.0F);
             Bones.turn(body.part("body"), 12.0F * pose.key("charge", 0.0F, 0.0F, 0.15F, 1.0F, 0.85F, 1.0F, 1.0F, 0.0F), 0.0F, 0.0F);
             Gaits.fall(body, pose, 10.0F, 80.0F);
+        }
+    }
+
+    /** An ash worm: a long grey worm of dead flesh, a round maw ringed with teeth at its front. Built small and drawn large. */
+    public static final class AshWorm extends CreatureModel {
+        private static final Look LOOK = new Look(0x8A8A86, 0x3A3A38, 0xB0B0AA, 0x6A6A66, 0xD8D0C0, 0x2A2A28, 0x5A5A56);
+        private static final int SEGMENTS = 10;
+
+        @Override
+        public Look look(int look) {
+            return LOOK;
+        }
+
+        @Override
+        public float renderScale() {
+            return 2.5F;
+        }
+
+        @Override
+        public Rig build(int look) {
+            Rig rig = new Rig();
+            rig.bone("root", null, 0.0F, 24.0F, 0.0F);
+            rig.bone("body", "root", 0.0F, -5.0F, -6.0F);
+            rig.bone("head", "body", 0.0F, 0.0F, 0.0F);
+            rig.box("head", Material.BELLY, -5, -5, -7, 10, 10, 7);
+            rig.box("head", Material.VEIN, -5.5F, -5.5F, -2, 11, 11, 1);
+            for (int t = 0; t < 10; t++) {
+                float a = t * Mth.TWO_PI / 10.0F;
+                rig.box("head", Material.BONE, Mth.sin(a) * 3.6F - 0.5F, Mth.cos(a) * 3.6F - 0.5F, -7.6F, 1, 1, 2);
+            }
+
+            rig.box("head", Material.EYE, -2.5F, -2.5F, -7.2F, 5, 5, 1);
+            String parent = "body";
+            for (int s = 0; s < SEGMENTS; s++) {
+                String seg = "seg" + s;
+                rig.bone(seg, parent, 0.0F, 0.0F, s == 0 ? 0.0F : 7.0F);
+                float w = 9.5F - Math.max(0, s - 5) * 1.2F;
+                box(rig, seg, Material.BELLY, -w / 2.0F, -w / 2.0F, 0.0F, w, w, 7.0F);
+                box(rig, seg, Material.VEIN, -w / 2.0F - 0.3F, -w / 2.0F - 0.3F, 6.0F, w + 0.6F, w + 0.6F, 1.0F);
+                parent = seg;
+            }
+
+            return rig;
+        }
+
+        @Override
+        public void animate(Rig.Baked body, Pose pose, int look) {
+            Gaits.sway(body, pose, "seg", SEGMENTS, 10.0F, 0.2F + 0.5F * pose.stride(), 0.6F);
+            Gaits.ripple(body, pose, "seg", SEGMENTS, 4.0F, 0.15F, 0.8F);
+            Gaits.look(body, pose, 0.5F, 0.4F);
+            float maw = pose.key("maw", 0.0F, 0.0F, 0.4F, -1.0F, 0.6F, 1.0F, 1.0F, 0.0F);
+            Bones.shift(body.part("body"), 0.0F, -3.0F * Math.max(0.0F, -maw), -6.0F * Math.max(0.0F, maw));
+            float crush = pose.key("crush", 0.0F, 0.0F, 0.55F, 1.0F, 0.66F, -0.4F, 1.0F, 0.0F);
+            Bones.turn(body.part("head"), -40.0F * Math.max(0.0F, crush) + 30.0F * Math.max(0.0F, -crush), 0.0F, 0.0F);
+            Bones.turn(body.part("seg0"), -20.0F * Math.max(0.0F, crush), 0.0F, 0.0F);
+            Bones.shift(body.part("body"), 0.0F, -8.0F * Math.max(0.0F, crush), 0.0F);
+            float lunge = pose.key("lunge", 0.0F, 0.0F, 0.15F, 1.0F, 0.85F, 1.0F, 1.0F, 0.0F);
+            Bones.turn(body.part("head"), 10.0F * lunge, 0.0F, 0.0F);
+            Gaits.fall(body, pose, 0.0F, 120.0F);
         }
     }
 }

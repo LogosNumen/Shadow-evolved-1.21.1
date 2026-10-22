@@ -1,6 +1,7 @@
 package net.logosnumen.nightmareevolved.dream.gen;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ public final class Godgrave {
     public static final int VAULT_HALF = 170;
     public static final int VAULT_NORTH = -1450;
     public static final int VAULT_SOUTH = 650;
+    /** The water's height in the spine's canal: the Spinal Ocean. */
+    public static final int SPINAL_SEA = 106;
     private static final int SHELL = 7;
     private static final double SKULL_X = AXIS;
     private static final double SKULL_Y = 150.0;
@@ -175,10 +178,13 @@ public final class Godgrave {
 
         BlockState bone = Blocks.BONE_BLOCK.defaultBlockState();
         boolean any = skull(column, bone);
-        for (Tube tube : tubesAt(x, z)) {
+        List<Tube> tubes = tubesAt(x, z);
+        for (Tube tube : tubes) {
             any |= tube(column, tube, bone);
         }
 
+        // The hollows are carved once all the bone is laid, so that where two bones overlap their hollows run on through.
+        hollows(column, tubes);
         any |= ribs(column, bone);
         any |= vault(column, bone);
         if (any) {
@@ -186,7 +192,7 @@ public final class Godgrave {
         }
     }
 
-    /** The y ranges where a vertical line at a column meets a tube; fills the bone and carves its hollow. */
+    /** Fills the bone where a vertical line at a column meets a tube. */
     private static boolean tube(Column column, Tube tube, BlockState bone) {
         double px = column.x + 0.5;
         double pz = column.z + 0.5;
@@ -196,23 +202,13 @@ public final class Godgrave {
 
         double lo = Double.MAX_VALUE;
         double hi = -Double.MAX_VALUE;
-        double holeLo = Double.MAX_VALUE;
-        double holeHi = -Double.MAX_VALUE;
         int from = (int)Math.floor(Math.min(tube.ay, tube.by) - Math.max(tube.radius, tube.knob) - 1);
         int to = (int)Math.ceil(Math.max(tube.ay, tube.by) + Math.max(tube.radius, tube.knob) + 1);
         for (int y = from; y <= to; y++) {
             double py = y + 0.5;
-            double d = distance(tube, px, py, pz);
-            boolean knob = tube.knob > 0.0 && (dist3(px, py, pz, tube.ax, tube.ay, tube.az) < tube.knob
-                || dist3(px, py, pz, tube.bx, tube.by, tube.bz) < tube.knob);
-            if (d < tube.radius || knob) {
+            if (distance(tube, px, py, pz) < tube.radius || knob(tube, px, py, pz)) {
                 lo = Math.min(lo, y);
                 hi = Math.max(hi, y);
-            }
-
-            if (tube.hollow > 0.0 && d < tube.hollow && !knob) {
-                holeLo = Math.min(holeLo, y);
-                holeHi = Math.max(holeHi, y);
             }
         }
 
@@ -225,17 +221,82 @@ public final class Godgrave {
         }
 
         column.fill((int)lo, (int)hi, bone);
-        if (holeLo <= holeHi) {
-            column.clear((int)holeLo, (int)holeHi);
-            // The hollow's floor: moss and red growth, as in every hollow bone.
-            int floor = (int)holeLo;
-            column.fill(floor, floor + 1, DreamBlocks.RED_MOSS.get().defaultBlockState());
-            if (Noise.hash(SEED, column.x, column.z, 1) < 0.25) {
-                column.set(floor + 2, DreamBlocks.VERMILION_GRASS.get().defaultBlockState());
+        return true;
+    }
+
+    /** A span of hollow in a column, and whether it is the spine's canal. */
+    private record Span(int lo, int hi, boolean sea) {
+    }
+
+    /**
+     * Carves the hollows of the bones a column crosses, joined where they overlap, with moss and red growth on their
+     * floors. Where a crack runs over a hollow it goes all the way down into it. The spine's canal holds the Spinal
+     * Ocean.
+     */
+    private static void hollows(Column column, List<Tube> tubes) {
+        double px = column.x + 0.5;
+        double pz = column.z + 0.5;
+        List<Span> spans = new ArrayList<>();
+        for (Tube tube : tubes) {
+            if (tube.hollow <= 0.0 || px < tube.minX || px > tube.maxX || pz < tube.minZ || pz > tube.maxZ) {
+                continue;
+            }
+
+            int lo = Integer.MAX_VALUE;
+            int hi = Integer.MIN_VALUE;
+            int top = Integer.MIN_VALUE;
+            int from = (int)Math.floor(Math.min(tube.ay, tube.by) - tube.radius - 1);
+            int to = (int)Math.ceil(Math.max(tube.ay, tube.by) + tube.radius + 1);
+            for (int y = from; y <= to; y++) {
+                double py = y + 0.5;
+                double d = distance(tube, px, py, pz);
+                if (d < tube.hollow && !knob(tube, px, py, pz)) {
+                    lo = Math.min(lo, y);
+                    hi = Math.max(hi, y);
+                }
+
+                if (d < tube.radius) {
+                    top = y;
+                }
+            }
+
+            if (lo <= hi) {
+                spans.add(new Span(lo, cracked(column.x, top, column.z) ? top : hi, tube.ax == AXIS && tube.bx == AXIS));
             }
         }
 
-        return true;
+        spans.sort(Comparator.comparingInt(Span::lo));
+        Span open = null;
+        for (Span span : spans) {
+            if (open != null && span.lo() <= open.hi() + 1) {
+                open = new Span(open.lo(), Math.max(open.hi(), span.hi()), open.sea() || span.sea());
+            } else {
+                if (open != null) {
+                    carve(column, open);
+                }
+
+                open = span;
+            }
+        }
+
+        if (open != null) {
+            carve(column, open);
+        }
+    }
+
+    private static void carve(Column column, Span span) {
+        column.clear(span.lo(), span.hi());
+        int floor = span.lo();
+        column.fill(floor, floor + 1, DreamBlocks.RED_MOSS.get().defaultBlockState());
+        if (span.sea()) {
+            column.flood(floor + 2, Math.min(SPINAL_SEA, span.hi()), Ground.WATER);
+        } else if (Noise.hash(SEED, column.x, column.z, 1) < 0.25) {
+            column.set(floor + 2, DreamBlocks.VERMILION_GRASS.get().defaultBlockState());
+        }
+    }
+
+    private static boolean knob(Tube tube, double px, double py, double pz) {
+        return tube.knob > 0.0 && (dist3(px, py, pz, tube.ax, tube.ay, tube.az) < tube.knob || dist3(px, py, pz, tube.bx, tube.by, tube.bz) < tube.knob);
     }
 
     private static double dist3(double ax, double ay, double az, double bx, double by, double bz) {

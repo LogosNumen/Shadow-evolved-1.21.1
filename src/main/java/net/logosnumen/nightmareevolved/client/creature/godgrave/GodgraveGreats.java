@@ -117,6 +117,10 @@ public final class GodgraveGreats {
     public static final class Abjuration extends CreatureModel {
         private static final Look LOOK = new Look(0x8A8A90, 0x3A3A40, 0xB4B4BA, 0xB02028, 0xA8A8AE, 0xFFF0A0, 0x7A7A80);
         private static final int LIMBS = 12;
+        private static final float[][] LUMPS = {
+            {-15, -14, -12, 26, 14, 25}, {-3, -12, -16, 18, 12, 18}, {-17, -10, 3, 14, 10, 14}, {-11, -25, -9, 19, 12, 17},
+            {0, -22, -11, 12, 10, 13}, {-8, -32, -6, 12, 9, 12}, {-4, -38, -3, 7, 7, 7}
+        };
 
         @Override
         public Look look(int look) {
@@ -133,16 +137,27 @@ public final class GodgraveGreats {
             Rig rig = new Rig();
             rig.bone("root", null, 0.0F, 24.0F, 0.0F);
             rig.bone("body", "root", 0.0F, 0.0F, 0.0F);
-            rig.box("body", Material.FUR, -14, -16, -14, 28, 16, 28);
-            rig.box("body", Material.FUR, -10, -28, -10, 20, 12, 20);
-            rig.box("body", Material.FUR, -6, -36, -6, 12, 8, 12);
-            rig.box("body", Material.MOSS, -15, -14, -15, 30, 8, 30);
-            rig.box("body", Material.MOSS, -11, -27, -11, 22, 6, 22);
-            for (int e = 0; e < 22; e++) {
-                float a = e * 2.399F;
-                float y = -3.0F - (e % 9) * 3.6F;
-                float r = y > -16.0F ? 14.2F : y > -28.0F ? 10.2F : 6.2F;
-                rig.box("body", Material.EYE, Mth.sin(a) * r - 0.5F, y, Mth.cos(a) * r - 0.5F, 1, 1, 1);
+            // A heap of grey flesh, lumped and sagging, overgrown with scarlet moss and opened all over with eyes.
+            for (int i = 0; i < LUMPS.length; i++) {
+                float[] b = LUMPS[i];
+                box(rig, "body", Material.FUR, b[0], b[1], b[2], b[3], b[4], b[5]);
+                // The moss hangs over each lump's top and down one side, as if poured on it.
+                float mossX = i % 2 == 0 ? b[0] - 0.5F : b[0] + b[3] * 0.4F;
+                box(rig, "body", Material.MOSS, mossX, b[1] - 0.5F, b[2] - 0.5F, b[3] * 0.6F + 0.5F, 4.0F, b[5] + 1.0F);
+                box(rig, "body", Material.MOSS, i % 2 == 0 ? b[0] - 0.5F : b[0] + b[3] - 0.5F, b[1], b[2] + b[5] * 0.3F, 1.0F, b[4] * 0.7F, b[5] * 0.4F);
+            }
+
+            for (int e = 0; e < 26; e++) {
+                float[] b = LUMPS[e % LUMPS.length];
+                float u = (e * 0.618F) % 1.0F;
+                float v = 0.25F + ((e * 0.382F) % 1.0F) * 0.5F;
+                float y = b[1] + b[4] * v;
+                switch (e / LUMPS.length % 4) {
+                    case 0 -> rig.box("body", Material.EYE, b[0] + b[3] * u, y, b[2] - 0.4F, 1, 1, 1);
+                    case 1 -> rig.box("body", Material.EYE, b[0] - 0.4F, y, b[2] + b[5] * u, 1, 1, 1);
+                    case 2 -> rig.box("body", Material.EYE, b[0] + b[3] - 0.6F, y, b[2] + b[5] * u, 1, 1, 1);
+                    default -> rig.box("body", Material.EYE, b[0] + b[3] * u, y, b[2] + b[5] - 0.6F, 1, 1, 1);
+                }
             }
 
             for (int l = 0; l < LIMBS; l++) {
@@ -234,6 +249,103 @@ public final class GodgraveGreats {
             float descend = pose.key("descend", 0.0F, 0.0F, 0.6F, 1.0F, 0.85F, 1.0F, 1.0F, 0.0F);
             Gaits.pair(body, "arm", -110.0F * descend, 0.0F, 0.0F, -110.0F * descend, 0.0F, 0.0F);
             Bones.size(body.part("body"), 1.0F - 0.6F * pose.fall(0.0F, 1.0F));
+        }
+    }
+
+    /**
+     * The depth dweller of the Spinal Ocean: a broad carapace of clear black obsidian, black eyes, and a forest of limbs
+     * and long antennae trailing through the water. Built small and drawn large.
+     */
+    public static final class DepthDweller extends CreatureModel {
+        private static final Look LOOK = new Look(0x1A1424, 0x050308, 0x4A3A6A, 0x2A2030, 0x6A5A8A, 0x040404, 0x3A2E4A);
+        private static final int LEGS = 6;
+        private static final int ANTENNAE = 4;
+        private static final int TENDRILS = 10;
+
+        @Override
+        public Look look(int look) {
+            return LOOK;
+        }
+
+        @Override
+        public float renderScale() {
+            return 2.5F;
+        }
+
+        @Override
+        public Rig build(int look) {
+            Rig rig = new Rig();
+            rig.bone("root", null, 0.0F, 24.0F, 0.0F);
+            rig.bone("body", "root", 0.0F, -10.0F, 0.0F);
+            rig.box("body", Material.CRYSTAL, -14, -6, -16, 28, 8, 32);
+            rig.box("body", Material.CRYSTAL, -10, -9, -12, 20, 3, 24);
+            rig.box("body", Material.BELLY, -12, 2, -14, 24, 3, 28);
+            rig.bone("head", "body", 0.0F, -1.0F, -16.0F);
+            rig.box("head", Material.CRYSTAL, -7, -3, -6, 14, 6, 6);
+            both(rig, "head", Material.EYE, -6.0F, -2.0F, -6.4F, 2.0F, 2.0F, 1.0F);
+            both(rig, "head", Material.EYE, -3.0F, -2.5F, -6.4F, 1.0F, 1.0F, 1.0F);
+            rig.bone("maw", "head", 0.0F, 3.0F, -3.0F);
+            rig.box("maw", Material.BELLY, -4, 0, -4, 8, 2, 5);
+            for (int a = 0; a < ANTENNAE; a++) {
+                String parent = "head";
+                float side = a < 2 ? -1.0F : 1.0F;
+                for (int s = 0; s < 4; s++) {
+                    String bone = "ant" + a + "_" + s;
+                    if (s == 0) {
+                        rig.bone(bone, parent, side * (2.0F + (a % 2) * 3.0F), -3.0F, -5.0F, -15.0F + (a % 2) * 10.0F, -side * (20.0F + (a % 2) * 15.0F), 0.0F);
+                    } else {
+                        rig.bone(bone, parent, 0.0F, 0.0F, -10.0F, 4.0F, 0.0F, 0.0F);
+                    }
+
+                    rig.box(bone, Material.HORN, -0.5F, -0.5F, -10, 1, 1, 10);
+                    parent = bone;
+                }
+            }
+
+            for (int i = 0; i < LEGS; i++) {
+                rig.pairBone("leg" + i, "body", -12.0F, 3.0F, -11.0F + i * 5.0F, 0.0F, 0.0F, 30.0F);
+                rig.pair("leg" + i, Material.CRYSTAL, -11, -0.5F, -0.5F, 11, 1, 1);
+                rig.pair("leg" + i, Material.CLAW, -13, -0.5F, -0.5F, 2, 2, 1);
+            }
+
+            for (int t = 0; t < TENDRILS; t++) {
+                String bone = "tend" + t;
+                rig.bone(bone, "body", -9.0F + (t % 5) * 4.5F, 5.0F, -8.0F + (t / 5) * 14.0F, 10.0F, 0.0F, 0.0F);
+                rig.box(bone, Material.VEIN, -0.5F, 0, -0.5F, 1, 9, 1);
+            }
+
+            return rig;
+        }
+
+        @Override
+        public void animate(Rig.Baked body, Pose pose, int look) {
+            Gaits.sideLegs(body, pose, LEGS, 20.0F, 15.0F, 0.35F);
+            Gaits.breathe(body, pose, "body", 1.0F, 0.05F);
+            Gaits.look(body, pose, 0.4F, 0.3F);
+            for (int a = 0; a < ANTENNAE; a++) {
+                for (int s = 0; s < 4; s++) {
+                    Bones.turn(body.part("ant" + a + "_" + s), pose.wave(0.07F, a + s * 0.6F) * 10.0F, pose.wave(0.05F, a * 1.3F + s) * 12.0F, 0.0F);
+                }
+            }
+
+            for (int t = 0; t < TENDRILS; t++) {
+                Bones.turn(body.part("tend" + t), pose.wave(0.09F, t * 0.8F) * 25.0F, 0.0F, pose.wave(0.07F, t * 1.4F) * 15.0F);
+            }
+
+            float lash = pose.key("antennae", 0.0F, 0.0F, 0.45F, -1.0F, 0.6F, 1.0F, 1.0F, 0.0F);
+            for (int a = 0; a < ANTENNAE; a++) {
+                Bones.turn(body.part("ant" + a + "_0"), 0.0F, 50.0F * lash, 0.0F);
+            }
+
+            float grasp = pose.key("limbs", 0.0F, 0.0F, 0.5F, 1.0F, 0.8F, 1.0F, 1.0F, 0.0F);
+            for (int i = 0; i < LEGS; i++) {
+                Gaits.pair(body, "leg" + i, 0.0F, -40.0F * grasp, -30.0F * grasp, 0.0F, -40.0F * grasp, -30.0F * grasp);
+            }
+
+            float maw = pose.key("maw", 0.0F, 0.0F, 0.4F, -1.0F, 0.6F, 1.0F, 1.0F, 0.0F);
+            Bones.turn(body.part("maw"), 50.0F * Math.max(0.0F, -maw), 0.0F, 0.0F);
+            Bones.shift(body.part("body"), 0.0F, 0.0F, -6.0F * Math.max(0.0F, maw));
+            Gaits.fall(body, pose, 0.0F, 180.0F);
         }
     }
 }

@@ -1797,5 +1797,10 @@
   "entity.nightmare_evolved.viper_lion": "Viper-Tailed Lion",
   "item.nightmare_evolved.viper_lion_spawn_egg": "Viper-Tailed Lion Spawn Egg",
   "entity.nightmare_evolved.tyrant_lizard": "Tyrant Lizard",
-  "item.nightmare_evolved.tyrant_lizard_spawn_egg": "Tyrant Lizard Spawn Egg"
+  "item.nightmare_evolved.tyrant_lizard_spawn_egg": "Tyrant Lizard Spawn Egg",
+  "entity.nightmare_evolved.ash_worm": "Ash Worm",
+  "item.nightmare_evolved.ash_worm_spawn_egg": "Ash Worm Spawn Egg",
+  "entity.nightmare_evolved.depth_dweller": "Depth Dweller",
+  "item.nightmare_evolved.depth_dweller_spawn_egg": "Depth Dweller Spawn Egg",
+  "place.nightmare_evolved.spinal_ocean": "the Spinal Ocean"
 }

@@ -189,8 +189,38 @@ public final class GodgraveKinds {
         .sounds(() -> SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM, () -> SoundEvents.IRON_GOLEM_HURT, () -> SoundEvents.WARDEN_DEATH, () -> SoundEvents.PHANTOM_FLAP)
         .build();
 
+    /**
+     * An ash worm: a grey worm of dead flesh dozens of metres long, a puppet with nothing of its own inside, crawling over
+     * the ash beneath the bones. Like everything under the veil, it burns where the white sky breaks through.
+     */
+    public static final Kind ASH_WORM = Kind.of("ash_worm", CreatureRank.GREAT, CreatureClass.BEAST)
+        .size(2.2F, 1.8F).stats(900.0, 34.0, 14.0, 0.26).follow(40.0)
+        .move(Move.melee("maw", Style.BITE, 18, 10, 3.4, 1.5F, 12))
+        .move(Move.of("crush", Style.SLAM, 26, 0.0, 4.0, 40, 6, 1.3F, 4.0, 16))
+        .move(Move.of("lunge", Style.CHARGE, 26, 4.0, 14.0, 60, 5, 1.4F, 2.4, 20))
+        .traits(Kind.Trait.SOULLESS, Kind.Trait.LIGHT_FALL)
+        .haunt(Region.GODGRAVE, 5, 1, 1)
+        .palette(Vfx.Palette.EARTH).egg(0x8A8A86, 0x3A3A38)
+        .sounds(() -> SoundEvents.SILVERFISH_AMBIENT, () -> SoundEvents.SLIME_HURT, () -> SoundEvents.SLIME_DEATH, () -> SoundEvents.SAND_STEP)
+        .build();
+
+    /**
+     * The depth dweller of the Spinal Ocean: a leviathan under a carapace of clear obsidian, with black eyes and a forest
+     * of limbs and antennae trailing through the dark water of the spine's canal.
+     */
+    public static final Kind DEPTH_DWELLER = Kind.of("depth_dweller", CreatureRank.GREAT, CreatureClass.DEMON)
+        .motion(Kind.Motion.SWIM).size(5.0F, 3.0F).stats(3200.0, 50.0, 30.0, 0.3).follow(64.0)
+        .move(Move.of("antennae", Style.SWEEP, 26, 0.0, 10.0, 30, 8, 1.2F, 10.0, 14))
+        .move(Move.of("limbs", Style.GRAB, 30, 0.0, 6.0, 40, 6, 1.3F, 6.0, 16))
+        .move(Move.melee("maw", Style.BITE, 20, 12, 4.0, 1.6F, 14))
+        .afflicts(() -> new MobEffectInstance(MobEffects.BLINDNESS, 60, 0))
+        .lair(Places.SPINAL_OCEAN, 0, 0, Godgrave.SPINAL_SEA - 8)
+        .palette(Vfx.Palette.SHADOW).egg(0x1A1424, 0x6A5A8A)
+        .sounds(() -> SoundEvents.ELDER_GUARDIAN_AMBIENT, () -> SoundEvents.ELDER_GUARDIAN_HURT, () -> SoundEvents.ELDER_GUARDIAN_DEATH, () -> SoundEvents.ELDER_GUARDIAN_FLOP)
+        .build();
+
     public static final List<Kind> ALL = List.of(ASURA, CONDEMNATION, ABJURATION, MAGGOT_BEAST, JACKAL_GIANT, CRIMSON_PYTHON, BLACK_TIGER, BLOOD_MOSQUITO,
-        HARPY, THREE_HEADED_HOUND, VIPER_LION, TYRANT_LIZARD, LAKE_GUARDIAN);
+        HARPY, THREE_HEADED_HOUND, VIPER_LION, TYRANT_LIZARD, LAKE_GUARDIAN, ASH_WORM, DEPTH_DWELLER);
 
     private GodgraveKinds() {
     }
