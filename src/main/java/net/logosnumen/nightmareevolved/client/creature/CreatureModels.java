@@ -3,6 +3,7 @@ package net.logosnumen.nightmareevolved.client.creature;
 import java.util.HashMap;
 import java.util.Map;
 import com.mojang.logging.LogUtils;
+import net.logosnumen.nightmareevolved.client.creature.bastion.BastionModels;
 import net.logosnumen.nightmareevolved.client.creature.burned.BurnedModels;
 import net.logosnumen.nightmareevolved.client.creature.desert.DesertModels;
 import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveBeasts;
@@ -10,6 +11,7 @@ import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveGreats;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleBeasts;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleFolk;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleHorrors;
+import net.logosnumen.nightmareevolved.client.creature.moonriver.MoonriverModels;
 import net.logosnumen.nightmareevolved.client.creature.mountains.MountainModels;
 import net.logosnumen.nightmareevolved.client.creature.ravenheart.RavenheartModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.CarapaceModels;
@@ -94,6 +96,8 @@ public final class CreatureModels {
         MODELS.put("millipede_queen", new BurnedModels.Queen());
         MODELS.put("chalice_knight", new RavenheartModels.ChaliceKnight());
         MODELS.put("stone_worm", new RavenheartModels.StoneWorm());
+        MODELS.put("gaunt_maw", new MoonriverModels.GauntMaw());
+        MODELS.put("undetectable_forest_maw", new BastionModels.ForestMaw());
     }
 
     private CreatureModels() {

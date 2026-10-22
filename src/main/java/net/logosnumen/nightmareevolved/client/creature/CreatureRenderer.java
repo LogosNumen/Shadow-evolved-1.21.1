@@ -122,7 +122,9 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         }
 
         model.animate(body, pose, creature.look());
-        this.shadowRadius = creature.getBbWidth() * 0.6F;
+        tint = creature.tint();
+        // A body drawn faint casts a faint shadow, and one not drawn at all casts none.
+        this.shadowRadius = creature.getBbWidth() * 0.6F * ((tint >>> 24) / 255.0F);
         float bodyYaw = Mth.rotLerp(partial, creature.yBodyRotO, creature.yBodyRot);
         float scale = model.renderScale() * creature.getScale();
         int overlay = OverlayTexture.pack(OverlayTexture.u(0.0F), OverlayTexture.v(creature.hurtTime > 0 || creature.deathTime > 0));
@@ -130,10 +132,12 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
         poseStack.scale(-scale, -scale, scale);
         poseStack.translate(0.0F, -1.501F, 0.0F);
-        tint = creature.tint();
-        body.root().render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(body.skin())), light, overlay, tint);
-        VertexConsumer glow = buffers.getBuffer(RenderType.eyes(body.glow()));
-        body.root().render(poseStack, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint);
+        if ((tint >>> 24) > 0) {
+            body.root().render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(body.skin())), light, overlay, tint);
+            VertexConsumer glow = buffers.getBuffer(RenderType.eyes(body.glow()));
+            body.root().render(poseStack, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint);
+        }
+
         poseStack.popPose();
         super.render(creature, entityYaw, partial, poseStack, buffers, light);
     }

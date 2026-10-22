@@ -19,6 +19,8 @@ public final class Kinds {
         GodgraveKinds.ALL.forEach(Kinds::add);
         BurnedKinds.ALL.forEach(Kinds::add);
         RavenheartKinds.ALL.forEach(Kinds::add);
+        MoonriverKinds.ALL.forEach(Kinds::add);
+        BastionKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {

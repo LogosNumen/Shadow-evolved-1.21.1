@@ -5,6 +5,7 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import net.logosnumen.nightmareevolved.creature.kind.BastionKinds;
 import net.logosnumen.nightmareevolved.creature.kind.BurnedKinds;
 import net.logosnumen.nightmareevolved.creature.kind.DesertKinds;
 import net.logosnumen.nightmareevolved.creature.kind.GodgraveKinds;
@@ -168,6 +169,16 @@ public class CreatureGameTests {
         knight.hurt(helper.getLevel().damageSources().generic(), knight.getMaxHealth() * 0.4F);
         helper.assertTrue(knight.roused() && knight.getAttributeValue(Attributes.MOVEMENT_SPEED) > speed, "Hard pressed, the beast bursts out, and it is faster");
         knight.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void theForestMawCannotBeSeenUntilItOpens(GameTestHelper helper) {
+        DreamCreature maw = Wildlife.spawn(helper.getLevel(), BastionKinds.FOREST_MAW, helper.absolutePos(new BlockPos(2, 2, 2)), MobSpawnType.SPAWN_EGG);
+        helper.assertTrue(maw != null && !maw.roused() && maw.tint() >>> 24 == 0 && !maw.shouldShowName(), "Waiting, the Forest Maw shows nothing of itself");
+        maw.hurt(helper.getLevel().damageSources().generic(), 1.0F);
+        helper.assertTrue(maw.roused() && maw.tint() >>> 24 == 0xFF, "Struck, it opens and is there to see");
+        maw.discard();
         helper.succeed();
     }
 }
