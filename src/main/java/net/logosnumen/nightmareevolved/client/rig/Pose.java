@@ -1,16 +1,16 @@
-package net.logosnumen.nightmareevolved.client.colossus;
+package net.logosnumen.nightmareevolved.client.rig;
 
 import javax.annotation.Nullable;
 import net.minecraft.util.Mth;
 
 /**
- * What a colossus's body is doing this frame: its clock, stride and gaze, the attack it is in and how far through,
- * how far it has fallen in death, and whether it rages. Angles are degrees.
+ * What a creature's body is doing this frame: its clock, stride and gaze, the move it is in and how far through, how
+ * far it has fallen in death, and whether it rages. Angles are degrees.
  */
-public record ColossusPose(float age, float walk, float stride, float headYaw, float headPitch, @Nullable String action, float progress, float death,
+public record Pose(float age, float walk, float stride, float headYaw, float headPitch, @Nullable String action, float progress, float death,
     boolean enraged) {
     /**
-     * A keyframed value for one attack: pairs of (progress, value), eased between, 0 when that attack isn't running.
+     * A keyframed value for one move: pairs of (progress, value), eased between, 0 when that move isn't running.
      * Curves start and end at 0 so the body flows out of and back into its walk.
      */
     public float key(String id, float... keys) {

@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.logosnumen.nightmareevolved.client.anim.ClientPoses;
+import net.logosnumen.nightmareevolved.client.rig.Pose;
 import net.logosnumen.nightmareevolved.client.rig.Rig;
 import net.logosnumen.nightmareevolved.colossus.ColossusAttack;
 import net.logosnumen.nightmareevolved.colossus.ColossusKind;
@@ -77,12 +78,12 @@ public class ColossusRenderer extends EntityRenderer<ColossusEntity> {
         return baked(entity).skin();
     }
 
-    private static ColossusPose pose(ColossusEntity entity, float partial) {
+    private static Pose pose(ColossusEntity entity, float partial) {
         ColossusAttack attack = entity.clientAction();
         float bodyYaw = Mth.rotLerp(partial, entity.yBodyRotO, entity.yBodyRot);
         float headYaw = Mth.wrapDegrees(Mth.rotLerp(partial, entity.yHeadRotO, entity.yHeadRot) - bodyYaw);
         float death = entity.deathTime > 0 ? Math.min(1.0F, (entity.deathTime + partial) / ColossusEntity.DEATH_TICKS) : 0.0F;
-        return new ColossusPose(
+        return new Pose(
             entity.tickCount + partial,
             entity.walkAnimation.position(partial),
             Math.min(1.0F, entity.walkAnimation.speed(partial)),
@@ -109,7 +110,7 @@ public class ColossusRenderer extends EntityRenderer<ColossusEntity> {
         ColossusModel model = MODELS.get(entity.kind());
         ColossusVariant variant = entity.variant();
         Rig.Baked body = baked(entity);
-        ColossusPose pose = pose(entity, partial);
+        Pose pose = pose(entity, partial);
         for (ModelPart part : body.root().getAllParts().toList()) {
             part.resetPose();
             part.xScale = 1.0F;
@@ -138,7 +139,7 @@ public class ColossusRenderer extends EntityRenderer<ColossusEntity> {
     }
 
     /** How far below the ground a Gravewyrm is drawn, in blocks: diving, under, rising again, or sinking in death. */
-    private static float sink(GravewyrmEntity wyrm, ColossusPose pose) {
+    private static float sink(GravewyrmEntity wyrm, Pose pose) {
         float depth = 3.5F * wyrm.getScale();
         float under = pose.key("burrow", 0.0F, 0.0F, 0.08F, 0.0F, 0.22F, 1.0F, 0.74F, 1.0F, 0.86F, 0.0F, 1.0F, 0.0F);
         if (wyrm.burrowed() && !"burrow".equals(pose.action())) {
@@ -149,7 +150,7 @@ public class ColossusRenderer extends EntityRenderer<ColossusEntity> {
     }
 
     /** The Gravewyrm's body: one segment every so far back along the head's trail, tapering to the tail, swaying. */
-    private void coils(GravewyrmEntity wyrm, Rig.Baked body, ColossusPose pose, float partial, float scale, float sink, PoseStack poseStack,
+    private void coils(GravewyrmEntity wyrm, Rig.Baked body, Pose pose, float partial, float scale, float sink, PoseStack poseStack,
         MultiBufferSource buffers, int light, int overlay) {
         ModelPart segment = body.part("segment");
         ModelPart tail = body.part("tail");
@@ -217,7 +218,7 @@ public class ColossusRenderer extends EntityRenderer<ColossusEntity> {
     }
 
     /** Shakes the view of a nearby player when a blow lands or, for the walkers, when a foot comes down. */
-    private void tremors(ColossusEntity entity, ColossusPose pose) {
+    private void tremors(ColossusEntity entity, Pose pose) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) {
             return;

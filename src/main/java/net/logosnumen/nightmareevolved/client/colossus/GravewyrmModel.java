@@ -3,6 +3,7 @@ package net.logosnumen.nightmareevolved.client.colossus;
 import net.logosnumen.nightmareevolved.client.rig.Bones;
 import net.logosnumen.nightmareevolved.client.rig.Look;
 import net.logosnumen.nightmareevolved.client.rig.Material;
+import net.logosnumen.nightmareevolved.client.rig.Pose;
 import net.logosnumen.nightmareevolved.client.rig.Rig;
 import net.logosnumen.nightmareevolved.colossus.ColossusVariant;
 import net.minecraft.util.Mth;
@@ -101,7 +102,7 @@ public final class GravewyrmModel extends ColossusModel {
     }
 
     @Override
-    public void animate(Rig.Baked body, ColossusPose p, ColossusVariant v) {
+    public void animate(Rig.Baked body, Pose p, ColossusVariant v) {
         // The segments and tail are drawn by the renderer along the trail, not with the head.
         body.part("segment").visible = false;
         body.part("tail").visible = false;
@@ -126,7 +127,7 @@ public final class GravewyrmModel extends ColossusModel {
     }
 
     /** How far the body sways side to side at a segment (blocks before scaling), for the renderer. */
-    public static float sway(ColossusPose p, int segment) {
+    public static float sway(Pose p, int segment) {
         float thrash = p.key("thrash", 0.0F, 0.0F, 0.2F, 1.0F, 0.8F, 1.0F, 1.0F, 0.0F);
         return Mth.sin(p.age() * (0.12F + thrash * 0.5F) - segment * 0.55F) * (0.18F + thrash * 0.6F);
     }

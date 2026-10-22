@@ -1,6 +1,7 @@
 package net.logosnumen.nightmareevolved.client.colossus;
 
 import net.logosnumen.nightmareevolved.client.rig.Look;
+import net.logosnumen.nightmareevolved.client.rig.Pose;
 import net.logosnumen.nightmareevolved.client.rig.Rig;
 import net.logosnumen.nightmareevolved.colossus.ColossusVariant;
 
@@ -13,7 +14,7 @@ public abstract class ColossusModel {
     public abstract Rig build(ColossusVariant variant);
 
     /** Poses the body for this frame. Every bone starts from its rest pose and size. */
-    public abstract void animate(Rig.Baked body, ColossusPose pose, ColossusVariant variant);
+    public abstract void animate(Rig.Baked body, Pose pose, ColossusVariant variant);
 
     /** How much larger than its model units the body is drawn. */
     public float renderScale() {
