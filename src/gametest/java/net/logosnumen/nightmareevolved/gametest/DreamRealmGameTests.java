@@ -1,12 +1,14 @@
 package net.logosnumen.nightmareevolved.gametest;
 
-import com.mojang.authlib.GameProfile;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.mojang.authlib.GameProfile;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import net.logosnumen.nightmareevolved.creature.kind.Kind;
+import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.dream.DreamBlocks;
 import net.logosnumen.nightmareevolved.dream.DreamState;
 import net.logosnumen.nightmareevolved.dream.DreamTravel;
@@ -30,8 +32,10 @@ import net.logosnumen.nightmareevolved.dream.law.DarkSea;
 import net.logosnumen.nightmareevolved.dream.law.RealmLaws;
 import net.logosnumen.nightmareevolved.dream.seed.NightmareGateEntity;
 import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
+import net.logosnumen.nightmareevolved.dream.seed.SeedRecords;
 import net.logosnumen.nightmareevolved.dream.seed.SeedSites;
 import net.logosnumen.nightmareevolved.dream.seed.Seeds;
+import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
@@ -330,6 +334,39 @@ public class DreamRealmGameTests {
             }
 
             gate.discard();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void aGodgraveGateSendsGodgravesCreatures(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        SeedSites.Site site = SeedSites.CANON.stream().filter(s -> s.id().equals("mictlan_ziggurat")).findFirst().orElseThrow();
+        SeedRecords.get(level.getServer()).find(site, level.getGameTime(), level.getGameTime());
+        List<Kind> godgrave = Kinds.roaming(Region.GODGRAVE);
+        NightmareGateEntity waves = NightmareGateEntity.open(level, helper.absolutePos(new BlockPos(1, 2, 1)), site.id(), 2);
+        CompoundTag tag = waves.saveWithoutId(new CompoundTag());
+        tag.putInt("Age", NightmareGateEntity.FORMING - 3);
+        waves.load(tag);
+        // A second Gate of the same Seed, its waves all spent, about to call its Guardian.
+        NightmareGateEntity last = NightmareGateEntity.open(level, helper.absolutePos(new BlockPos(1, 2, 1)), site.id(), 2);
+        CompoundTag spent = last.saveWithoutId(new CompoundTag());
+        spent.putInt("Age", NightmareGateEntity.FORMING + 1500 - 3);
+        spent.putInt("Waves", 5);
+        last.load(spent);
+        helper.succeedWhen(() -> {
+            List<Mob> sent = level.getEntitiesOfClass(Mob.class, waves.getBoundingBox().inflate(16.0), waves::sent);
+            helper.assertTrue(!sent.isEmpty(), "The Gate's first wave comes through");
+            for (Mob mob : sent) {
+                helper.assertTrue(mob instanceof DreamCreature creature && godgrave.contains(creature.kind()), "Each is a creature of Godgrave");
+            }
+
+            List<Mob> guardian = level.getEntitiesOfClass(Mob.class, last.getBoundingBox().inflate(16.0), last::sent);
+            helper.assertTrue(guardian.size() == 1 && guardian.get(0) instanceof DreamCreature creature && creature.kind() == godgrave.get(godgrave.size() - 1)
+                && Creatures.rankOf(creature).ordinal() >= creature.kind().rank.ordinal(), "Its Guardian is Godgrave's strongest, at its own rank or above");
+            sent.forEach(Mob::discard);
+            guardian.forEach(Mob::discard);
+            waves.discard();
+            last.discard();
         });
     }
 
