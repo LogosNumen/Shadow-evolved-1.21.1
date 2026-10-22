@@ -21,6 +21,7 @@ public final class Kinds {
         RavenheartKinds.ALL.forEach(Kinds::add);
         MoonriverKinds.ALL.forEach(Kinds::add);
         BastionKinds.ALL.forEach(Kinds::add);
+        StormseaKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {

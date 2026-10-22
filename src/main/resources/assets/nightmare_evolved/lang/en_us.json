@@ -1817,5 +1817,9 @@
   "entity.nightmare_evolved.gaunt_maw": "Gaunt Maw",
   "item.nightmare_evolved.gaunt_maw_spawn_egg": "Gaunt Maw Spawn Egg",
   "entity.nightmare_evolved.undetectable_forest_maw": "Undetectable Forest Maw",
-  "item.nightmare_evolved.undetectable_forest_maw_spawn_egg": "Undetectable Forest Maw Spawn Egg"
+  "item.nightmare_evolved.undetectable_forest_maw_spawn_egg": "Undetectable Forest Maw Spawn Egg",
+  "entity.nightmare_evolved.sea_serpent": "Sea Serpent",
+  "item.nightmare_evolved.sea_serpent_spawn_egg": "Sea Serpent Spawn Egg",
+  "entity.nightmare_evolved.old_tom": "Old Tom",
+  "item.nightmare_evolved.old_tom_spawn_egg": "Old Tom Spawn Egg"
 }

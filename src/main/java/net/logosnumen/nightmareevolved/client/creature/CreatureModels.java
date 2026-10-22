@@ -18,6 +18,7 @@ import net.logosnumen.nightmareevolved.client.creature.shore.CarapaceModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreBeasts;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreFolk;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreHorrors;
+import net.logosnumen.nightmareevolved.client.creature.stormsea.StormseaModels;
 import net.logosnumen.nightmareevolved.client.rig.Look;
 import net.logosnumen.nightmareevolved.client.rig.Material;
 import net.logosnumen.nightmareevolved.client.rig.Pose;
@@ -98,6 +99,8 @@ public final class CreatureModels {
         MODELS.put("stone_worm", new RavenheartModels.StoneWorm());
         MODELS.put("gaunt_maw", new MoonriverModels.GauntMaw());
         MODELS.put("undetectable_forest_maw", new BastionModels.ForestMaw());
+        MODELS.put("sea_serpent", new StormseaModels.SeaSerpent());
+        MODELS.put("old_tom", new StormseaModels.OldTom());
     }
 
     private CreatureModels() {

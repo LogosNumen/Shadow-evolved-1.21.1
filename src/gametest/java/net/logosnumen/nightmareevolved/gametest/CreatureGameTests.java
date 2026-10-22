@@ -15,6 +15,7 @@ import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.creature.kind.MountainKinds;
 import net.logosnumen.nightmareevolved.creature.kind.RavenheartKinds;
 import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
+import net.logosnumen.nightmareevolved.creature.kind.StormseaKinds;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
 import net.logosnumen.nightmareevolved.dream.Region;
@@ -65,6 +66,7 @@ public class CreatureGameTests {
         lairsIn(helper, MountainKinds.ALL, Region.HOLLOW_MOUNTAINS);
         lairsIn(helper, GodgraveKinds.ALL, Region.GODGRAVE);
         lairsIn(helper, BurnedKinds.ALL, Region.BURNED_FOREST);
+        lairsIn(helper, StormseaKinds.ALL, Region.STORMSEA);
 
         helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();
