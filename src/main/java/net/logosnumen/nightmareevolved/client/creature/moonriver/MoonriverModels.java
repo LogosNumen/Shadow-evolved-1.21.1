@@ -30,23 +30,23 @@ public final class MoonriverModels {
         @Override
         public Rig build(int look) {
             Rig rig = new Rig();
-            Humanoid h = Humanoid.build(rig, 46.0F, 9.0F, Material.BELLY, Material.BELLY, Material.BELLY);
+            Humanoid h = Humanoid.build(rig, 46.0F, 9.0F, Material.SCALE, Material.SCALE, Material.SCALE);
             // Sinew drawn tight over the ribs.
             for (int r = 0; r < 4; r++) {
                 box(rig, "chest", Material.VEIN, -4.0F, -h.chest * 0.6F + r * 2.6F, -2.6F, 8.0F, 0.8F, 0.5F);
             }
 
             // The head, much too big, nearly all maw.
-            box(rig, "head", Material.BELLY, -6.0F, -12.0F, -6.0F, 12.0F, 10.0F, 11.0F);
+            box(rig, "head", Material.SCALE, -6.0F, -12.0F, -6.0F, 12.0F, 10.0F, 11.0F);
             both(rig, "head", Material.EYE, -3.6F, -10.5F, -6.3F, 1.0F, 1.0F, 1.0F);
-            box(rig, "head", Material.VEIN, -5.0F, -7.5F, -6.4F, 10.0F, 5.0F, 1.0F);
+            box(rig, "head", Material.BELLY, -5.0F, -7.5F, -6.4F, 10.0F, 5.0F, 1.0F);
             for (int t = 0; t < 6; t++) {
                 box(rig, "head", Material.BONE, -4.6F + t * 1.7F, -7.5F, -6.6F, 0.8F, 1.6F, 0.8F);
             }
 
             rig.bone("jaw", "head", 0.0F, -2.5F, -1.0F);
-            box(rig, "jaw", Material.BELLY, -5.5F, 0.0F, -5.5F, 11.0F, 3.0F, 10.0F);
-            box(rig, "jaw", Material.VEIN, -4.5F, -0.5F, -5.0F, 9.0F, 1.0F, 8.0F);
+            box(rig, "jaw", Material.SCALE, -5.5F, 0.0F, -5.5F, 11.0F, 3.0F, 10.0F);
+            box(rig, "jaw", Material.BELLY, -4.5F, -0.5F, -5.0F, 9.0F, 1.0F, 8.0F);
             for (int t = 0; t < 6; t++) {
                 box(rig, "jaw", Material.BONE, -4.6F + t * 1.7F, -1.4F, -5.2F, 0.8F, 1.6F, 0.8F);
             }
@@ -57,7 +57,7 @@ public final class MoonriverModels {
             for (int a = 1; a <= ARMS; a++) {
                 String arm = "arm" + a;
                 rig.pairBone(arm, "chest", -5.0F, -h.chest * 0.55F + a * 3.5F, 0.0F, -10.0F * a, 0.0F, 12.0F + 6.0F * a);
-                rig.pair(arm, Material.BELLY, -1, -1, -1, 2, 20, 2);
+                rig.pair(arm, Material.SCALE, -1, -1, -1, 2, 20, 2);
                 rig.pair(arm, Material.CLAW, -1.5F, 19, -1, 3, 4, 1);
             }
 

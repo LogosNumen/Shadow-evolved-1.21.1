@@ -22,7 +22,7 @@ public final class RavenheartModels {
      * claws through the gauntlets, and the blade is cast aside.
      */
     public static final class ChaliceKnight extends CreatureModel {
-        private static final Look LOOK = new Look(0x4A5A3A, 0x1A2010, 0x7A8A5A, 0x6A2A24, 0x8A4A2A, 0xFFB030, 0x6A4A2A);
+        private static final Look LOOK = new Look(0x4A5A3A, 0x1A2010, 0x7A8A5A, 0x6A2A24, 0x8A4A2A, 0xFFB030, 0x4E5E36);
         private static final String[] BEAST = {"maw", "spines", "claw_r", "claw_l"};
 
         @Override
