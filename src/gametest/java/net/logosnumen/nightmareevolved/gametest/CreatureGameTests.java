@@ -5,6 +5,7 @@ import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import net.logosnumen.nightmareevolved.creature.kind.BurnedKinds;
 import net.logosnumen.nightmareevolved.creature.kind.DesertKinds;
 import net.logosnumen.nightmareevolved.creature.kind.GodgraveKinds;
 import net.logosnumen.nightmareevolved.creature.kind.IsleKinds;
@@ -18,6 +19,7 @@ import net.logosnumen.nightmareevolved.dream.Region;
 import net.logosnumen.nightmareevolved.dream.life.Wildlife;
 import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
 import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
+import net.logosnumen.nightmareevolved.entity.creature.MillipedeQueen;
 import net.logosnumen.nightmareevolved.memory.Memories;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -26,6 +28,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
+import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.monster.Zombie;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -59,6 +62,7 @@ public class CreatureGameTests {
         lairsIn(helper, IsleKinds.ALL, Region.CHAINED_ISLES);
         lairsIn(helper, MountainKinds.ALL, Region.HOLLOW_MOUNTAINS);
         lairsIn(helper, GodgraveKinds.ALL, Region.GODGRAVE);
+        lairsIn(helper, BurnedKinds.ALL, Region.BURNED_FOREST);
 
         helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();
@@ -130,5 +134,25 @@ public class CreatureGameTests {
         helper.assertTrue(vessel.roused(), "Struck, it shows what it is");
         vessel.discard();
         helper.succeed();
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void theMillipedeQueenSlipsBetweenMoments(GameTestHelper helper) {
+        // She is too big for the test's little room to pass a spawn's check for space, so she is set down directly.
+        DreamCreature spawned = helper.spawn(CreatureTypes.type(BurnedKinds.MILLIPEDE_QUEEN), new BlockPos(2, 2, 2));
+        helper.assertTrue(spawned instanceof MillipedeQueen, "A Millipede Queen comes into the world");
+        MillipedeQueen queen = (MillipedeQueen)spawned;
+        helper.assertTrue(!queen.between(), "At rest she stays in one moment");
+        Husk foe = helper.spawnWithNoFreeWill(EntityType.HUSK, new BlockPos(1, 2, 8));
+        queen.setTarget(foe);
+        helper.succeedWhen(() -> {
+            queen.setTarget(foe);
+            helper.assertTrue(queen.between(), "In a fight she slips between two moments");
+            float health = queen.getHealth();
+            queen.hurt(helper.getLevel().damageSources().generic(), 50.0F);
+            helper.assertTrue(queen.getHealth() == health, "Between moments, blows pass through her");
+            queen.discard();
+            foe.discard();
+        });
     }
 }

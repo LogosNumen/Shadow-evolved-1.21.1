@@ -2,6 +2,7 @@ package net.logosnumen.nightmareevolved.dream.gen;
 
 import java.util.List;
 import net.logosnumen.nightmareevolved.dream.Places;
+import net.logosnumen.nightmareevolved.dream.gen.landmark.BurnedPlaces;
 import net.logosnumen.nightmareevolved.dream.gen.landmark.CitadelPlaces;
 import net.logosnumen.nightmareevolved.dream.gen.landmark.CrimsonSpire;
 import net.logosnumen.nightmareevolved.dream.gen.landmark.DesertPlaces;
@@ -21,6 +22,7 @@ public final class Landmarks {
         into.add(new ShorePlaces.BoneRidge());
         into.add(new ShorePlaces.DarkCity());
         into.add(new ShorePlaces.UndergroundMine());
+        into.add(new BurnedPlaces.Hive());
         into.add(new IslePlaces.Sanctuary());
         into.add(new IslePlaces.NorthernIsland());
         into.add(new IslePlaces.IvoryTower());

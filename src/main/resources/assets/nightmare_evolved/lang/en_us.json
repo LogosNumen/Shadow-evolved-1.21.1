@@ -1802,5 +1802,12 @@
   "item.nightmare_evolved.ash_worm_spawn_egg": "Ash Worm Spawn Egg",
   "entity.nightmare_evolved.depth_dweller": "Depth Dweller",
   "item.nightmare_evolved.depth_dweller_spawn_egg": "Depth Dweller Spawn Egg",
-  "place.nightmare_evolved.spinal_ocean": "the Spinal Ocean"
+  "place.nightmare_evolved.spinal_ocean": "the Spinal Ocean",
+  "entity.nightmare_evolved.black_millipede": "Black Millipede",
+  "item.nightmare_evolved.black_millipede_spawn_egg": "Black Millipede Spawn Egg",
+  "entity.nightmare_evolved.painted_millipede": "Painted Millipede",
+  "item.nightmare_evolved.painted_millipede_spawn_egg": "Painted Millipede Spawn Egg",
+  "entity.nightmare_evolved.millipede_queen": "Millipede Queen",
+  "item.nightmare_evolved.millipede_queen_spawn_egg": "Millipede Queen Spawn Egg",
+  "place.nightmare_evolved.millipede_hive": "a Millipede Queen's hive"
 }

@@ -3,6 +3,7 @@ package net.logosnumen.nightmareevolved.client.creature;
 import java.util.HashMap;
 import java.util.Map;
 import com.mojang.logging.LogUtils;
+import net.logosnumen.nightmareevolved.client.creature.burned.BurnedModels;
 import net.logosnumen.nightmareevolved.client.creature.desert.DesertModels;
 import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveBeasts;
 import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveGreats;
@@ -87,6 +88,9 @@ public final class CreatureModels {
         MODELS.put("tyrant_lizard", new GodgraveBeasts.TyrantLizard());
         MODELS.put("ash_worm", new GodgraveBeasts.AshWorm());
         MODELS.put("depth_dweller", new GodgraveGreats.DepthDweller());
+        MODELS.put("black_millipede", new BurnedModels.Millipede());
+        MODELS.put("painted_millipede", new BurnedModels.Painted());
+        MODELS.put("millipede_queen", new BurnedModels.Queen());
     }
 
     private CreatureModels() {

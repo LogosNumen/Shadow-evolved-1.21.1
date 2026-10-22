@@ -144,6 +144,11 @@ public class DreamCreature extends Monster {
         return false;
     }
 
+    /** The colour its body is drawn in, alpha first: white unless something about it changes how it looks. */
+    public int tint() {
+        return 0xFFFFFFFF;
+    }
+
     public boolean keepsLair() {
         return !this.lair.isEmpty();
     }

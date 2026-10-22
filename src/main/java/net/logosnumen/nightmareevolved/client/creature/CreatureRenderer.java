@@ -130,9 +130,10 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
         poseStack.scale(-scale, -scale, scale);
         poseStack.translate(0.0F, -1.501F, 0.0F);
-        body.root().render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(body.skin())), light, overlay);
+        tint = creature.tint();
+        body.root().render(poseStack, buffers.getBuffer(RenderType.entityTranslucent(body.skin())), light, overlay, tint);
         VertexConsumer glow = buffers.getBuffer(RenderType.eyes(body.glow()));
-        body.root().render(poseStack, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        body.root().render(poseStack, glow, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, tint);
         poseStack.popPose();
         super.render(creature, entityYaw, partial, poseStack, buffers, light);
     }
