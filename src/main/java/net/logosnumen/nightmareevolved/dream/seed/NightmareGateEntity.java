@@ -7,8 +7,11 @@ import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
+import net.logosnumen.nightmareevolved.creature.kind.Kind;
+import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.dream.DreamDamage;
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
+import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
 import net.logosnumen.nightmareevolved.nightmare.Trial;
 import net.logosnumen.nightmareevolved.vfx.Vfx;
 import net.minecraft.core.BlockPos;
@@ -186,15 +189,25 @@ public final class NightmareGateEntity extends Entity {
 
         this.waves++;
         Trial trial = trial(this.category());
+        List<Kind> kinds = this.kinds(level);
         RandomSource random = level.random;
         int count = 3 + this.category() + this.waves;
         int top = Math.min(CreatureRank.values().length - 1, Math.max(0, this.category() - 1));
         for (int i = 0; i < count; i++) {
             boolean early = this.waves <= 2;
-            int rank = early ? Math.max(0, top - (random.nextFloat() < 0.75F ? 1 : 0)) : top - (random.nextFloat() < 0.3F ? 1 : 0);
+            int rank = Math.max(0, early ? Math.max(0, top - (random.nextFloat() < 0.75F ? 1 : 0)) : top - (random.nextFloat() < 0.3F ? 1 : 0));
+            if (!kinds.isEmpty()) {
+                // The creatures of the Seed's own region, as strong as this wave allows (or its weakest, if none is so weak).
+                List<Kind> fit = kinds.stream().filter(k -> k.rank.ordinal() <= rank).toList();
+                Kind kind = fit.isEmpty() ? kinds.get(0) : fit.get(random.nextInt(fit.size()));
+                CreatureRank as = CreatureRank.values()[Math.max(rank, kind.rank.ordinal())];
+                this.spawn(level, CreatureTypes.type(kind), as, kind.creatureClass, false);
+                continue;
+            }
+
             CreatureClass[] classes = CreatureClass.values();
             CreatureClass creatureClass = classes[Math.min(2, random.nextInt(1 + Math.min(this.waves, 2)))];
-            this.spawn(level, trial.pool.get(random.nextInt(trial.pool.size())), CreatureRank.values()[Math.max(0, rank)], creatureClass, false);
+            this.spawn(level, trial.pool.get(random.nextInt(trial.pool.size())), CreatureRank.values()[rank], creatureClass, false);
         }
 
         level.playSound(null, this.blockPosition(), SoundEvents.WARDEN_EMERGE, SoundSource.HOSTILE, 2.5F, 0.7F);
@@ -210,8 +223,15 @@ public final class NightmareGateEntity extends Entity {
             case 4 -> CreatureClass.TERROR;
             default -> CreatureClass.TITAN;
         };
+        List<Kind> kinds = this.kinds(level);
         Mob guardian;
-        if (trial.colossus != null) {
+        if (!kinds.isEmpty()) {
+            // The strongest creature that roams the Seed's region, raised to guard its Gate.
+            Kind kind = kinds.get(kinds.size() - 1);
+            rank = CreatureRank.values()[Math.max(rank.ordinal(), kind.rank.ordinal())];
+            creatureClass = kind.creatureClass;
+            guardian = CreatureTypes.type(kind).create(level);
+        } else if (trial.colossus != null) {
             ColossusEntity colossus = Colossi.typeOf(trial.colossus).create(level);
             if (colossus != null) {
                 colossus.setSeed(level.random.nextInt());
@@ -265,6 +285,12 @@ public final class NightmareGateEntity extends Entity {
         List<Mob> mobs = level.getEntitiesOfClass(Mob.class, this.getBoundingBox().inflate(96.0),
             mob -> mob.isAlive() && this.sent(mob));
         return mobs.size();
+    }
+
+    /** What roams the region this Gate's Seed grows in; empty if the Seed is unknown or its region has no creatures yet. */
+    private List<Kind> kinds(ServerLevel level) {
+        SeedRecords.Seed seed = SeedRecords.get(level.getServer()).get(this.seed);
+        return seed == null ? List.of() : Kinds.roaming(seed.region);
     }
 
     static Trial trial(int category) {

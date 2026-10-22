@@ -3,6 +3,7 @@ package net.logosnumen.nightmareevolved.client.colossus;
 import net.logosnumen.nightmareevolved.client.rig.Bones;
 import net.logosnumen.nightmareevolved.client.rig.Look;
 import net.logosnumen.nightmareevolved.client.rig.Material;
+import net.logosnumen.nightmareevolved.client.rig.Pose;
 import net.logosnumen.nightmareevolved.client.rig.Rig;
 import net.logosnumen.nightmareevolved.colossus.ColossusVariant;
 import net.minecraft.client.model.geom.ModelPart;
@@ -121,7 +122,7 @@ public final class CairnModel extends ColossusModel {
     }
 
     @Override
-    public void animate(Rig.Baked body, ColossusPose p, ColossusVariant v) {
+    public void animate(Rig.Baked body, Pose p, ColossusVariant v) {
         float walk = p.gait(0.45F, 0.0F);
         float yaw = Mth.clamp(p.headYaw(), -50.0F, 50.0F);
         float look = Mth.clamp(p.headPitch(), -40.0F, 40.0F);

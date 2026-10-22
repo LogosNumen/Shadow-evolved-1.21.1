@@ -1,6 +1,7 @@
 package net.logosnumen.nightmareevolved.creature;
 
 import net.logosnumen.nightmareevolved.entity.colossus.ColossusEntity;
+import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.soul.Soul;
@@ -52,7 +53,7 @@ public final class CreatureEvents {
     /** A slain Nightmare Creature leaves soul shards of its rank: a guardian many, a colossus a great many. */
     public static void onDrops(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!Creatures.ofNightmare(entity) || entity.getLastHurtByMob() == null && event.getSource().getEntity() == null) {
+        if (!Creatures.ofNightmare(entity) || !Creatures.feedsSouls(entity) || entity.getLastHurtByMob() == null && event.getSource().getEntity() == null) {
             return;
         }
 
@@ -65,7 +66,8 @@ public final class CreatureEvents {
     /** A few monsters born in the waking world are touched by the Nightmare. */
     public static void onFinalizeSpawn(FinalizeSpawnEvent event) {
         Mob mob = event.getEntity();
-        if (event.getSpawnType() != MobSpawnType.NATURAL || !(mob instanceof Enemy) || mob instanceof ColossusEntity || Creatures.ofNightmare(mob)
+        if (event.getSpawnType() != MobSpawnType.NATURAL || !(mob instanceof Enemy) || mob instanceof ColossusEntity || mob instanceof DreamCreature
+            || Creatures.ofNightmare(mob)
             || Nightmares.isNightmare(mob.level()) || mob.getRandom().nextFloat() >= TOUCHED) {
             return;
         }

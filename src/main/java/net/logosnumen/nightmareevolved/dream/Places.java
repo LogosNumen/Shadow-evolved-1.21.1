@@ -17,6 +17,13 @@ public final class Places {
     public static final Place DARK_CITY = new Place("dark_city", 1420, -6020);
     public static final Place ASHEN_BARROW = new Place("ashen_barrow", -3330, -6150);
     public static final Place BONE_RIDGE = new Place("bone_ridge", -260, -6960);
+    /** Where the iron spiders nest in the labyrinth (the novel gives no place; this one is the mod's). */
+    public static final Place IRON_NEST = new Place("iron_nest", -200, -5600);
+    /** A nest of stone on a coral hill where the Vile Thieving Bird's spawn waits, unhatched (the mod's own place). */
+    public static final Place STONE_NEST = new Place("stone_nest", -1900, -6700);
+    // The Burned Forest.
+    /** A Millipede Queen's hive deep in the deadfall (the novel's queens have hives; this one is the mod's). */
+    public static final Place MILLIPEDE_HIVE = new Place("millipede_hive", -600, -11400);
     // The Hollow Mountains.
     public static final Place UNDERGROUND_MINE = new Place("underground_mine", 1350, -4200);
     public static final Place UNDERWORLD_GATE = new Place("underworld_gate", -520, -3060);
@@ -29,6 +36,8 @@ public final class Places {
     public static final Place GODGRAVE_SKULL = new Place("godgrave_skull", -1024, -2300);
     public static final Place VANISHING_LAKE = new Place("vanishing_lake", -1024, -150);
     public static final Place MICTLAN_ZIGGURAT = new Place("mictlan_ziggurat", -1024, -760);
+    /** Where the spine's flooded canal runs beyond the ribs (the novel names the ocean, not this spot). */
+    public static final Place SPINAL_OCEAN = new Place("spinal_ocean", -1024, 900);
     // The Glass Hell.
     public static final Place RED_HILL = new Place("red_hill", 1000, -260);
     // The Chained Isles.
@@ -56,10 +65,10 @@ public final class Places {
     public static final Place BLACK_OBELISK = new Place("black_obelisk", -800, 5700);
 
     public static final List<Place> ALL = List.of(
-        CRIMSON_SPIRE, DARK_CITY, ASHEN_BARROW, BONE_RIDGE, UNDERGROUND_MINE, UNDERWORLD_GATE, NETHERS_CITY, BLACK_MOUNTAIN, TOMB_OF_ARIEL,
-        BLACK_SKULL, GODGRAVE_SKULL, VANISHING_LAKE, MICTLAN_ZIGGURAT, RED_HILL, TEAR, SANCTUARY_OF_NOCTIS, NORTHERN_ISLAND, IVORY_TOWER,
-        EBONY_TOWER, IRON_HAND, RECKONING, SHIPWRECK, TWISTED_TREES, JAGGED_ROCKS, DESECRATED_GROVE, CORRUPTED_ISLAND, BASTION, RAVENHEART,
-        RAVENHEART_VOLCANO, WEEPING_GODDESS, RIVERGATE, NIGHT_GARDEN, BLACK_OBELISK
+        CRIMSON_SPIRE, DARK_CITY, ASHEN_BARROW, BONE_RIDGE, IRON_NEST, STONE_NEST, MILLIPEDE_HIVE, UNDERGROUND_MINE, UNDERWORLD_GATE, NETHERS_CITY,
+        BLACK_MOUNTAIN, TOMB_OF_ARIEL, BLACK_SKULL, GODGRAVE_SKULL, VANISHING_LAKE, MICTLAN_ZIGGURAT, SPINAL_OCEAN, RED_HILL, TEAR, SANCTUARY_OF_NOCTIS,
+        NORTHERN_ISLAND, IVORY_TOWER, EBONY_TOWER, IRON_HAND, RECKONING, SHIPWRECK, TWISTED_TREES, JAGGED_ROCKS, DESECRATED_GROVE,
+        CORRUPTED_ISLAND, BASTION, RAVENHEART, RAVENHEART_VOLCANO, WEEPING_GODDESS, RIVERGATE, NIGHT_GARDEN, BLACK_OBELISK
     );
 
     private Places() {

@@ -62,8 +62,11 @@ descriptions and dialogue are original writing.
   - **Seeds of Nightmare** call to the Awakened and hold their next Nightmares. A Seed left alone blooms into a Gate in
     the waking world, which sends waves of creatures and then its Guardian.
   - **Citadels:** a Saint can bind one by crouching at its Gateway.
+  - **Its creatures:** sixty-six of the novel's Nightmare Creatures, each region its own, at their ranks and classes,
+    from Carapace Scavengers to Condemnation. The greatest keep lairs where the novel puts them.
 
-  The regions, Gateways, Seeds and Citadels are in [docs/DREAM_REALM.md](docs/DREAM_REALM.md).
+  The regions, Gateways, Seeds and Citadels are in [docs/DREAM_REALM.md](docs/DREAM_REALM.md), and the creatures in
+  [docs/CREATURES.md](docs/CREATURES.md).
 - **Colossi**: four Titan-class Nightmare Creatures many times a player's height, and no two alike. The **Cairn
   Colossus** of piled stone, the skeletal **Ossuary Behemoth**, the burrowing **Gravewyrm** and the armoured
   **Chainbound Colossus**. Each is built from a seed (colouring, size, elders, horns, heads, weapons, segments) and has

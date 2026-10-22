@@ -2,6 +2,9 @@ package net.logosnumen.nightmareevolved.client;
 
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
+import net.logosnumen.nightmareevolved.client.creature.CreatureBoltRenderer;
+import net.logosnumen.nightmareevolved.client.creature.CreatureModels;
+import net.logosnumen.nightmareevolved.client.creature.CreatureRenderer;
 import net.logosnumen.nightmareevolved.client.dream.ClientRealm;
 import net.logosnumen.nightmareevolved.client.dream.DreamSky;
 import net.logosnumen.nightmareevolved.client.dream.NightmareGateRenderer;
@@ -23,6 +26,8 @@ import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaClient;
 import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaSky;
 import net.logosnumen.nightmareevolved.client.soulsea.VesselRenderer;
 import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
+import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
+import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
 import net.logosnumen.nightmareevolved.memory.MemoryItems;
@@ -42,6 +47,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ShieldItem;
@@ -108,6 +114,11 @@ public final class ClientSetup {
         event.registerEntityRenderer(SeaEntities.SHADOW.get(), SeaShadowRenderer::new);
         event.registerEntityRenderer(SeaEntities.HOARD.get(), SeaHoardRenderer::new);
         event.registerEntityRenderer(SeedEntities.GATE.get(), NightmareGateRenderer::new);
+        for (EntityType<DreamCreature> type : CreatureTypes.types()) {
+            event.registerEntityRenderer(type, CreatureRenderer::new);
+        }
+
+        event.registerEntityRenderer(CreatureTypes.BOLT.get(), CreatureBoltRenderer::new);
     }
 
     /** What players wear from their Memories, drawn on every player model. */
@@ -126,6 +137,7 @@ public final class ClientSetup {
 
     /** Memory bows draw like bows and Memory shields block like shields. */
     private static void onClientSetup(FMLClientSetupEvent event) {
+        CreatureModels.verify();
         event.enqueueWork(() -> {
             for (Supplier<? extends Item> memory : MemoryItems.all()) {
                 Item item = memory.get();

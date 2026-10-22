@@ -39,9 +39,11 @@ Stormsea past everything in the far south.
   Island, and the Night Temple hanging under it with its black altar; the Ivory and Ebony Towers; Iron Hand, Reckoning
   and the Shipwreck, whose hold keeps a chest; the Desecrated Grove; and the Twisted Trees, Jagged Rocks and the
   Corrupted Island.
+- **Burned Forest:** a Millipede Queen's hive, a fortified dome in the deadfall.
 - **Hollow Mountains:** the Black Mountain, the temple gate of the Underworld, and Nether's City.
 - **Nightmare Desert:** the Black Skull, the Tomb of Ariel, its gauntlet and the mirage path.
-- **Godgrave:** the skull, Vanishing Lake's hidden pond, the ziggurat of the Hollows and the ruined cities around it.
+- **Godgrave:** the skull, Vanishing Lake's hidden pond, the ziggurat of the Hollows and the ruined cities around it,
+  and the Spinal Ocean flooding the spine's canal. Cracks in the bones lead down into their hollows.
 - **Citadels:** Bastion, Ravenheart, Clan Sorrow's citadel, Rivergate, Red Hill, the Night Garden and the Black Obelisk.
 
 ## Coming and going
@@ -91,7 +93,8 @@ A Seed someone has found, if left alone for six days, blooms (the `nightmareGate
 2. Somewhere near a player, a tall, faint warp gathers for a minute.
 3. It tears open into a ragged rift of darkness with a burning edge. Touching it is deadly.
 4. Waves of Nightmare Creatures pour through, stronger as the Gate grows, until the **Guardian of the Gate** comes,
-   a rank above the rest.
+   a rank above the rest. They are the creatures of the region the Seed grows in, and the Guardian is the strongest
+   of them.
 5. Slaying the Guardian closes the Gate, and the Seed sleeps until it ripens again. Conquering the Seed's Nightmare
    closes it for good.
 
