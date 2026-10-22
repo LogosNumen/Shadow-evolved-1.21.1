@@ -3,9 +3,11 @@ package net.logosnumen.nightmareevolved.client.creature;
 import java.util.HashMap;
 import java.util.Map;
 import com.mojang.logging.LogUtils;
+import net.logosnumen.nightmareevolved.client.creature.desert.DesertModels;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleBeasts;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleFolk;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleHorrors;
+import net.logosnumen.nightmareevolved.client.creature.mountains.MountainModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.CarapaceModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreBeasts;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreFolk;
@@ -59,6 +61,15 @@ public final class CreatureModels {
         MODELS.put("wormvine", new IsleHorrors.Wormvine());
         MODELS.put("blood_nourished_root", new IsleHorrors.Root());
         MODELS.put("isle_horror", new IsleHorrors.IsleHorror());
+        MODELS.put("mist_being", new MountainModels.MistBeing());
+        MODELS.put("tainted_saint", new MountainModels.TaintedSaint());
+        MODELS.put("absence", new MountainModels.Absence());
+        MODELS.put("dark_one", new MountainModels.DarkOne());
+        MODELS.put("jade_titan", new MountainModels.JadeTitan());
+        MODELS.put("horror_of_the_lightless_current", new MountainModels.LightlessHorror());
+        MODELS.put("deathless", new DesertModels.Warrior());
+        MODELS.put("deathless_giant", new DesertModels.Giant());
+        MODELS.put("skinwalker", new DesertModels.Vessel());
     }
 
     private CreatureModels() {

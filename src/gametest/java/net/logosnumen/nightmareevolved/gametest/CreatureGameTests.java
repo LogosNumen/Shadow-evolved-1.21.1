@@ -5,9 +5,11 @@ import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
 import java.util.List;
+import net.logosnumen.nightmareevolved.creature.kind.DesertKinds;
 import net.logosnumen.nightmareevolved.creature.kind.IsleKinds;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Kinds;
+import net.logosnumen.nightmareevolved.creature.kind.MountainKinds;
 import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
@@ -54,6 +56,7 @@ public class CreatureGameTests {
     public static void lairsLieInTheirRegions(GameTestHelper helper) {
         lairsIn(helper, ShoreKinds.ALL, Region.FORGOTTEN_SHORE);
         lairsIn(helper, IsleKinds.ALL, Region.CHAINED_ISLES);
+        lairsIn(helper, MountainKinds.ALL, Region.HOLLOW_MOUNTAINS);
 
         helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();
@@ -101,5 +104,29 @@ public class CreatureGameTests {
             scavenger.discard();
             prey.discard();
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void theDeathlessCannotDie(GameTestHelper helper) {
+        DreamCreature dead = Wildlife.spawn(helper.getLevel(), DesertKinds.DEATHLESS, helper.absolutePos(new BlockPos(1, 2, 1)), MobSpawnType.SPAWN_EGG);
+        helper.assertTrue(dead != null, "A Deathless rises");
+        helper.assertTrue(!Creatures.feedsSouls(dead), "It has no soul to feed anyone's");
+        dead.hurt(helper.getLevel().damageSources().generic(), 10000.0F);
+        helper.assertTrue(dead.isAlive() && dead.roused(), "A killing blow only breaks it apart");
+        float health = dead.getHealth();
+        dead.hurt(helper.getLevel().damageSources().generic(), 50.0F);
+        helper.assertTrue(dead.getHealth() == health, "Lying in pieces, it cannot be harmed further");
+        dead.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void skinwalkersShowThemselvesWhenStruck(GameTestHelper helper) {
+        DreamCreature vessel = Wildlife.spawn(helper.getLevel(), DesertKinds.SKINWALKER, helper.absolutePos(new BlockPos(1, 2, 1)), MobSpawnType.SPAWN_EGG);
+        helper.assertTrue(vessel != null && !vessel.roused(), "A Skinwalker walks as a traveller");
+        vessel.hurt(helper.getLevel().damageSources().generic(), 2.0F);
+        helper.assertTrue(vessel.roused(), "Struck, it shows what it is");
+        vessel.discard();
+        helper.succeed();
     }
 }

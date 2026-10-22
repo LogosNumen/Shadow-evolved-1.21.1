@@ -111,7 +111,8 @@ public final class Wildlife {
         List<Kind> kinds = new ArrayList<>();
         List<Kind.Haunt> haunts = new ArrayList<>();
         collect(here, kinds, haunts);
-        if (here.whole() != here) {
+        if (haunts.isEmpty() && here.whole() != here) {
+            // A part of a region without creatures of its own (the Sea of Ash, the barrows) shares the whole's.
             collect(here.whole(), kinds, haunts);
         }
 

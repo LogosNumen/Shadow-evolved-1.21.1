@@ -14,6 +14,8 @@ public final class Kinds {
     static {
         ShoreKinds.ALL.forEach(Kinds::add);
         IsleKinds.ALL.forEach(Kinds::add);
+        MountainKinds.ALL.forEach(Kinds::add);
+        DesertKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {
