@@ -12,6 +12,7 @@ import net.logosnumen.nightmareevolved.creature.kind.IsleKinds;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Kinds;
 import net.logosnumen.nightmareevolved.creature.kind.MountainKinds;
+import net.logosnumen.nightmareevolved.creature.kind.RavenheartKinds;
 import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
 import net.logosnumen.nightmareevolved.dream.Places;
 import net.logosnumen.nightmareevolved.dream.RealmMap;
@@ -154,5 +155,19 @@ public class CreatureGameTests {
             queen.discard();
             foe.discard();
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void chaliceKnightsBecomeBeastsWhenHardPressed(GameTestHelper helper) {
+        DreamCreature knight = Wildlife.spawn(helper.getLevel(), RavenheartKinds.CHALICE_KNIGHT, helper.absolutePos(new BlockPos(2, 2, 2)), MobSpawnType.SPAWN_EGG);
+        helper.assertTrue(knight != null && !knight.roused(), "A Chalice Knight fights as a knight");
+        double speed = knight.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        knight.hurt(helper.getLevel().damageSources().generic(), knight.getMaxHealth() * 0.2F);
+        helper.assertTrue(!knight.roused(), "A glancing blow doesn't bring the beast out");
+        knight.invulnerableTime = 0;
+        knight.hurt(helper.getLevel().damageSources().generic(), knight.getMaxHealth() * 0.4F);
+        helper.assertTrue(knight.roused() && knight.getAttributeValue(Attributes.MOVEMENT_SPEED) > speed, "Hard pressed, the beast bursts out, and it is faster");
+        knight.discard();
+        helper.succeed();
     }
 }

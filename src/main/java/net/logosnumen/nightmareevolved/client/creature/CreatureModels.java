@@ -11,6 +11,7 @@ import net.logosnumen.nightmareevolved.client.creature.isles.IsleBeasts;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleFolk;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleHorrors;
 import net.logosnumen.nightmareevolved.client.creature.mountains.MountainModels;
+import net.logosnumen.nightmareevolved.client.creature.ravenheart.RavenheartModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.CarapaceModels;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreBeasts;
 import net.logosnumen.nightmareevolved.client.creature.shore.ShoreFolk;
@@ -91,6 +92,8 @@ public final class CreatureModels {
         MODELS.put("black_millipede", new BurnedModels.Millipede());
         MODELS.put("painted_millipede", new BurnedModels.Painted());
         MODELS.put("millipede_queen", new BurnedModels.Queen());
+        MODELS.put("chalice_knight", new RavenheartModels.ChaliceKnight());
+        MODELS.put("stone_worm", new RavenheartModels.StoneWorm());
     }
 
     private CreatureModels() {

@@ -71,4 +71,20 @@ public final class Humanoid {
         Bones.shift(body.part("body"), 0.0F, hips * 0.85F * f, -hips * 0.3F * f);
         Gaits.pair(body, "arm", -60.0F * f, 0.0F, 20.0F * f, -60.0F * f, 0.0F, 20.0F * f);
     }
+
+    /** Swings a one-handed weapon arm through the moves knights share: an overhead cleave, a thrust, a wide sweep. */
+    public static void swordwork(Rig.Baked body, Pose pose) {
+        // Cleave: the blade raised high, then brought down.
+        Bones.turn(body.part("arm_r"), pose.key("cleave", 0.0F, 0.0F, 0.45F, -150.0F, 0.58F, -35.0F, 1.0F, 0.0F), 0.0F, 0.0F);
+        Bones.turn(body.part("chest"), pose.key("cleave", 0.0F, 0.0F, 0.45F, -8.0F, 0.58F, 14.0F, 1.0F, 0.0F), 0.0F, 0.0F);
+        // Cut: the same, quicker.
+        Bones.turn(body.part("arm_r"), pose.key("cut", 0.0F, 0.0F, 0.4F, -140.0F, 0.56F, -30.0F, 1.0F, 0.0F), 0.0F, 0.0F);
+        // Thrust: drawn back, then driven forward.
+        Bones.turn(body.part("arm_r"), pose.key("thrust", 0.0F, 0.0F, 0.4F, 20.0F, 0.6F, -90.0F, 1.0F, 0.0F), 0.0F, 0.0F);
+        Bones.turn(body.part("chest"), pose.key("thrust", 0.0F, 0.0F, 0.4F, -5.0F, 0.6F, 10.0F, 1.0F, 0.0F),
+            pose.key("thrust", 0.0F, 0.0F, 0.4F, 20.0F, 0.6F, -20.0F, 1.0F, 0.0F), 0.0F);
+        // Sweep: across from right to left.
+        Bones.turn(body.part("arm_r"), pose.key("sweep", 0.0F, 0.0F, 0.3F, -80.0F, 0.7F, -80.0F, 1.0F, 0.0F), 0.0F, 0.0F);
+        Bones.turn(body.part("chest"), 0.0F, pose.key("sweep", 0.0F, 0.0F, 0.4F, -50.0F, 0.6F, 50.0F, 1.0F, 0.0F), 0.0F);
+    }
 }

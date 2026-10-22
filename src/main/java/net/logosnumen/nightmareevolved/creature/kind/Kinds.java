@@ -18,6 +18,7 @@ public final class Kinds {
         DesertKinds.ALL.forEach(Kinds::add);
         GodgraveKinds.ALL.forEach(Kinds::add);
         BurnedKinds.ALL.forEach(Kinds::add);
+        RavenheartKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {

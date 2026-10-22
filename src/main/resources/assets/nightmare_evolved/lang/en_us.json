@@ -1809,5 +1809,9 @@
   "item.nightmare_evolved.painted_millipede_spawn_egg": "Painted Millipede Spawn Egg",
   "entity.nightmare_evolved.millipede_queen": "Millipede Queen",
   "item.nightmare_evolved.millipede_queen_spawn_egg": "Millipede Queen Spawn Egg",
-  "place.nightmare_evolved.millipede_hive": "a Millipede Queen's hive"
+  "place.nightmare_evolved.millipede_hive": "a Millipede Queen's hive",
+  "entity.nightmare_evolved.chalice_knight": "Chalice Knight",
+  "item.nightmare_evolved.chalice_knight_spawn_egg": "Chalice Knight Spawn Egg",
+  "entity.nightmare_evolved.stone_worm": "Stone Worm",
+  "item.nightmare_evolved.stone_worm_spawn_egg": "Stone Worm Spawn Egg"
 }

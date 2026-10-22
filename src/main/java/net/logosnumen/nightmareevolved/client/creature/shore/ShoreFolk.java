@@ -14,22 +14,6 @@ public final class ShoreFolk {
     private ShoreFolk() {
     }
 
-    /** Swings a one-handed weapon arm through the moves knights share: an overhead cleave, a thrust, a wide sweep. */
-    static void swordwork(Rig.Baked body, Pose pose) {
-        // Cleave: the blade raised high, then brought down.
-        Bones.turn(body.part("arm_r"), pose.key("cleave", 0.0F, 0.0F, 0.45F, -150.0F, 0.58F, -35.0F, 1.0F, 0.0F), 0.0F, 0.0F);
-        Bones.turn(body.part("chest"), pose.key("cleave", 0.0F, 0.0F, 0.45F, -8.0F, 0.58F, 14.0F, 1.0F, 0.0F), 0.0F, 0.0F);
-        // Cut: the same, quicker.
-        Bones.turn(body.part("arm_r"), pose.key("cut", 0.0F, 0.0F, 0.4F, -140.0F, 0.56F, -30.0F, 1.0F, 0.0F), 0.0F, 0.0F);
-        // Thrust: drawn back, then driven forward.
-        Bones.turn(body.part("arm_r"), pose.key("thrust", 0.0F, 0.0F, 0.4F, 20.0F, 0.6F, -90.0F, 1.0F, 0.0F), 0.0F, 0.0F);
-        Bones.turn(body.part("chest"), pose.key("thrust", 0.0F, 0.0F, 0.4F, -5.0F, 0.6F, 10.0F, 1.0F, 0.0F),
-            pose.key("thrust", 0.0F, 0.0F, 0.4F, 20.0F, 0.6F, -20.0F, 1.0F, 0.0F), 0.0F);
-        // Sweep: across from right to left.
-        Bones.turn(body.part("arm_r"), pose.key("sweep", 0.0F, 0.0F, 0.3F, -80.0F, 0.7F, -80.0F, 1.0F, 0.0F), 0.0F, 0.0F);
-        Bones.turn(body.part("chest"), 0.0F, pose.key("sweep", 0.0F, 0.0F, 0.4F, -50.0F, 0.6F, 50.0F, 1.0F, 0.0F), 0.0F);
-    }
-
     /** The Forsaken Knight: anthracite gothic plate engraved all over, a horned helm, red flames in its visor, a black sword. */
     public static final class Knight extends CreatureModel {
         private static final Look LOOK = new Look(0x2E2E34, 0x0C0C10, 0x5A5A66, 0x1A1A20, 0x24242A, 0xFF2A1A, 0x34343C);
@@ -67,7 +51,7 @@ public final class ShoreFolk {
         @Override
         public void animate(Rig.Baked body, Pose pose, int look) {
             Humanoid.walk(body, pose, 28.0F, 0.6F);
-            swordwork(body, pose);
+            Humanoid.swordwork(body, pose);
             float step = pose.key("shadow_step", 0.0F, 0.0F, 0.5F, 1.0F, 1.0F, 0.0F);
             Bones.turn(body.part("body"), 25.0F * step, 0.0F, 0.0F);
             Bones.shift(body.part("body"), 0.0F, 6.0F * step, 0.0F);
@@ -106,7 +90,7 @@ public final class ShoreFolk {
         public void animate(Rig.Baked body, Pose pose, int look) {
             Humanoid.walk(body, pose, 26.0F, 0.6F);
             Bones.turn(body.part("arm_l"), -30.0F, 0.0F, -10.0F);
-            swordwork(body, pose);
+            Humanoid.swordwork(body, pose);
             float bash = pose.key("bash", 0.0F, 0.0F, 0.4F, -0.4F, 0.6F, 1.0F, 1.0F, 0.0F);
             Bones.turn(body.part("arm_l"), -60.0F * bash, 20.0F * bash, 0.0F);
             Humanoid.die(body, pose, 15.6F);
