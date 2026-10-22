@@ -16,6 +16,7 @@ public final class Kinds {
         IsleKinds.ALL.forEach(Kinds::add);
         MountainKinds.ALL.forEach(Kinds::add);
         DesertKinds.ALL.forEach(Kinds::add);
+        GodgraveKinds.ALL.forEach(Kinds::add);
     }
 
     private Kinds() {

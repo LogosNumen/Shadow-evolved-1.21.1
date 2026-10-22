@@ -1,11 +1,12 @@
 package net.logosnumen.nightmareevolved.gametest;
 
+import java.util.List;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
 import net.logosnumen.nightmareevolved.creature.CreatureRank;
 import net.logosnumen.nightmareevolved.creature.Creatures;
-import java.util.List;
 import net.logosnumen.nightmareevolved.creature.kind.DesertKinds;
+import net.logosnumen.nightmareevolved.creature.kind.GodgraveKinds;
 import net.logosnumen.nightmareevolved.creature.kind.IsleKinds;
 import net.logosnumen.nightmareevolved.creature.kind.Kind;
 import net.logosnumen.nightmareevolved.creature.kind.Kinds;
@@ -57,6 +58,7 @@ public class CreatureGameTests {
         lairsIn(helper, ShoreKinds.ALL, Region.FORGOTTEN_SHORE);
         lairsIn(helper, IsleKinds.ALL, Region.CHAINED_ISLES);
         lairsIn(helper, MountainKinds.ALL, Region.HOLLOW_MOUNTAINS);
+        lairsIn(helper, GodgraveKinds.ALL, Region.GODGRAVE);
 
         helper.assertTrue(RealmMap.Shore.basin(Places.IRON_NEST.x(), Places.IRON_NEST.z()) < 1.0, "The iron spiders nest in the labyrinth");
         helper.succeed();

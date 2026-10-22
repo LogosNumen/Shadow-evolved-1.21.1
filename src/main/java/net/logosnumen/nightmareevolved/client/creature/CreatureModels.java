@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import com.mojang.logging.LogUtils;
 import net.logosnumen.nightmareevolved.client.creature.desert.DesertModels;
+import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveBeasts;
+import net.logosnumen.nightmareevolved.client.creature.godgrave.GodgraveGreats;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleBeasts;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleFolk;
 import net.logosnumen.nightmareevolved.client.creature.isles.IsleHorrors;
@@ -70,6 +72,19 @@ public final class CreatureModels {
         MODELS.put("deathless", new DesertModels.Warrior());
         MODELS.put("deathless_giant", new DesertModels.Giant());
         MODELS.put("skinwalker", new DesertModels.Vessel());
+        MODELS.put("asura_of_condemnation", new GodgraveGreats.Asura());
+        MODELS.put("condemnation", new GodgraveGreats.Condemnation());
+        MODELS.put("abjuration", new GodgraveGreats.Abjuration());
+        MODELS.put("guardian_of_vanishing_lake", new GodgraveGreats.LakeGuardian());
+        MODELS.put("maggot_beast", new GodgraveBeasts.MaggotBeast());
+        MODELS.put("jackal_giant", new GodgraveBeasts.JackalGiant());
+        MODELS.put("crimson_python", new GodgraveBeasts.Python());
+        MODELS.put("black_tiger", new GodgraveBeasts.BlackTiger());
+        MODELS.put("blood_mosquito", new GodgraveBeasts.Mosquito());
+        MODELS.put("harpy", new GodgraveBeasts.Harpy());
+        MODELS.put("three_headed_hound", new GodgraveBeasts.Hound());
+        MODELS.put("viper_lion", new GodgraveBeasts.ViperLion());
+        MODELS.put("tyrant_lizard", new GodgraveBeasts.TyrantLizard());
     }
 
     private CreatureModels() {
