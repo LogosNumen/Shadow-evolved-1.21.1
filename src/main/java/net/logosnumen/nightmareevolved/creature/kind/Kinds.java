@@ -1,6 +1,7 @@
 package net.logosnumen.nightmareevolved.creature.kind;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,22 @@ public final class Kinds {
     @Nullable
     public static Kind byId(String id) {
         return BY_ID.get(id);
+    }
+
+    /**
+     * The kinds that roam a region or any of its parts, weakest first: not the lone keepers of lairs, and not those
+     * that live only in water.
+     */
+    public static List<Kind> roaming(Region region) {
+        List<Kind> found = new ArrayList<>();
+        for (Kind kind : BY_ID.values()) {
+            if (kind.lair == null && kind.motion != Kind.Motion.SWIM && kind.haunts.stream().anyMatch(h -> h.region().whole() == region.whole())) {
+                found.add(kind);
+            }
+        }
+
+        found.sort(Comparator.comparingInt((Kind k) -> k.rank.ordinal()).thenComparingInt(k -> k.creatureClass.ordinal()));
+        return found;
     }
 
     /** The kinds that haunt a region (its whole, not its parts), with what each haunt says of them there. */

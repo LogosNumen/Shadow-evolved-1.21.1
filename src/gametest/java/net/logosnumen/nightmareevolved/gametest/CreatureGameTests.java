@@ -183,4 +183,17 @@ public class CreatureGameTests {
         maw.discard();
         helper.succeed();
     }
+
+    @GameTest(template = "empty")
+    public static void gatesSendOutTheirRegionsCreatures(GameTestHelper helper) {
+        List<Kind> godgrave = Kinds.roaming(Region.GODGRAVE);
+        helper.assertTrue(godgrave.contains(GodgraveKinds.BLACK_TIGER) && godgrave.contains(GodgraveKinds.ASURA), "Godgrave's Gates send out what roams Godgrave, its hollows too");
+        helper.assertTrue(godgrave.stream().noneMatch(k -> k.lair != null || k.motion == Kind.Motion.SWIM), "Never a lair's keeper, nor anything that lives only in water");
+        helper.assertTrue(!godgrave.contains(ShoreKinds.CARAPACE_SCAVENGER), "Nor another region's creatures");
+        for (int i = 1; i < godgrave.size(); i++) {
+            helper.assertTrue(godgrave.get(i - 1).rank.ordinal() <= godgrave.get(i).rank.ordinal(), "Weakest first, so the strongest can guard the Gate");
+        }
+
+        helper.succeed();
+    }
 }
