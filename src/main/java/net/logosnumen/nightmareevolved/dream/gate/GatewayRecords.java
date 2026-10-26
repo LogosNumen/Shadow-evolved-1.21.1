@@ -21,16 +21,23 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 /**
  * The Gateways that have come and gone since the world began: those left where Seeds of Nightmare were destroyed, those
- * that have been destroyed themselves, and the lords their Citadels are bound to. Kept with the overworld's data.
+ * that have been destroyed themselves, and the lords their Citadels are bound to; with the oaths Saints have sworn to
+ * Sovereigns, and which lords were last seen as Sovereigns. Kept with the overworld's data.
  */
 public final class GatewayRecords extends SavedData {
     private static final String NAME = "nightmare_evolved_gateways";
     private final List<Gateways.Gateway> born = new ArrayList<>();
     private final Set<String> destroyed = new HashSet<>();
     private final Map<String, Lord> lords = new HashMap<>();
+    private final Map<UUID, Oath> oaths = new HashMap<>();
+    private final Set<UUID> sovereigns = new HashSet<>();
 
     /** The soul a Citadel is bound to. */
     public record Lord(UUID id, String name) {
+    }
+
+    /** A Saint's oath of fealty: who swore it, and the Sovereign they serve. */
+    public record Oath(String saint, Lord liege) {
     }
 
     public static GatewayRecords get(MinecraftServer server) {
@@ -61,6 +68,17 @@ public final class GatewayRecords extends SavedData {
             if (lord.hasUUID("Id")) {
                 records.lords.put(citadel, new Lord(lord.getUUID("Id"), lord.getString("Name")));
             }
+        }
+
+        for (Tag t : tag.getList("Oaths", Tag.TAG_COMPOUND)) {
+            CompoundTag o = (CompoundTag)t;
+            if (o.hasUUID("Saint") && o.hasUUID("Liege")) {
+                records.oaths.put(o.getUUID("Saint"), new Oath(o.getString("SaintName"), new Lord(o.getUUID("Liege"), o.getString("LiegeName"))));
+            }
+        }
+
+        for (Tag t : tag.getList("Sovereigns", Tag.TAG_INT_ARRAY)) {
+            records.sovereigns.add(NbtUtils.loadUUID(t));
         }
 
         return records;
@@ -95,6 +113,19 @@ public final class GatewayRecords extends SavedData {
             lords.put(citadel, l);
         });
         tag.put("Lords", lords);
+        ListTag oaths = new ListTag();
+        this.oaths.forEach((saint, oath) -> {
+            CompoundTag o = new CompoundTag();
+            o.putUUID("Saint", saint);
+            o.putString("SaintName", oath.saint());
+            o.putUUID("Liege", oath.liege().id());
+            o.putString("LiegeName", oath.liege().name());
+            oaths.add(o);
+        });
+        tag.put("Oaths", oaths);
+        ListTag sovereigns = new ListTag();
+        this.sovereigns.forEach(id -> sovereigns.add(NbtUtils.createUUID(id)));
+        tag.put("Sovereigns", sovereigns);
         return tag;
     }
 
@@ -134,6 +165,49 @@ public final class GatewayRecords extends SavedData {
 
     public void setDestroyed(String id, boolean destroyed) {
         if (destroyed ? this.destroyed.add(id) : this.destroyed.remove(id)) {
+            this.setDirty();
+        }
+    }
+
+    /** The oath a Saint has sworn, or null if they serve no one. */
+    @Nullable
+    public Oath oath(UUID saint) {
+        return this.oaths.get(saint);
+    }
+
+    public void swear(UUID saint, String saintName, Lord liege) {
+        this.oaths.put(saint, new Oath(saintName, liege));
+        this.setDirty();
+    }
+
+    /** Ends a Saint's oath; true if there was one. */
+    public boolean renounce(UUID saint) {
+        boolean had = this.oaths.remove(saint) != null;
+        if (had) {
+            this.setDirty();
+        }
+
+        return had;
+    }
+
+    /** The Saints sworn to a Sovereign, by their ids. */
+    public Map<UUID, Oath> vassals(UUID sovereign) {
+        Map<UUID, Oath> vassals = new HashMap<>();
+        this.oaths.forEach((saint, oath) -> {
+            if (oath.liege().id().equals(sovereign)) {
+                vassals.put(saint, oath);
+            }
+        });
+        return vassals;
+    }
+
+    /** Whether a soul was a Sovereign when last seen, for the lords of Citadels who are not here to ask. */
+    public boolean sovereign(UUID id) {
+        return this.sovereigns.contains(id);
+    }
+
+    public void noteSovereign(UUID id, boolean sovereign) {
+        if (sovereign ? this.sovereigns.add(id) : this.sovereigns.remove(id)) {
             this.setDirty();
         }
     }
