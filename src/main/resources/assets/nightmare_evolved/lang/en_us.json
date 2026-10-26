@@ -188,6 +188,7 @@
   "spell.nightmare_evolved.shards_useless": "The shard has nothing your core can take.",
   "spell.nightmare_evolved.new_core": "Your soul tears, and a new core is born in it. You are a %s now.",
   "commands.nightmare_evolved.soul.no_flaw": "No Flaw is called that.",
+  "commands.nightmare_evolved.soul.no_stage": "There is no step of Ascension called that.",
   "commands.nightmare_evolved.soul.flaw": "Your Flaw is now %s.",
   "commands.nightmare_evolved.soul.no_attribute": "No Attribute is called that.",
   "commands.nightmare_evolved.soul.attribute.added": "Your soul now bears %s.",

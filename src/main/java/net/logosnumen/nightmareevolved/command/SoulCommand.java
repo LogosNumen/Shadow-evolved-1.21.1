@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.aspect.Awakening;
+import net.logosnumen.nightmareevolved.aspect.Stage;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
 import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.dream.gate.Citadels;
@@ -28,7 +29,8 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Operator tools for the soul and its trials. {@code /ne soul} sets the caller's Rank, Aspect (with its own Flaw, or a
- * chosen one), Flaw, Attributes, cores and fragments; fills essence; or resets the soul to an Aspirant's.
+ * chosen one), Flaw, Attributes, cores and fragments; fills essence; uses an Aspect ability by its step; or resets the soul
+ * to an Aspirant's.
  * {@code /ne trial begin <trial>|win} enters any trial or wins the one under way.
  */
 final class SoulCommand {
@@ -60,7 +62,10 @@ final class SoulCommand {
             .then(Commands.literal("fragments").then(Commands.argument("fragments", IntegerArgumentType.integer(0)).executes(SoulCommand::fragments)))
             .then(Commands.literal("saturate").executes(SoulCommand::saturate))
             .then(Commands.literal("essence").executes(SoulCommand::essence))
-            .then(Commands.literal("reset").executes(SoulCommand::reset));
+            .then(Commands.literal("reset").executes(SoulCommand::reset))
+            .then(Commands.literal("use").then(Commands.argument("stage", StringArgumentType.word())
+                .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(Stage.values()).map(Stage::id), b))
+                .executes(SoulCommand::use)));
     }
 
     static LiteralArgumentBuilder<CommandSourceStack> trial() {
@@ -176,6 +181,20 @@ final class SoulCommand {
         soul.setEssence(soul.maxEssence());
         Soul.sync(player);
         return 1;
+    }
+
+    /** Uses the caller's Aspect ability of a step, as its key would (a Transformation is taken on or let go). */
+    private static int use(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        String id = StringArgumentType.getString(context, "stage");
+        for (Stage stage : Stage.values()) {
+            if (stage.id().equals(id)) {
+                return Aspects.use(player, stage.ordinal()) ? 1 : 0;
+            }
+        }
+
+        context.getSource().sendFailure(Component.translatable("commands.nightmare_evolved.soul.no_stage"));
+        return 0;
     }
 
     private static int reset(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

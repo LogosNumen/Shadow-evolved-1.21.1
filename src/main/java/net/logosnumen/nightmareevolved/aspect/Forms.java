@@ -9,8 +9,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 /**
  * The bodies Saints take when they transform: a dragon, a thunderbird, a winged lion, a centaur, a giantess. Each
- * changes size and strength, may fly, and wears its Aspect's colours (wings for those that fly). The creature shapes
- * themselves are drawn by the rig in a later step; until then a form shows as its size, its light and its wings.
+ * changes size and strength, may fly, and wears its Aspect's light. Clients draw the creature itself in place of the
+ * Saint's body (see {@code client.form.FormBodies}).
  */
 public final class Forms {
     private Forms() {
@@ -50,9 +50,8 @@ public final class Forms {
 
             @Override
             public void tick(Ctx ctx, int age) {
-                if (shape.flight() && age % 3 == 0) {
-                    Vfx.wings(ctx.level(), ctx.player(), ctx.palette(), 1.0, age * 0.15);
-                } else if (age % 10 == 0) {
+                // The form's own body carries its wings now; the Aspect's light still clings to it.
+                if (age % 10 == 0) {
                     Vfx.aura(ctx.level(), ctx.player(), ctx.palette(), 6);
                 }
 
