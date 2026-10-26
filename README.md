@@ -67,6 +67,10 @@ descriptions and dialogue are original writing.
 
   The regions, Gateways, Seeds and Citadels are in [docs/DREAM_REALM.md](docs/DREAM_REALM.md), and the creatures in
   [docs/CREATURES.md](docs/CREATURES.md).
+- **Ascension**: Saints transform into the novel's forms (Kai's dragon, Roan's winged lion, Helie's centaur and the
+  rest), seen by everyone around them. Higher ranks shrug off the blows of lower ones. Saints swear fealty to
+  Sovereigns, whose Domains spread through the Citadels they and their Saints have bound. See
+  [docs/ASCENSION.md](docs/ASCENSION.md).
 - **Colossi**: four Titan-class Nightmare Creatures many times a player's height, and no two alike. The **Cairn
   Colossus** of piled stone, the skeletal **Ossuary Behemoth**, the burrowing **Gravewyrm** and the armoured
   **Chainbound Colossus**. Each is built from a seed (colouring, size, elders, horns, heads, weapons, segments) and has
@@ -80,6 +84,8 @@ descriptions and dialogue are original writing.
 
 `/spell accept` answers the Spell and enters your next trial when you are ready; `/spell status` shows your rank,
 essence, soul cores and what stands between you and the next trial; `/spell runes` recites your runes in chat.
+`/spell swear <sovereign>`, `/spell receive <saint>` and `/spell renounce [saint]` swear, receive and break oaths of
+fealty.
 
 For operators:
 
@@ -90,6 +96,7 @@ For operators:
 | `/ne soul flaw <flaw>` / `attribute add\|remove <attribute>` | Sets your Flaw; gives or takes an Attribute. |
 | `/ne soul cores <n>` / `fragments <n>` | Sets your soul cores (up to seven) or fragments. |
 | `/ne soul saturate` / `essence` / `reset` | Fills your cores; fills your essence and readies every ability; makes you an Aspirant again. |
+| `/ne soul use <step>` | Uses your Aspect's ability of that step (`dormant` to `supreme`), as its key would. |
 | `/ne trial begin <trial>` / `win` | Enters any trial at once; wins the trial you are in. |
 | `/ne memory give <memory> [rank] [tier]` | Puts one of the novel's Memories in your soul. |
 | `/ne memory weave <shape> <family> <rank> <tier>` | Has the Spell weave a Memory, as for a creature of that kind. |
