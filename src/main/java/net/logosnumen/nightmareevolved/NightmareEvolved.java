@@ -31,6 +31,7 @@ import net.logosnumen.nightmareevolved.memory.MemoryEvents;
 import net.logosnumen.nightmareevolved.memory.MemoryItems;
 import net.logosnumen.nightmareevolved.network.Network;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
+import net.logosnumen.nightmareevolved.soul.RankGap;
 import net.logosnumen.nightmareevolved.soul.SoulEvents;
 import net.logosnumen.nightmareevolved.soulsea.SeaBlocks;
 import net.logosnumen.nightmareevolved.soulsea.SoulSeaEvents;
@@ -82,6 +83,8 @@ public final class NightmareEvolved {
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onDrops);
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onFinalizeSpawn);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(RankGap::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(RankGap::onKnockBack);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onDeath);
         NeoForge.EVENT_BUS.addListener(Afflictions::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(Afflictions::onEntityTick);
