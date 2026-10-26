@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.logosnumen.nightmareevolved.aspect.series.Roster;
+import net.logosnumen.nightmareevolved.network.WornPayload;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
 import net.logosnumen.nightmareevolved.soul.SoulHooks;
@@ -196,6 +197,9 @@ public final class Aspects {
         ability.hooks.start(ctx);
         Kit.pose(player, ability.clip);
         Soul.applyStats(player);
+        if (ability.kind == Ability.Kind.TRANSFORMATION) {
+            WornPayload.broadcast(player);
+        }
     }
 
     private static void stop(ServerPlayer player, SoulData soul, Aspect aspect, Ability ability) {
@@ -209,6 +213,9 @@ public final class Aspects {
         soul.setReadyAt(ability.id, player.level().getGameTime() + Math.round(ability.cooldown * cooldownShare(player, soul, ability)));
         Soul.applyStats(player);
         Soul.sync(player);
+        if (ability.kind == Ability.Kind.TRANSFORMATION) {
+            WornPayload.broadcast(player);
+        }
     }
 
     /** Switches off every held ability, as when the Aspect changes or the soul rises. */
@@ -218,6 +225,7 @@ public final class Aspects {
         if (aspect == null) {
             soul.toggles().clear();
             soul.setForm("");
+            WornPayload.broadcast(player);
             return;
         }
 

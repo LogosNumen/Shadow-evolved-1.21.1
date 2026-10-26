@@ -14,6 +14,7 @@ import net.logosnumen.nightmareevolved.dream.gen.shape.WeepingShaper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 
 /**
@@ -77,9 +78,14 @@ public final class Gateways {
 
     /** Every Gateway that stands now: the canon ones, and those left where Seeds were destroyed. */
     public static List<Gateway> all(ServerLevel realm) {
+        return all(realm.getServer());
+    }
+
+    public static List<Gateway> all(MinecraftServer server) {
+        GatewayRecords records = GatewayRecords.get(server);
         List<Gateway> all = new ArrayList<>(CANON);
-        all.addAll(GatewayRecords.get(realm.getServer()).born());
-        all.removeIf(gateway -> GatewayRecords.get(realm.getServer()).destroyed(gateway.id));
+        all.addAll(records.born());
+        all.removeIf(gateway -> records.destroyed(gateway.id));
         return all;
     }
 

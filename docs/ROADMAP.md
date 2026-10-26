@@ -94,20 +94,22 @@ and moves to match. The greatest keep lairs at the places the novel puts them.
 Still to come: the Corrupted Immortals of the Eternal City, the Cloudveil's fireflies, and creatures for the Glass Hell,
 the Bone Sea, the Weeping Goddess and the Land of Barrows.
 
-## 3e. Ascension
+## 3e. Ascension (under way; see [ASCENSION.md](ASCENSION.md))
 
-The parts of the earlier overhaul that were written for it, ported and fitted to the novel:
-
-- **Saint Transformations,** on the code-built creature rig. Each matches the novel: Kai's midnight dragon, Sky Tide's
-  thunderbird, Roan's winged lion, Helie's centaur, Silent Stalker's panther, Jest's horned fiend, Revel's bat-winged
-  form, Effie's steel giant, Jet's mist wraith, Ki Song's tide of blood, Nephis's winged light, Morgan's living metal,
-  and Sunny's Shadow avatars.
-- **Movement and command:** flight for Saints, legions for Sovereigns, and the rank gap.
-- **Sovereign Domains:** spread through Citadels a Saint has bound, plus each Aspect's own way: swords for Anvil, the
-  dead for Ki Song, a branded word for Kai.
+- **Saint Transformations** drawn on the code-built creature rig, each matching the novel: Kai's midnight dragon,
+  Tyris's thunderbird, Roan's winged lion, Helie's centaur, Silent Stalker's panther, Noctis's wolf of moonlight, Jest's
+  horned fiend, Seishan's shark-skinned kin, Revel's bat-winged form and Ki Song's tide of blood; Morgan's living steel,
+  Jet's mist, the Summer Knight's sunlight, Nephis's radiance and Sunny's shadow. (Done.)
+- **The rank gap:** lower souls barely harm higher ones and, far enough below, can't move them. (Done.)
+- **Fealty and Sovereign Domains:** Saints swear to Sovereigns, and Domains spread through the Citadels a Sovereign or
+  their sworn Saints have bound; a Saint without a liege has a nascent Domain. The innate Domains (swords for Anvil, the
+  dead for Ki Song, a branded word for Kai) came with the Aspects in 3a. (Done.)
+- **Citadel Components:** the powers a Citadel's lord commands, once the novel's details are confirmed.
+- Every Saint flying and every Sovereign leading a legion, from the earlier overhaul, don't match the novel: flight
+  comes with the winged forms, and armies move to the Great Clans below.
 
 ## Later
 
-- Factions and the Great Clans (Valor, Song, Night) with reputation.
+- Factions and the Great Clans (Valor, Song, Night) with reputation, and the armies that serve them.
 - Nightmares rebuilt as the novel's own stories.
 - An art pass, a guide, and release.

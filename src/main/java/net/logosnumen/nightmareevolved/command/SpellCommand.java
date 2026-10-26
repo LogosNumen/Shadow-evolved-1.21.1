@@ -1,15 +1,18 @@
 package net.logosnumen.nightmareevolved.command;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.logosnumen.nightmareevolved.aspect.Ability;
 import net.logosnumen.nightmareevolved.aspect.Aspect;
 import net.logosnumen.nightmareevolved.aspect.Aspects;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
-import net.logosnumen.nightmareevolved.flaw.Flaw;
 import net.logosnumen.nightmareevolved.dream.DreamRealm;
 import net.logosnumen.nightmareevolved.dream.DreamState;
+import net.logosnumen.nightmareevolved.dream.gate.Fealty;
+import net.logosnumen.nightmareevolved.dream.gate.GatewayRecords;
 import net.logosnumen.nightmareevolved.dream.gate.Gateways;
+import net.logosnumen.nightmareevolved.flaw.Flaw;
 import net.logosnumen.nightmareevolved.nightmare.Nightmares;
 import net.logosnumen.nightmareevolved.nightmare.Trial;
 import net.logosnumen.nightmareevolved.soul.Soul;
@@ -19,6 +22,7 @@ import net.logosnumen.nightmareevolved.spell.SpellReplies;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,7 +31,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 /**
  * {@code /spell}, for every player: {@code accept} answers the Spell's call and enters the next trial (the same as
  * sleeping when ready), {@code status} asks where the soul stands, and {@code runes} has the Spell recite them in chat
- * (the R key shows them on a screen).
+ * (the R key shows them on a screen). {@code swear <sovereign>} offers a Saint's fealty, {@code receive <saint>}
+ * accepts it, and {@code renounce} breaks one's oath (or, for a Sovereign, {@code renounce <saint>} releases a vassal).
  */
 public final class SpellCommand {
     private SpellCommand() {
@@ -39,6 +44,14 @@ public final class SpellCommand {
                 .then(Commands.literal("accept").executes(SpellCommand::accept))
                 .then(Commands.literal("status").executes(SpellCommand::status))
                 .then(Commands.literal("runes").executes(SpellCommand::runes))
+                .then(Commands.literal("swear").then(Commands.argument("sovereign", EntityArgument.player())
+                    .executes(c -> Fealty.swear(c.getSource().getPlayerOrException(), EntityArgument.getPlayer(c, "sovereign")) ? 1 : 0)))
+                .then(Commands.literal("receive").then(Commands.argument("saint", EntityArgument.player())
+                    .executes(c -> Fealty.receive(c.getSource().getPlayerOrException(), EntityArgument.getPlayer(c, "saint")) ? 1 : 0)))
+                .then(Commands.literal("renounce")
+                    .executes(c -> Fealty.renounce(c.getSource().getPlayerOrException()) ? 1 : 0)
+                    .then(Commands.argument("vassal", StringArgumentType.word())
+                        .executes(c -> Fealty.release(c.getSource().getPlayerOrException(), StringArgumentType.getString(c, "vassal")) ? 1 : 0)))
         );
     }
 
@@ -61,6 +74,13 @@ public final class SpellCommand {
             Gateways.Gateway anchor = realm == null ? null : Gateways.byId(realm, dream.anchor());
             player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.anchor", anchor != null ? anchor.title()
                 : Component.translatable("spell.nightmare_evolved.status.anchor_lost")));
+        }
+
+        if (player.getServer() != null) {
+            GatewayRecords.Oath oath = GatewayRecords.get(player.getServer()).oath(player.getUUID());
+            if (oath != null) {
+                player.sendSystemMessage(Spell.line("spell.nightmare_evolved.status.liege", oath.liege().name()));
+            }
         }
 
         Trial trial = Trial.next(soul.rank());

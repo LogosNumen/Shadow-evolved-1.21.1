@@ -1,7 +1,9 @@
 package net.logosnumen.nightmareevolved.client;
 
+import java.util.function.Supplier;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.client.anim.PoseEvents;
+import net.logosnumen.nightmareevolved.client.colossus.ColossusRenderer;
 import net.logosnumen.nightmareevolved.client.creature.CreatureBoltRenderer;
 import net.logosnumen.nightmareevolved.client.creature.CreatureModels;
 import net.logosnumen.nightmareevolved.client.creature.CreatureRenderer;
@@ -10,12 +12,17 @@ import net.logosnumen.nightmareevolved.client.dream.DreamSky;
 import net.logosnumen.nightmareevolved.client.dream.NightmareGateRenderer;
 import net.logosnumen.nightmareevolved.client.dream.RealmFog;
 import net.logosnumen.nightmareevolved.client.dream.RealmRender;
-import java.util.function.Supplier;
+import net.logosnumen.nightmareevolved.client.form.FormRenderer;
 import net.logosnumen.nightmareevolved.client.memory.ClientWorn;
 import net.logosnumen.nightmareevolved.client.memory.WalkingCofferRenderer;
 import net.logosnumen.nightmareevolved.client.memory.WornMemoryLayer;
+import net.logosnumen.nightmareevolved.client.particle.VfxParticle;
 import net.logosnumen.nightmareevolved.client.soul.AbilityKeys;
 import net.logosnumen.nightmareevolved.client.soul.ClientSea;
+import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
+import net.logosnumen.nightmareevolved.client.soul.FlyingSwordRenderer;
+import net.logosnumen.nightmareevolved.client.soul.SoulConstructRenderer;
+import net.logosnumen.nightmareevolved.client.soul.SoulHud;
 import net.logosnumen.nightmareevolved.client.soulsea.MeditationOverlay;
 import net.logosnumen.nightmareevolved.client.soulsea.SeaEchoRenderer;
 import net.logosnumen.nightmareevolved.client.soulsea.SeaHoardRenderer;
@@ -25,22 +32,16 @@ import net.logosnumen.nightmareevolved.client.soulsea.SeaSunRenderer;
 import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaClient;
 import net.logosnumen.nightmareevolved.client.soulsea.SoulSeaSky;
 import net.logosnumen.nightmareevolved.client.soulsea.VesselRenderer;
+import net.logosnumen.nightmareevolved.colossus.Colossi;
 import net.logosnumen.nightmareevolved.dream.seed.SeedEntities;
 import net.logosnumen.nightmareevolved.entity.creature.CreatureTypes;
 import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
 import net.logosnumen.nightmareevolved.entity.memory.MemoryEntities;
+import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
 import net.logosnumen.nightmareevolved.entity.soulsea.SeaEntities;
-import net.logosnumen.nightmareevolved.memory.MemoryItems;
-import net.logosnumen.nightmareevolved.client.soul.ClientSoul;
-import net.logosnumen.nightmareevolved.client.soul.FlyingSwordRenderer;
-import net.logosnumen.nightmareevolved.client.soul.SoulConstructRenderer;
-import net.logosnumen.nightmareevolved.client.soul.SoulHud;
 import net.logosnumen.nightmareevolved.item.ModItems;
 import net.logosnumen.nightmareevolved.item.SoulShardItem;
-import net.logosnumen.nightmareevolved.client.colossus.ColossusRenderer;
-import net.logosnumen.nightmareevolved.client.particle.VfxParticle;
-import net.logosnumen.nightmareevolved.colossus.Colossi;
-import net.logosnumen.nightmareevolved.entity.soul.SoulEntities;
+import net.logosnumen.nightmareevolved.memory.MemoryItems;
 import net.logosnumen.nightmareevolved.vfx.ModParticles;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -51,13 +52,13 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ShieldItem;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -90,6 +91,8 @@ public final class ClientSetup {
         NeoForge.EVENT_BUS.addListener(ClientSetup::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(VfxParticle::onRenderLevel);
         // Pushes and pops must pair: the push listens last, so nothing can cancel the render after it.
+        NeoForge.EVENT_BUS.addListener(FormRenderer::onRenderPlayerPre);
+        NeoForge.EVENT_BUS.addListener(FormRenderer::onRenderHand);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, PoseEvents::onRenderPlayerPre);
         NeoForge.EVENT_BUS.addListener(PoseEvents::onRenderPlayerPost);
         NeoForge.EVENT_BUS.addListener(PoseEvents::onCameraAngles);
@@ -138,6 +141,7 @@ public final class ClientSetup {
     /** Memory bows draw like bows and Memory shields block like shields. */
     private static void onClientSetup(FMLClientSetupEvent event) {
         CreatureModels.verify();
+        FormRenderer.verify();
         event.enqueueWork(() -> {
             for (Supplier<? extends Item> memory : MemoryItems.all()) {
                 Item item = memory.get();

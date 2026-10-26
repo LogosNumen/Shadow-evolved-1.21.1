@@ -15,8 +15,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * What a player wears from their Memories that others can see: a garment over their shoulders, a crown or a mask on
- * their head. Sent to everyone who can see them.
+ * What a player wears from their Memories that others can see (a garment over their shoulders, a crown or a mask on
+ * their head), and the form they have taken if they are a transformed Saint. Sent to everyone who can see them.
  */
 public record WornPayload(int entity, List<String> looks) implements CustomPacketPayload {
     public static final Type<WornPayload> TYPE = new Type<>(NightmareEvolved.id("worn"));
@@ -25,6 +25,9 @@ public record WornPayload(int entity, List<String> looks) implements CustomPacke
         ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(16)), WornPayload::looks,
         WornPayload::new
     );
+
+    /** How a Transformation is marked among the looks: this, then the form's ability id. */
+    public static final String FORM = "form:";
 
     /** The looks of what a player wears: a named Memory's own id, or "cloak:" and a family for a woven cloak. */
     public static WornPayload of(ServerPlayer player) {
@@ -39,6 +42,12 @@ public record WornPayload(int entity, List<String> looks) implements CustomPacke
             if (def.kind == MemoryDef.Kind.GARMENT || def.kind == MemoryDef.Kind.TOOL) {
                 looks.add(def.named ? def.id : def.id + ":" + data.name().split("\\.")[0]);
             }
+        }
+
+        // A Saint's Transformation shows too: the form they have taken.
+        String form = Soul.of(player).form();
+        if (!form.isEmpty()) {
+            looks.add(FORM + form);
         }
 
         return new WornPayload(player.getId(), looks);

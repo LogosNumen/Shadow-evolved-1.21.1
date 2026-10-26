@@ -110,9 +110,22 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
             return;
         }
 
-        CreatureModel model = CreatureModels.of(creature.kind());
-        Rig.Baked body = baked(creature);
-        Pose pose = pose(creature, partial);
+        tint = creature.tint();
+        // A body drawn faint casts a faint shadow, and one not drawn at all casts none.
+        this.shadowRadius = creature.getBbWidth() * 0.6F * ((tint >>> 24) / 255.0F);
+        int overlay = OverlayTexture.pack(OverlayTexture.u(0.0F), OverlayTexture.v(creature.hurtTime > 0 || creature.deathTime > 0));
+        draw(CreatureModels.of(creature.kind()), baked(creature), pose(creature, partial), creature.look(),
+            Mth.rotLerp(partial, creature.yBodyRotO, creature.yBodyRot), creature.getScale(), tint, poseStack, buffers, light, overlay);
+        super.render(creature, entityYaw, partial, poseStack, buffers, light);
+    }
+
+    /**
+     * Poses a built body and draws it standing where the pose stack is, turned to face {@code bodyYaw}: its painted skin
+     * lit as the world is, then its glowing parts at full brightness. A creature's own body and a Saint's form are drawn
+     * the same way.
+     */
+    public static void draw(CreatureModel model, Rig.Baked body, Pose pose, int look, float bodyYaw, float size, int tint, PoseStack poseStack,
+        MultiBufferSource buffers, int light, int overlay) {
         for (ModelPart part : body.root().getAllParts().toList()) {
             part.resetPose();
             part.xScale = 1.0F;
@@ -121,13 +134,8 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
             part.visible = true;
         }
 
-        model.animate(body, pose, creature.look());
-        tint = creature.tint();
-        // A body drawn faint casts a faint shadow, and one not drawn at all casts none.
-        this.shadowRadius = creature.getBbWidth() * 0.6F * ((tint >>> 24) / 255.0F);
-        float bodyYaw = Mth.rotLerp(partial, creature.yBodyRotO, creature.yBodyRot);
-        float scale = model.renderScale() * creature.getScale();
-        int overlay = OverlayTexture.pack(OverlayTexture.u(0.0F), OverlayTexture.v(creature.hurtTime > 0 || creature.deathTime > 0));
+        model.animate(body, pose, look);
+        float scale = model.renderScale() * size;
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
         poseStack.scale(-scale, -scale, scale);
@@ -139,7 +147,6 @@ public class CreatureRenderer extends EntityRenderer<DreamCreature> {
         }
 
         poseStack.popPose();
-        super.render(creature, entityYaw, partial, poseStack, buffers, light);
     }
 
     /** Draws a creature in a player's shape and skin (a Mirror Beast mirroring someone, a Skinwalker's vessel), tinted. */
