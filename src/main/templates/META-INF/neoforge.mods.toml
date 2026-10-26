@@ -1,11 +1,14 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
+issueTrackerURL="https://github.com/LogosNumen/Shadow-evolved-1.21.1/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
+displayURL="https://github.com/LogosNumen/Shadow-evolved-1.21.1"
+logoFile="nightmare_evolved_logo.png"
 authors="${mod_authors}"
 credits="A fan work inspired by Shadow Slave by Guiltythree; not affiliated with the author or publisher."
 description='''${mod_description}'''
