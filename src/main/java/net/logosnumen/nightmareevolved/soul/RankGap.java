@@ -1,7 +1,6 @@
 package net.logosnumen.nightmareevolved.soul;
 
 import javax.annotation.Nullable;
-import net.logosnumen.nightmareevolved.creature.Creatures;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -11,8 +10,8 @@ import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
  * The gap between ranks. A soul of a higher rank is a different order of being from one below it: blows from beneath it
  * barely mark it, and from far enough below they cannot even move it, while its own blows land with the weight of its
  * rank. Players and Nightmare Creatures stand on one ladder (a Sleeper with Dormant creatures, a Saint with Corrupted
- * ones). A player struck from below is guarded most of all; a creature struck by a lower player still takes enough
- * that the bold can fight upward.
+ * ones); Aspirants and creatures the Nightmare has no hold on stand outside it. A player struck from below is guarded
+ * most of all; a creature struck by a lower player still takes enough that the bold can fight upward.
  */
 public final class RankGap {
     /** From this many ranks below, an attacker can no longer knock its target back. */
@@ -26,19 +25,10 @@ public final class RankGap {
     private RankGap() {
     }
 
-    /** A soul's place on the shared ladder, or -1 for things outside it (animals, mundane monsters). */
-    public static int ladder(LivingEntity entity) {
-        if (entity instanceof Player player) {
-            return Math.max(0, Soul.of(player).rank().ladder);
-        }
-
-        return Creatures.ofNightmare(entity) ? Creatures.rankOf(entity).ordinal() : -1;
-    }
-
     /** How many ranks the defender stands above the attacker (negative when below); 0 when either is off the ladder. */
     public static int gap(LivingEntity attacker, LivingEntity defender) {
-        int a = ladder(attacker);
-        int d = ladder(defender);
+        int a = Soul.ladder(attacker);
+        int d = Soul.ladder(defender);
         return attacker == defender || a < 0 || d < 0 ? 0 : d - a;
     }
 

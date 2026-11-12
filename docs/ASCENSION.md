@@ -41,7 +41,7 @@ wings on the ground and beating them aloft. In a creature's body, the first-pers
 ## The rank gap
 
 Players and Nightmare Creatures stand on one ladder: a Sleeper with Dormant creatures, an Awakened with Awakened ones,
-a Master with the Fallen, a Saint with the Corrupted, a Sovereign with the Great, and so on. A higher soul is of a
+a Master with the Fallen, a Saint with the Corrupted, a Sovereign with the Great, and so on. Aspirants and ordinary creatures stand outside it. A higher soul is of a
 different order from those below it:
 
 - A player struck from one rank below takes 60% of the blow, from two ranks 30%, and from three or more 12%.

@@ -70,6 +70,8 @@ public class AscensionGameTests {
         Soul.setRank(saint, Rank.SLEEPER);
         helper.assertTrue(RankGap.multiplier(saint, scavenger) < 1.0F && RankGap.multiplier(saint, scavenger) > 0.5F,
             "A lower soul can still fight upward");
+        Soul.setRank(saint, Rank.ASPIRANT);
+        helper.assertTrue(RankGap.multiplier(scavenger, saint) == 1.0F && RankGap.multiplier(saint, scavenger) == 1.0F, "Aspirants stand outside the ladder");
         scavenger.discard();
         helper.succeed();
     }

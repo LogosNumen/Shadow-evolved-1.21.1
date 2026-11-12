@@ -80,7 +80,6 @@ public final class NightmareEvolved {
         NeoForge.EVENT_BUS.addListener(SoulEvents::onRespawn);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onChangeDimension);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onTick);
-        NeoForge.EVENT_BUS.addListener(CreatureEvents::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onDrops);
         NeoForge.EVENT_BUS.addListener(CreatureEvents::onFinalizeSpawn);
         NeoForge.EVENT_BUS.addListener(SoulEvents::onIncomingDamage);
