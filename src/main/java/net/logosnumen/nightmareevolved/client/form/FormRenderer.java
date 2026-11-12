@@ -70,9 +70,10 @@ public final class FormRenderer {
         float death = player.deathTime > 0 ? Math.min(1.0F, (player.deathTime + partial) / 20.0F) : 0.0F;
         if (body != null) {
             float swing = player.getAttackAnim(partial);
-            // A creature form reads "enraged" as aloft: wings beat and legs tuck up while the Saint flies.
+            // A creature form reads "enraged" as aloft: wings beat and legs tuck up while the Saint is off the ground
+            // (who is flying is known only to the flier's own client; who is on the ground is known to all).
             Pose pose = new Pose(player.tickCount + partial, player.walkAnimation.position(partial), Math.min(1.0F, player.walkAnimation.speed(partial)),
-                headYaw, player.getViewXRot(partial), swing > 0.0F ? body.attack() : null, swing, death, player.getAbilities().flying);
+                headYaw, player.getViewXRot(partial), swing > 0.0F ? body.attack() : null, swing, death, !player.onGround());
             CreatureRenderer.draw(body.model(), baked(form, body), pose, 0, bodyYaw, player.getScale(), body.tint(), poseStack, buffers, light, overlay);
             return;
         }

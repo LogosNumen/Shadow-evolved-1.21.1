@@ -13,7 +13,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * How Nightmare Creatures fight and what they leave: the gap in rank between attacker and defender changes how much a
@@ -26,28 +25,6 @@ public final class CreatureEvents {
     private static final float TOUCHED = 0.08F;
 
     private CreatureEvents() {
-    }
-
-    /**
-     * Each rank a defender stands above its attacker takes off two fifths of what lands; each rank below adds a
-     * quarter. Anything outside the ladder (Aspirants, ordinary creatures) is untouched by it.
-     */
-    public static float gapMultiplier(int attacker, int defender) {
-        if (attacker < 0 || defender < 0 || attacker == defender) {
-            return 1.0F;
-        }
-
-        int gap = defender - attacker;
-        return gap > 0 ? (float)Math.pow(0.6, gap) : 1.0F + 0.25F * -gap;
-    }
-
-    public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (event.getSource().getEntity() instanceof LivingEntity attacker) {
-            float multiplier = gapMultiplier(Soul.ladder(attacker), Soul.ladder(event.getEntity()));
-            if (multiplier != 1.0F) {
-                event.setAmount(event.getAmount() * multiplier);
-            }
-        }
     }
 
     /** A slain Nightmare Creature leaves soul shards of its rank: a guardian many, a colossus a great many. */

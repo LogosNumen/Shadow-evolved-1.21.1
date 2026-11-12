@@ -50,10 +50,6 @@ public record MemoryData(UUID id, String def, String name, int rank, int tier, L
         return new MemoryData(this.id, this.def, this.name, this.rank, this.tier, this.enchants, this.owner, nonce);
     }
 
-    public MemoryData withRank(int rank) {
-        return new MemoryData(this.id, this.def, this.name, rank, this.tier, this.enchants, this.owner, this.nonce);
-    }
-
     public boolean has(Enchant enchant) {
         return this.enchants.contains(enchant.id());
     }

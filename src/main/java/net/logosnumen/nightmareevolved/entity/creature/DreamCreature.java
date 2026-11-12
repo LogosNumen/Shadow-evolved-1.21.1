@@ -398,11 +398,6 @@ public class DreamCreature extends Monster {
         return this.acting != null;
     }
 
-    @Nullable
-    protected Move currentMove() {
-        return this.acting;
-    }
-
     /** How often a move is chosen now (kinds can change their minds as a fight goes). */
     protected int weight(Move move) {
         return move.weight();

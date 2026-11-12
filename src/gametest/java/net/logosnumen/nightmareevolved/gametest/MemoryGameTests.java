@@ -1,14 +1,14 @@
 package net.logosnumen.nightmareevolved.gametest;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mojang.authlib.GameProfile;
 import net.logosnumen.nightmareevolved.NightmareEvolved;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
 import net.logosnumen.nightmareevolved.creature.CreatureClass;
@@ -26,6 +26,8 @@ import net.logosnumen.nightmareevolved.memory.MemoryItems;
 import net.logosnumen.nightmareevolved.memory.MemoryRecord;
 import net.logosnumen.nightmareevolved.memory.SoulMemories;
 import net.logosnumen.nightmareevolved.memory.Worn;
+import net.logosnumen.nightmareevolved.network.SoulActionPayload;
+import net.logosnumen.nightmareevolved.network.SoulActions;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
@@ -97,6 +99,26 @@ public class MemoryGameTests {
             }
         }
 
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void onlyTheRelicCanBeBound(GameTestHelper helper) {
+        // Awakened, so the Marble Shell stays as it is given (a Master's grows into the next shell at once).
+        ServerPlayer player = soul(helper, Rank.AWAKENED);
+        SoulData soul = Soul.of(player);
+        MemoryRecord shard = SoulMemories.grant(player, Memories.MOONLIGHT_SHARD, false);
+        SoulActionPayload ask = new SoulActionPayload(SoulActionPayload.Action.BIND, shard.id, 0);
+        SoulActions.handle(player, ask);
+        SoulActions.handle(player, ask);
+        helper.assertTrue(soul.memory(shard.id) != null && !soul.hasAttribute(SoulAttribute.MARBLE_SHELL.id()),
+            "Asking to bind an ordinary Memory as the relic changes nothing");
+        MemoryRecord mantle = SoulMemories.grant(player, Memories.MANTLE_OF_THE_UNDERWORLD, false);
+        ask = new SoulActionPayload(SoulActionPayload.Action.BIND, mantle.id, 0);
+        SoulActions.handle(player, ask);
+        helper.assertTrue(soul.memory(mantle.id) != null, "The relic asks to be sure first");
+        SoulActions.handle(player, ask);
+        helper.assertTrue(soul.memory(mantle.id) == null && soul.hasAttribute(SoulAttribute.MARBLE_SHELL.id()), "Asked twice, the relic becomes part of its owner");
         helper.succeed();
     }
 

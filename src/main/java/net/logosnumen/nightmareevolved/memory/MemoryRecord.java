@@ -53,10 +53,6 @@ public final class MemoryRecord {
         return this.pieces.stream().anyMatch(p -> p.out);
     }
 
-    public boolean allOut() {
-        return this.pieces.stream().allMatch(p -> p.out);
-    }
-
     public CompoundTag save(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putUUID("Id", this.id);

@@ -11,6 +11,7 @@ import net.logosnumen.nightmareevolved.creature.kind.ShoreKinds;
 import net.logosnumen.nightmareevolved.dream.gate.Citadels;
 import net.logosnumen.nightmareevolved.dream.gate.Domains;
 import net.logosnumen.nightmareevolved.dream.gate.Fealty;
+import net.logosnumen.nightmareevolved.dream.gate.GatewayRecords;
 import net.logosnumen.nightmareevolved.dream.gate.Gateways;
 import net.logosnumen.nightmareevolved.dream.life.Wildlife;
 import net.logosnumen.nightmareevolved.entity.creature.DreamCreature;
@@ -70,6 +71,8 @@ public class AscensionGameTests {
         Soul.setRank(saint, Rank.SLEEPER);
         helper.assertTrue(RankGap.multiplier(saint, scavenger) < 1.0F && RankGap.multiplier(saint, scavenger) > 0.5F,
             "A lower soul can still fight upward");
+        Soul.setRank(saint, Rank.ASPIRANT);
+        helper.assertTrue(RankGap.multiplier(scavenger, saint) == 1.0F && RankGap.multiplier(saint, scavenger) == 1.0F, "Aspirants stand outside the ladder");
         scavenger.discard();
         helper.succeed();
     }
@@ -101,6 +104,10 @@ public class AscensionGameTests {
             "Now the Citadel carries the Sovereign's Domain, and further");
         helper.assertTrue(Domains.guard(held, sovereign.getUUID()) == Domains.SUPREME_GUARD, "where the Sovereign is all but untouchable");
         helper.assertTrue(!Fealty.swear(saint, sovereign), "A sworn Saint can't swear again");
+        GatewayRecords.get(server).noteSovereign(saint.getUUID(), true);
+        Domains.Hold risen = Domains.at(Domains.holds(server), at.getX() + 10, at.getZ());
+        helper.assertTrue(risen != null && risen.ruler().id().equals(saint.getUUID()), "A vassal who rises to Sovereign serves no one");
+        GatewayRecords.get(server).noteSovereign(saint.getUUID(), false);
 
         helper.assertTrue(Fealty.renounce(saint), "The Saint renounces the oath");
         Domains.Hold after = Domains.at(Domains.holds(server), at.getX() + 10, at.getZ());

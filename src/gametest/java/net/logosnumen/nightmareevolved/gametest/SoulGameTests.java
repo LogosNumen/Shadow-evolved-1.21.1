@@ -13,7 +13,6 @@ import net.logosnumen.nightmareevolved.aspect.Awakening;
 import net.logosnumen.nightmareevolved.aspect.Stage;
 import net.logosnumen.nightmareevolved.aspect.Targets;
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
-import net.logosnumen.nightmareevolved.creature.CreatureEvents;
 import net.logosnumen.nightmareevolved.flaw.Flaw;
 import net.logosnumen.nightmareevolved.nightmare.Trial;
 import net.logosnumen.nightmareevolved.soul.Rank;
@@ -61,14 +60,6 @@ public class SoulGameTests {
 
         helper.assertTrue(SoulRules.maxEssence(Rank.SAINT, Tier.DORMANT, 1, 1.0) > SoulRules.maxEssence(Rank.SAINT, Tier.DORMANT, 1, 0.0),
             "A saturated core should hold more essence");
-        helper.succeed();
-    }
-
-    @GameTest(template = "empty")
-    public static void rankGapsBendBlows(GameTestHelper helper) {
-        helper.assertTrue(Math.abs(CreatureEvents.gapMultiplier(0, 2) - 0.36F) < 1.0E-4F, "Two ranks up should take 0.36 of a blow");
-        helper.assertTrue(Math.abs(CreatureEvents.gapMultiplier(2, 0) - 1.5F) < 1.0E-4F, "Two ranks down should take half again");
-        helper.assertTrue(CreatureEvents.gapMultiplier(-1, 4) == 1.0F, "Aspirants stand outside the ladder");
         helper.succeed();
     }
 

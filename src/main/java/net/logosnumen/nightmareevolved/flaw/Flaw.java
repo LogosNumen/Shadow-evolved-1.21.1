@@ -416,11 +416,6 @@ public enum Flaw implements SoulHooks {
         return Component.translatable("flaw.nightmare_evolved." + this.id() + ".desc");
     }
 
-    /** Whether the novel itself gives this Flaw its name. */
-    public boolean namedInNovel() {
-        return this == CLEAR_CONSCIENCE || this == PRISTINE_SOUL || this == CROWN_OF_THORNS;
-    }
-
     @Nullable
     public static Flaw byId(String id) {
         for (Flaw flaw : values()) {

@@ -1104,7 +1104,7 @@ public final class SoulMemories {
     public static boolean bindRelic(Worn w, String attribute) {
         CompoundTag state = w.state();
         long now = w.level().getGameTime();
-        if (now - state.getLong("BindAsked") > 200L) {
+        if (!state.contains("BindAsked") || now - state.getLong("BindAsked") > 200L) {
             state.putLong("BindAsked", now);
             w.setState(state);
             tell(w.player(), "relic_confirm", Memories.name(w.data()));
