@@ -169,10 +169,10 @@ public final class GatewayRecords extends SavedData {
         }
     }
 
-    /** The oath a Saint has sworn, or null if they serve no one. */
+    /** The oath a Saint has sworn, or null if they serve no one. A soul that has risen to Sovereign serves no one. */
     @Nullable
     public Oath oath(UUID saint) {
-        return this.oaths.get(saint);
+        return this.sovereigns.contains(saint) ? null : this.oaths.get(saint);
     }
 
     public void swear(UUID saint, String saintName, Lord liege) {
