@@ -1,7 +1,9 @@
 package net.logosnumen.nightmareevolved.network;
 
 import net.logosnumen.nightmareevolved.attribute.SoulAttribute;
+import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.echo.Echoes;
+import net.logosnumen.nightmareevolved.memory.Enchant;
 import net.logosnumen.nightmareevolved.memory.MemoryData;
 import net.logosnumen.nightmareevolved.memory.MemoryRecord;
 import net.logosnumen.nightmareevolved.memory.MemoryStorage;
@@ -10,7 +12,6 @@ import net.logosnumen.nightmareevolved.memory.Worn;
 import net.logosnumen.nightmareevolved.soul.Rank;
 import net.logosnumen.nightmareevolved.soul.Soul;
 import net.logosnumen.nightmareevolved.soul.SoulData;
-import net.logosnumen.nightmareevolved.dream.DreamTravel;
 import net.logosnumen.nightmareevolved.soulsea.SoulSea;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,7 +29,8 @@ public final class SoulActions {
             case BIND -> {
                 SoulData soul = Soul.of(player);
                 MemoryRecord record = soul.memory(payload.target());
-                if (record != null) {
+                // Only the relic itself can be bound: a client naming some other Memory is refused.
+                if (record != null && record.data().has(Enchant.SOULBOUND_RELIC)) {
                     SoulMemories.bindRelic(new Worn(player, soul, record.pieces.get(0).stack, record.data(), Worn.Slot.WORN), SoulAttribute.MARBLE_SHELL.id());
                 }
             }
