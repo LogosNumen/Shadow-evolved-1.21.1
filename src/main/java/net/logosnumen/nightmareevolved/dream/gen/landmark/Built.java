@@ -137,12 +137,4 @@ public abstract class Built implements Landmark {
             }
         }
     }
-
-    /** Solid ground under a building, down to the land, so nothing floats. */
-    protected static void footing(Column column, int y, BlockState state) {
-        int ground = column.solidBelow(y - 1);
-        if (ground < y - 1) {
-            column.fill(Math.max(ground + 1, y - 40), y - 1, state);
-        }
-    }
 }
